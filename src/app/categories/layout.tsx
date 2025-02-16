@@ -1,6 +1,7 @@
 import { Header } from "@components/header";
+import { ThemedLayoutV2 } from "@components/layout";
 import { authProviderServer } from "@providers/auth-provider/auth-provider.server";
-import { ThemedLayoutV2 } from "@refinedev/antd";
+// import { ThemedLayoutV2 } from "@refinedev/antd";
 import { redirect } from "next/navigation";
 import React from "react";
 

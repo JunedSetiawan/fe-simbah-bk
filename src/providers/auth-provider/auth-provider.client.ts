@@ -2,46 +2,56 @@
 
 import type { AuthProvider } from "@refinedev/core";
 import Cookies from "js-cookie";
+import { SignJWT, jwtVerify } from "jose";
 
-const mockUsers = [
-  {
-    name: "John Doe",
-    email: "johndoe@mail.com",
-    roles: ["admin"],
-    avatar: "https://i.pravatar.cc/150?img=1",
-  },
-  {
-    name: "Jane Doe",
-    email: "janedoe@mail.com",
-    roles: ["editor"],
-    avatar: "https://i.pravatar.cc/150?img=1",
-  },
-];
+const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET);
 
 export const authProviderClient: AuthProvider = {
-  login: async ({ email, username, password, remember }) => {
-    // Suppose we actually send a request to the back end here.
-    const user = mockUsers[0];
-
-    if (user) {
-      Cookies.set("auth", JSON.stringify(user), {
-        expires: 30, // 30 days
-        path: "/",
+  login: async ({ username, password }) => {
+    try {
+      const response = await fetch("http://localhost:3333/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
       });
+
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+
+      const userData = await response.json();
+
+      // Encrypt the token and user data
+      const encryptedData = await new SignJWT(userData)
+        .setProtectedHeader({ alg: "HS256" })
+        .setIssuedAt()
+        .setExpirationTime("30d")
+        .sign(secret);
+
+      Cookies.set("auth", encryptedData, {
+        expires: 30,
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+      });
+
       return {
         success: true,
         redirectTo: "/",
       };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          name: "LoginError",
+          message: "Invalid username or password",
+        },
+      };
     }
-
-    return {
-      success: false,
-      error: {
-        name: "LoginError",
-        message: "Invalid username or password",
-      },
-    };
   },
+
   logout: async () => {
     Cookies.remove("auth", { path: "/" });
     return {
@@ -52,9 +62,18 @@ export const authProviderClient: AuthProvider = {
   check: async () => {
     const auth = Cookies.get("auth");
     if (auth) {
-      return {
-        authenticated: true,
-      };
+      try {
+        await jwtVerify(auth, secret);
+        return {
+          authenticated: true,
+        };
+      } catch (error) {
+        return {
+          authenticated: false,
+          logout: true,
+          redirectTo: "/login",
+        };
+      }
     }
 
     return {
@@ -66,16 +85,34 @@ export const authProviderClient: AuthProvider = {
   getPermissions: async () => {
     const auth = Cookies.get("auth");
     if (auth) {
-      const parsedUser = JSON.parse(auth);
-      return parsedUser.roles;
+      try {
+        const { payload } = await jwtVerify(auth, secret);
+        const token = payload.token as { abilities: string[] };
+        return token.abilities;
+      } catch (error) {
+        return null;
+      }
     }
     return null;
   },
   getIdentity: async () => {
     const auth = Cookies.get("auth");
     if (auth) {
-      const parsedUser = JSON.parse(auth);
-      return parsedUser;
+      try {
+        const { payload } = await jwtVerify(auth, secret);
+        console.log(payload);
+
+        return {
+          id: payload.id,
+          username: payload.username,
+          profileType: payload.profileType,
+          createdAt: payload.createdAt,
+          updatedAt: payload.updatedAt,
+          token: payload.token,
+        };
+      } catch (error) {
+        return null;
+      }
     }
     return null;
   },
