@@ -15,6 +15,8 @@
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
     "@ant-design/nextjs-registry": "^1.0.0",
+    "@dicebear/collection": "^9.2.2",
+    "@dicebear/core": "^9.2.2",
     "@refinedev/antd": "^5.44.0",
     "@refinedev/cli": "^2.16.21",
     "@refinedev/core": "^4.47.1",

@@ -100,15 +100,26 @@ export const authProviderClient: AuthProvider = {
     if (auth) {
       try {
         const { payload } = await jwtVerify(auth, secret);
-        console.log(payload);
 
+        console.log({
+          id: payload.id,
+          username: payload.username,
+          profileType: payload.profileType,
+          createdAt: payload.createdAt,
+          updatedAt: payload.updatedAt,
+          teacher: payload.teacher, // Relasi teacher
+          student: payload.student, // Relasi student
+          parent: payload.parent, // Relasi parent
+        });
         return {
           id: payload.id,
           username: payload.username,
           profileType: payload.profileType,
           createdAt: payload.createdAt,
           updatedAt: payload.updatedAt,
-          token: payload.token,
+          teacher: payload.teacher, // Relasi teacher
+          student: payload.student, // Relasi student
+          parent: payload.parent, // Relasi parent
         };
       } catch (error) {
         return null;
