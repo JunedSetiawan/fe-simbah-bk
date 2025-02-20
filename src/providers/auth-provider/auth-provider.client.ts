@@ -23,19 +23,30 @@ export const authProviderClient: AuthProvider = {
 
       const userData = await response.json();
 
-      // Encrypt the token and user data
-      const encryptedData = await new SignJWT(userData)
+      // Ambil token yang sebenarnya dari userData.token.token
+      const actualToken = userData.token.token;
+
+      // Enkripsi token sebelum disimpan di cookie
+      const encryptedToken = await new SignJWT({ token: actualToken })
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
-        .setExpirationTime("30d")
+        .setExpirationTime("1d")
         .sign(secret);
 
-      Cookies.set("auth", encryptedData, {
+      console.log(userData, actualToken);
+
+      // Simpan token yang dienkripsi di cookie
+      Cookies.set("auth", encryptedToken, {
         expires: 30,
         path: "/",
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
       });
+
+      // Simpan data pengguna di localStorage TANPA token
+      const userDataWithoutToken = { ...userData };
+      delete userDataWithoutToken.token; // Hapus objek token dari data pengguna
+      localStorage.setItem("user", JSON.stringify(userDataWithoutToken));
 
       return {
         success: true,
@@ -96,30 +107,30 @@ export const authProviderClient: AuthProvider = {
     return null;
   },
   getIdentity: async () => {
-    const auth = Cookies.get("auth");
+    const auth = localStorage.getItem("user");
     if (auth) {
       try {
-        const { payload } = await jwtVerify(auth, secret);
+        const user = JSON.parse(auth);
 
         console.log({
-          id: payload.id,
-          username: payload.username,
-          profileType: payload.profileType,
-          createdAt: payload.createdAt,
-          updatedAt: payload.updatedAt,
-          teacher: payload.teacher, // Relasi teacher
-          student: payload.student, // Relasi student
-          parent: payload.parent, // Relasi parent
+          id: user.id,
+          username: user.username,
+          profileType: user.profileType,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+          teacher: user.teacher, // Relasi teacher
+          student: user.student, // Relasi student
+          parent: user.parent, // Relasi parent
         });
         return {
-          id: payload.id,
-          username: payload.username,
-          profileType: payload.profileType,
-          createdAt: payload.createdAt,
-          updatedAt: payload.updatedAt,
-          teacher: payload.teacher, // Relasi teacher
-          student: payload.student, // Relasi student
-          parent: payload.parent, // Relasi parent
+          id: user.id,
+          username: user.username,
+          profileType: user.profileType,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+          teacher: user.teacher, // Relasi teacher
+          student: user.student, // Relasi student
+          parent: user.parent, // Relasi parent
         };
       } catch (error) {
         return null;

@@ -35,6 +35,8 @@ import {
 } from "antd";
 import type { RefineThemedLayoutV2SiderProps } from "@refinedev/antd";
 import type { CSSProperties } from "react";
+import LogoImage from "@/public/logo/logo-smkn-jenangan.png";
+import Image from "next/image";
 
 const drawerButtonStyles: CSSProperties = {
   borderStartStartRadius: 0,
@@ -79,7 +81,32 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
   const isMobile =
     typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
 
-  const RenderToTitle = TitleFromProps ?? TitleFromContext ?? ThemedTitleV2;
+  const CustomTitle = ({ collapsed }: { collapsed: boolean }) => {
+    return (
+      <div className="flex items-center gap-2">
+        {/* Your custom logo */}
+        <Image
+          src={LogoImage}
+          alt="Logo"
+          style={{ height: collapsed ? "36px" : "36px", width: "auto" }}
+        />
+        {!collapsed && (
+          <div className="flex flex-col">
+            {" "}
+            {/* Tambahkan wrapper div dengan flex-col */}
+            <h4 className="text-white text-lg font-semibold m-0">
+              E-Konseling
+            </h4>
+            <h3 className="text-white text-sm m-0 font-light">
+              SMKN 1 JENANGAN PONOROGO
+            </h3>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const RenderToTitle = TitleFromProps ?? CustomTitle ?? ThemedTitleV2;
 
   const renderTreeView = (tree: ITreeMenu[], selectedKey?: string) => {
     return tree.map((item: ITreeMenu) => {
@@ -109,12 +136,18 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
               key={item.key}
               icon={icon ?? <UnorderedListOutlined />}
               title={label}
+              // Tambahkan style untuk menu sub-item
+              style={{
+                whiteSpace: "nowrap",
+                color: "white",
+              }}
             >
               {renderTreeView(children, selectedKey)}
             </Menu.SubMenu>
           </CanAccess>
         );
       }
+
       const isSelected = key === selectedKey;
       const isRoute = !(
         pickNotDeprecated(meta?.parent, options?.parent, parentName) !==
@@ -136,14 +169,24 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
           <Menu.Item
             key={item.key}
             icon={icon ?? (isRoute && <UnorderedListOutlined />)}
-            style={linkStyle}
+            style={{
+              ...linkStyle,
+              whiteSpace: "nowrap",
+              color: "white",
+            }}
           >
-            <Link to={route ?? ""} style={linkStyle}>
+            <Link
+              to={route ?? ""}
+              style={{
+                ...linkStyle,
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
               {label}
             </Link>
-            {!siderCollapsed && isSelected && (
-              <div className="ant-menu-tree-arrow" />
-            )}
           </Menu.Item>
         </CanAccess>
       );
@@ -202,23 +245,29 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
       <>
         {dashboard}
         {items}
-        {logout}
       </>
     );
   };
+  const SIDEBAR_WIDTH = 250; // Increased from 280px to 320px for more space
+  const COLLAPSED_WIDTH = 80;
 
   const renderMenu = () => {
     return (
       <Menu
+        className="bg-primary"
         selectedKeys={selectedKey ? [selectedKey] : []}
         defaultOpenKeys={defaultOpenKeys}
         mode="inline"
         style={{
+          backgroundColor: "rgba(44, 89, 90, 1)",
           paddingTop: "8px",
           border: "none",
           overflow: "auto",
-          height: "calc(100% - 72px)",
+          // height: isMobile ? "calc(100vh - 64px)" : "calc(100% - 72px)",
+          minHeight: "auto",
         }}
+        theme="dark"
+        inlineCollapsed={siderCollapsed && !isMobile}
         onClick={() => {
           setMobileSiderOpen(false);
         }}
@@ -235,30 +284,49 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
           open={mobileSiderOpen}
           onClose={() => setMobileSiderOpen(false)}
           placement={direction === "rtl" ? "right" : "left"}
-          closable={false}
-          width={200}
+          closable={true}
+          width={SIDEBAR_WIDTH}
           bodyStyle={{
             padding: 0,
+            height: "100%",
+            backgroundColor: "rgba(44, 89, 90, 1)", // Sesuaikan dengan warna tema
           }}
           maskClosable={true}
+          styles={{
+            body: {
+              marginTop: "20px",
+              padding: 0,
+              height: "100%",
+            },
+            header: {
+              display: "none", // Sembunyikan header drawer
+            },
+            mask: {
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+            },
+            content: {
+              boxShadow: "none",
+            },
+          }}
         >
           <Layout>
             <Layout.Sider
               style={{
                 height: "100vh",
-                backgroundColor: token.colorBgContainer,
-                borderRight: `1px solid ${token.colorBgElevated}`,
+                backgroundColor: "rgba(44, 89, 90, 1)",
+                borderRight: "none",
               }}
             >
               <div
                 style={{
-                  width: "200px",
-                  padding: "0 16px",
+                  width: "100%",
+                  padding: "16px",
                   display: "flex",
                   justifyContent: "flex-start",
                   alignItems: "center",
                   height: "64px",
-                  backgroundColor: token.colorBgElevated,
+                  backgroundColor: "rgba(44, 89, 90, 1)",
+                  color: "white",
                 }}
               >
                 <RenderToTitle collapsed={false} />
@@ -267,12 +335,6 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
             </Layout.Sider>
           </Layout>
         </Drawer>
-        <Button
-          style={drawerButtonStyles}
-          size="large"
-          onClick={() => setMobileSiderOpen(true)}
-          icon={<BarsOutlined />}
-        />
       </>
     );
   };
@@ -282,8 +344,9 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
   }
 
   const siderStyles: React.CSSProperties = {
-    backgroundColor: token.colorBgContainer,
+    backgroundColor: "rgba(44, 89, 90, 1)",
     borderRight: `1px solid ${token.colorBgElevated}`,
+    color: "white",
   };
 
   if (fixed) {
@@ -293,7 +356,7 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
     siderStyles.zIndex = 999;
   }
   const renderClosingIcons = () => {
-    const iconProps = { style: { color: token.colorPrimary } };
+    const iconProps = { style: { color: "white" } };
     const OpenIcon = direction === "rtl" ? RightOutlined : LeftOutlined;
     const CollapsedIcon = direction === "rtl" ? LeftOutlined : RightOutlined;
     const IconComponent = siderCollapsed ? CollapsedIcon : OpenIcon;
@@ -306,7 +369,7 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
       {fixed && (
         <div
           style={{
-            width: siderCollapsed ? "80px" : "200px",
+            width: siderCollapsed ? "80px" : "250px",
             transition: "all 0.2s",
           }}
         />
@@ -320,31 +383,23 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
             setSiderCollapsed(collapsed);
           }
         }}
+        width={SIDEBAR_WIDTH}
         collapsedWidth={80}
         breakpoint="lg"
-        trigger={
-          <Button
-            type="text"
-            style={{
-              borderRadius: 0,
-              height: "100%",
-              width: "100%",
-              backgroundColor: token.colorBgElevated,
-            }}
-          >
-            {renderClosingIcons()}
-          </Button>
-        }
+        trigger={null}
       >
         <div
+          className="bg-primary text-white"
           style={{
-            width: siderCollapsed ? "80px" : "200px",
+            marginTop: "20px",
+            width: siderCollapsed ? "80px" : "250px",
             padding: siderCollapsed ? "0" : "0 16px",
             display: "flex",
             justifyContent: siderCollapsed ? "center" : "flex-start",
             alignItems: "center",
             height: "64px",
-            backgroundColor: token.colorBgElevated,
+            // backgroundColor: token.colorBgElevated,
+
             fontSize: "14px",
           }}
         >

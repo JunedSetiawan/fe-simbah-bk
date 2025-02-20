@@ -46,6 +46,13 @@ export default function RootLayout({
                     authProvider={authProviderClient}
                     resources={[
                       {
+                        name: "dashboard",
+                        list: "/",
+                        meta: {
+                          icon: "🏠",
+                        },
+                      },
+                      {
                         name: "blog_posts",
                         list: "/blog-posts",
                         create: "/blog-posts/create",

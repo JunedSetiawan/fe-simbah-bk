@@ -9,6 +9,15 @@ import {
   // LoginFormTypes,
   LoginPageProps,
 } from "@refinedev/core";
+import LogoImage from "@/public/logo/logo-smkn-jenangan.png";
+// import { Title } from "@refinedev/antd";
+import { Card, Input, Button, Form, theme } from "antd";
+import Image from "next/image";
+import {
+  ArrowRightOutlined,
+  EyeOutlined,
+  EyeInvisibleOutlined,
+} from "@ant-design/icons";
 import { LoginFormTypes } from "./types";
 
 type DivPropsType = React.DetailedHTMLProps<
@@ -24,41 +33,46 @@ type LoginProps = LoginPageProps<DivPropsType, DivPropsType, FormPropsType>;
 
 export const LoginPage: React.FC<LoginProps> = ({
   providers,
-  registerLink,
-  forgotPasswordLink,
-  rememberMe,
-  contentProps,
-  wrapperProps,
   renderContent,
-  formProps,
   title = undefined,
-  hideForm,
   mutationVariables,
 }) => {
+  const { useToken } = theme;
   const routerType = useRouterType();
   const Link = useLink();
+  const [form] = Form.useForm();
+  const { token } = useToken();
   const { Link: LegacyLink } = useRouterContext();
 
   const ActiveLink = routerType === "legacy" ? LegacyLink : Link;
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(false);
+  const [formValues, setFormValues] = useState({
+    username: "",
+    password: "",
+  });
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  // Monitor perubahan form
+  const handleFormChange = (changedValues: any, allValues: any) => {
+    setFormValues(allValues);
+    setIsFormValid(!!allValues.username && !!allValues.password);
+  };
 
   const translate = useTranslate();
 
-  // interface LoginFormTypes {
-  //   username?: string;
-  //   password?: string;
-  //   remember?: boolean;
-  //   providerName?: string;
-  //   redirectPath?: string;
-  // }
-
   const authProvider = useActiveAuthProvider();
-  const { mutate: login } = useLogin<LoginFormTypes>({
+  const { mutate: login, isLoading } = useLogin<LoginFormTypes>({
     v3LegacyAuthProviderCompatible: Boolean(authProvider?.isLegacy),
   });
+
+  const onFinish = (values: any) => {
+    login({
+      ...mutationVariables,
+      username: values.username,
+      password: values.password,
+      remember: values.remember,
+    });
+  };
 
   const renderLink = (link: string, text?: string) => {
     return <ActiveLink to={link}>{text}</ActiveLink>;
@@ -98,90 +112,79 @@ export const LoginPage: React.FC<LoginProps> = ({
   };
 
   const content = (
-    <div {...contentProps}>
-      <h1 style={{ textAlign: "center" }}>
-        {translate("pages.login.title", "Sign in to your account")}
-      </h1>
-      {renderProviders()}
-      {!hideForm && (
-        <>
-          <hr />
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              login({ ...mutationVariables, username, password, remember });
-            }}
-            {...formProps}
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
+        <div className="flex items-center gap-3 mb-12">
+          <div className="h-14 w-14 relative">
+            <Image src={LogoImage} alt="Logo" fill className="object-contain" />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold">SIMBAH E-Konseling</h2>
+            <p className="text-sm text-gray-600 mt-1">SMKN 1 JENANGAN</p>
+          </div>
+        </div>
+
+        <div className="mb-8">
+          <h1 className="text-xl font-medium">Masuk ke akun pengguna</h1>
+          <p className="text-sm text-gray-600 mt-1">
+            Jaga username dan password anda tetap aman
+          </p>
+        </div>
+
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+          className="space-y-2"
+          onValuesChange={handleFormChange}
+        >
+          <Form.Item
+            name="username"
+            label="Username"
+            rules={[{ required: true, message: "Please input your username!" }]}
           >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                padding: 25,
-              }}
-            >
-              <label htmlFor="username-input">
-                {translate("pages.login.fields.username", "Username")}
-              </label>
-              <input
-                id="username-input"
-                name="username"
-                type="text"
-                size={20}
-                autoCorrect="off"
-                spellCheck={false}
-                autoCapitalize="off"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+            <Input
+              size="large"
+              placeholder="Enter your username"
+              className="rounded-md"
+              disabled={isLoading}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="password"
+            label="Password"
+            rules={[{ required: true, message: "Please input your password!" }]}
+          >
+            <div className="flex space-x-3">
+              <Input.Password
+                size="large"
+                placeholder="Enter your password"
+                className="rounded-md"
+                iconRender={(visible) =>
+                  visible ? <EyeOutlined /> : <EyeInvisibleOutlined />
+                }
+                disabled={isLoading}
               />
-              <label htmlFor="password-input">
-                {translate("pages.login.fields.password", "Password")}
-              </label>
-              <input
-                id="password-input"
-                type="password"
-                name="password"
-                required
-                size={20}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              {rememberMe ?? (
-                <>
-                  <label htmlFor="remember-me-input">
-                    {translate("pages.login.buttons.rememberMe", "Remember me")}
-                    <input
-                      id="remember-me-input"
-                      name="remember"
-                      type="checkbox"
-                      size={20}
-                      checked={remember}
-                      value={remember.toString()}
-                      onChange={() => {
-                        setRemember(!remember);
-                      }}
-                    />
-                  </label>
-                </>
-              )}
-              <br />
-              {forgotPasswordLink ??
-                renderLink(
-                  "/forgot-password",
-                  translate(
-                    "pages.login.buttons.forgotPassword",
-                    "Forgot password?"
-                  )
-                )}
-              <input
-                type="submit"
-                value={translate("pages.login.signin", "Sign in")}
+              <Button
+                className={`${isFormValid ? "bg-primary" : "bg-gray-300"}`}
+                type="primary"
+                htmlType="submit"
+                size="large"
+                icon={<ArrowRightOutlined />}
+                loading={isLoading}
+                disabled={!isFormValid || isLoading}
               />
             </div>
-          </form>
-        </>
-      )}
+          </Form.Item>
+        </Form>
+
+        <div className="mt-12 text-center">
+          <p className="text-xs text-gray-500">
+            &copy;2025 SMKN 1 Jenangan Ponorogo by Jnd.
+          </p>
+        </div>
+      </Card>
     </div>
   );
 

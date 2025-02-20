@@ -1,1 +1,68 @@
-@import "tailwindcss";
+@import "tailwindcss" important;
+
+@utility bg-primary {
+    background-color: #2c595a;
+}
+
+@utility bg-secondary {
+    background-color: #f5f5f5;
+}
+
+/* Override Ant Design menu item styles */
+.ant-menu-item a {
+    color: white !important;
+}
+
+.ant-menu-item-selected a {
+    color: white !important;
+}
+
+.ant-menu-submenu-title {
+    color: white !important;
+}
+
+.ant-menu-item .anticon {
+    color: white !important;
+}
+
+.ant-menu-submenu .anticon {
+    color: white !important;
+}
+:where(.css-dev-only-do-not-override-1yacf91).ant-menu-dark .ant-menu-item-selected {
+    background-color: #3f7f80 !important;
+}
+
+/* Add to your global CSS */
+.ant-drawer .ant-layout-sider {
+    width: 250px !important;
+    flex: 0 0 250px !important; 
+     max-width: 250px !important;
+            min-width: 200px !important;
+    background-color: rgba(44, 89, 90, 1) !important;
+}
+
+.ant-drawer-content-wrapper {
+    box-shadow: none !important;
+}
+
+.ant-drawer-content {
+    background-color: rgba(44, 89, 90, 1) !important;
+}
+
+@media (max-width: 768px) {
+
+    .ant-menu-item,
+    .ant-menu-submenu-title {
+        color: white !important;
+    }
+
+    .ant-menu-item a {
+        color: white !important;
+    }
+
+    .ant-menu-submenu-arrow {
+        color: white !important;
+    }
+}
+
+

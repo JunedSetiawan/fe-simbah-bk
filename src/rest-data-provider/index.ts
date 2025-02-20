@@ -2,7 +2,41 @@ import { axiosInstance, generateSort, generateFilter } from "./utils";
 import { stringify } from "query-string";
 import type { AxiosInstance } from "axios";
 import type { DataProvider } from "@refinedev/core";
+import axios from "axios";
 import Cookies from "js-cookie";
+import { jwtVerify } from "jose"; // Import untuk mendekripsi token
+
+const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET);
+
+// Interceptor untuk menambahkan token ke setiap permintaan
+axiosInstance.interceptors.request.use(
+  async (config) => {
+    // Ambil token dari cookie
+    const encryptedToken = Cookies.get("auth");
+
+    if (encryptedToken) {
+      try {
+        // Dekripsi token
+        const { payload } = await jwtVerify(encryptedToken, secret);
+        const token = payload.token; // Token yang sebenarnya
+
+        console.log(token);
+
+        // Tambahkan token ke header Authorization
+        if (token && config?.headers) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (error) {
+        console.error("Failed to decrypt token", error);
+      }
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 type MethodTypes = "get" | "delete" | "head" | "options";
 type MethodTypesWithBody = "post" | "put" | "patch";
@@ -48,18 +82,9 @@ export const dataProvider = (
       ? `${url}?${stringify(combinedQuery)}`
       : url;
 
-    const auth = Cookies.get("auth");
-    const headers = {
-      ...headersFromMeta,
-      Authorization: auth ? `Bearer ${auth}` : "",
-    };
-
-    const { data, headers: responseHeaders } = await httpClient[requestMethod](
-      urlWithQuery,
-      {
-        headers,
-      }
-    );
+    const { data, headers } = await httpClient[requestMethod](urlWithQuery, {
+      headers: headersFromMeta,
+    });
 
     const total = +headers["x-total-count"];
 
