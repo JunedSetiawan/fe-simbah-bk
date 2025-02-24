@@ -16,6 +16,7 @@ export const authProviderServer: Pick<AuthProvider, "check"> = {
           authenticated: true,
         };
       } catch (error) {
+        console.log(error);
         return {
           authenticated: false,
           logout: true,

@@ -11,7 +11,8 @@ import "./global.css";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { ColorModeContextProvider } from "@contexts/color-mode";
 import { authProviderClient } from "@providers/auth-provider/auth-provider.client";
-import { dataProvider } from "@providers/data-provider";
+import { dataProviders } from "@providers/data-provider";
+import { accessControlProvider } from "@providers/access-control-provider";
 import "@refinedev/antd/dist/reset.css";
 
 export const metadata: Metadata = {
@@ -41,9 +42,10 @@ export default function RootLayout({
                 <DevtoolsProvider>
                   <Refine
                     routerProvider={routerProvider}
-                    dataProvider={dataProvider}
+                    dataProvider={dataProviders}
                     notificationProvider={useNotificationProvider}
                     authProvider={authProviderClient}
+                    // accessControlProvider={accessControlProvider}
                     resources={[
                       {
                         name: "dashboard",
@@ -68,6 +70,16 @@ export default function RootLayout({
                         create: "/categories/create",
                         edit: "/categories/edit/:id",
                         show: "/categories/show/:id",
+                        meta: {
+                          canDelete: true,
+                        },
+                      },
+                      {
+                        name: "users",
+                        list: "/users",
+                        create: "/users/create",
+                        edit: "/users/edit/:id",
+                        show: "/users/show/:id",
                         meta: {
                           canDelete: true,
                         },

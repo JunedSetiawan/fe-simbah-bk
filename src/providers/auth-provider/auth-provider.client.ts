@@ -3,13 +3,16 @@
 import type { AuthProvider } from "@refinedev/core";
 import Cookies from "js-cookie";
 import { SignJWT, jwtVerify } from "jose";
+import { dataProviders } from "@providers/data-provider";
+import { useInvalidate } from "@refinedev/core";
 
 const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET);
 
 export const authProviderClient: AuthProvider = {
   login: async ({ username, password }) => {
     try {
-      const response = await fetch("http://localhost:3333/api/login", {
+      console.log(dataProviders.getApiUrl());
+      const response = await fetch(dataProviders.getApiUrl() + "/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,11 +68,20 @@ export const authProviderClient: AuthProvider = {
 
   logout: async () => {
     Cookies.remove("auth", { path: "/" });
+    localStorage.removeItem("user");
+
+    // const invalidate = useInvalidate();
+
+    // invalidate({
+
+    //   invalidates: ["all"],
+    // });
     return {
       success: true,
       redirectTo: "/login",
     };
   },
+
   check: async () => {
     const auth = Cookies.get("auth");
     if (auth) {
@@ -93,19 +105,16 @@ export const authProviderClient: AuthProvider = {
       redirectTo: "/login",
     };
   },
+
   getPermissions: async () => {
-    const auth = Cookies.get("auth");
-    if (auth) {
-      try {
-        const { payload } = await jwtVerify(auth, secret);
-        const token = payload.token as { abilities: string[] };
-        return token.abilities;
-      } catch (error) {
-        return null;
-      }
+    const user = localStorage.getItem("user");
+    if (user) {
+      const parsedUser = JSON.parse(user);
+      return parsedUser.profileType;
     }
     return null;
   },
+
   getIdentity: async () => {
     const auth = localStorage.getItem("user");
     if (auth) {
@@ -138,6 +147,7 @@ export const authProviderClient: AuthProvider = {
     }
     return null;
   },
+
   onError: async (error) => {
     if (error.response?.status === 401) {
       return {
