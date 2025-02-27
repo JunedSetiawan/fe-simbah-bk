@@ -1,14 +1,7 @@
 "use client";
 
 import React from "react";
-import { useShow } from "@refinedev/core";
-import {
-  Show,
-  NumberField,
-  TagField,
-  TextField,
-  DateField,
-} from "@refinedev/antd";
+import { useGetIdentity } from "@refinedev/core";
 import {
   Typography,
   Descriptions,
@@ -20,6 +13,7 @@ import {
   Badge,
   Space,
   Tag,
+  Spin,
 } from "antd";
 import {
   UserOutlined,
@@ -32,15 +26,21 @@ import {
   BankOutlined,
   BookOutlined,
 } from "@ant-design/icons";
+import { DateField } from "@refinedev/antd";
 
 const { Title, Text } = Typography;
 
-export const UserShow = () => {
-  const { query } = useShow();
-  const { data, isLoading } = query;
-
-  const record = data?.data;
-  const profileType = record?.profileType;
+export const ProfilePage: React.FC = () => {
+  const { data: user, isLoading } = useGetIdentity<{
+    id: string;
+    username: string;
+    profileType: string;
+    createdAt: string;
+    updatedAt: string;
+    teacher?: any;
+    student?: any;
+    parent?: any;
+  }>();
 
   // Determine badge color based on profile type
   const getBadgeColor = (type: any) => {
@@ -57,9 +57,9 @@ export const UserShow = () => {
   };
 
   const renderProfileDetails = () => {
-    if (!record) return null;
+    if (!user) return null;
 
-    switch (profileType) {
+    switch (user.profileType) {
       case "Guru":
         return (
           <Card
@@ -73,21 +73,21 @@ export const UserShow = () => {
           >
             <Descriptions bordered column={1}>
               <Descriptions.Item label="Nama Lengkap">
-                {record.teacher?.name || "N/A"}
+                {user.teacher?.name || "N/A"}
               </Descriptions.Item>
               <Descriptions.Item label="NIP">
-                {record.teacher?.nip || "N/A"}
+                {user.teacher?.nip || "N/A"}
               </Descriptions.Item>
               <Descriptions.Item label="Tahun Mulai Bekerja">
-                {record.teacher?.workSince || "N/A"}
+                {user.teacher?.workSince || "N/A"}
               </Descriptions.Item>
               <Descriptions.Item label="Status Pegawai">
-                {record.teacher?.employeeStatus || "N/A"}
+                {user.teacher?.employeeStatus || "N/A"}
               </Descriptions.Item>
               <Descriptions.Item label="Tanggal Berhenti">
-                {record.teacher?.workStop ? (
+                {user.teacher?.workStop ? (
                   <DateField
-                    value={record.teacher.workStop}
+                    value={user.teacher.workStop}
                     format="DD MMM YYYY"
                   />
                 ) : (
@@ -111,19 +111,28 @@ export const UserShow = () => {
           >
             <Descriptions bordered column={1}>
               <Descriptions.Item label="Nama Lengkap">
-                {record.student?.name || "N/A"}
+                {user.student?.name || "N/A"}
               </Descriptions.Item>
               <Descriptions.Item label="NISN">
-                {record.student?.nisn || "N/A"}
+                {user.student?.nisn || "N/A"}
               </Descriptions.Item>
               <Descriptions.Item label="NIS">
-                {record.student?.nis || "N/A"}
+                {user.student?.nis || "N/A"}
               </Descriptions.Item>
               <Descriptions.Item label="Nomor KK">
-                {record.student?.kk_number || "N/A"}
+                {user.student?.kk_number || "N/A"}
               </Descriptions.Item>
               <Descriptions.Item label="Kelas">
-                {record.student?.studentClass?.className || "N/A"}
+                {user.student?.studentClass?.class
+                  ? user.student.studentClass.class.romanLevel +
+                    " " +
+                    user.student.studentClass.class.expertise.shortName +
+                    " " +
+                    user.student.studentClass.class.alphabet +
+                    "-" +
+                    user.student.studentClass.class.expertise.prody.faculty
+                      .schoolYear.year
+                  : "N/A"}
               </Descriptions.Item>
             </Descriptions>
           </Card>
@@ -143,49 +152,49 @@ export const UserShow = () => {
             >
               <Descriptions bordered column={1}>
                 <Descriptions.Item label="Nama Lengkap">
-                  {record.parent?.name || "N/A"}
+                  {user.parent?.name || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Status">
-                  {record.parent?.type || "N/A"}
+                  {user.parent?.type || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="NIK">
-                  {record.parent?.nik || "N/A"}
+                  {user.parent?.nik || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Tempat Lahir">
-                  {record.parent?.birth_place || "N/A"}
+                  {user.parent?.birth_place || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Tahun Lahir">
-                  {record.parent?.birth_date || "N/A"}
+                  {user.parent?.birth_date || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Agama">
-                  {record.parent?.religion || "N/A"}
+                  {user.parent?.religion || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Pendidikan Terakhir">
-                  {record.parent?.education || "N/A"}
+                  {user.parent?.education || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Pekerjaan">
-                  {record.parent?.job || "N/A"}
+                  {user.parent?.job || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Penghasilan Bulanan">
-                  {record.parent?.monthly_income || "N/A"}
+                  {user.parent?.monthly_income || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Alamat">
-                  {record.parent?.address || "N/A"}
+                  {user.parent?.address || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Telepon Rumah">
-                  {record.parent?.phone || "N/A"}
+                  {user.parent?.phone || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Telepon Seluler">
-                  {record.parent?.phone_mobile || "N/A"}
+                  {user.parent?.phone_mobile || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Status Hidup">
-                  {record.parent?.live_status || "N/A"}
+                  {user.parent?.live_status || "N/A"}
                 </Descriptions.Item>
               </Descriptions>
             </Card>
 
-            {record.parent?.studentParents &&
-              record.parent.studentParents.length > 0 && (
+            {user.parent?.studentParents &&
+              user.parent.studentParents.length > 0 && (
                 <Card
                   title={
                     <Space>
@@ -196,7 +205,7 @@ export const UserShow = () => {
                   bordered={false}
                   className="custom-card"
                 >
-                  {record.parent.studentParents.map((sp: any, index: any) => (
+                  {user.parent.studentParents.map((sp: any, index: any) => (
                     <Card
                       key={index}
                       type="inner"
@@ -238,64 +247,86 @@ export const UserShow = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
+
   return (
-    <Show isLoading={isLoading} headerButtons={[]}>
-      <Row gutter={[24, 24]}>
-        {/* Account Details */}
-        <Col xs={24} md={8}>
-          <Card bordered={false} className="user-info-card">
-            <div style={{ textAlign: "center", marginBottom: 24 }}>
-              <Avatar
-                size={100}
-                icon={<UserOutlined />}
-                style={{ backgroundColor: getBadgeColor(profileType) }}
-              />
-              <Title level={3} style={{ marginTop: 16, marginBottom: 0 }}>
-                {(profileType === "Guru" && record?.teacher?.name) ||
-                  (profileType === "Siswa" && record?.student?.name) ||
-                  (profileType === "Orang Tua" && record?.parent?.name) ||
-                  record?.username}
-              </Title>
-              <Badge
-                color={getBadgeColor(profileType)}
-                text={<Text strong>{profileType || "User"}</Text>}
-                style={{ margin: "8px 0" }}
-              />
-            </div>
-
-            <Divider style={{ margin: "12px 0" }} />
-
-            <Descriptions column={1}>
-              <Descriptions.Item label="User ID">
-                <NumberField value={record?.id ?? 0} />
-              </Descriptions.Item>
-              <Descriptions.Item label="Username">
-                <TextField value={record?.username} strong />
-              </Descriptions.Item>
-              <Descriptions.Item label="Role">
-                <Tag color="cyan">{record?.userRole?.role?.name || "N/A"}</Tag>
-              </Descriptions.Item>
-              <Descriptions.Item label="Dibuat pada">
-                <DateField
-                  value={record?.createdAt}
-                  format="DD MMM YYYY HH:mm"
+    <div style={{ padding: "24px" }}>
+      <Card
+        title={<Title level={3}>Profil Saya</Title>}
+        bordered={false}
+        style={{ marginBottom: 24 }}
+      >
+        <Row gutter={[24, 24]}>
+          {/* Account Details */}
+          <Col xs={24} md={8}>
+            <Card bordered={false} className="user-info-card">
+              <div style={{ textAlign: "center", marginBottom: 24 }}>
+                <Avatar
+                  size={100}
+                  icon={<UserOutlined />}
+                  style={{ backgroundColor: getBadgeColor(user?.profileType) }}
                 />
-              </Descriptions.Item>
-              <Descriptions.Item label="Terakhir diperbarui">
-                <DateField
-                  value={record?.updatedAt}
-                  format="DD MMM YYYY HH:mm"
-                />
-              </Descriptions.Item>
-            </Descriptions>
-          </Card>
-        </Col>
+                <Title level={3} style={{ marginTop: 16, marginBottom: 0 }}>
+                  {(user?.profileType === "Guru" && user?.teacher?.name) ||
+                    (user?.profileType === "Siswa" && user?.student?.name) ||
+                    (user?.profileType === "Orang Tua" && user?.parent?.name) ||
+                    user?.username ||
+                    "User"}
+                </Title>
+                {/* <Badge
+                  color={getBadgeColor(user?.profileType)}
+                  text={<Text strong>{user?.profileType || "User"}</Text>}
+                  style={{ margin: "8px 0" }}
+                /> */}
+              </div>
 
-        {/* Profile Details */}
-        <Col xs={24} md={16}>
-          {renderProfileDetails()}
-        </Col>
-      </Row>
-    </Show>
+              <Divider style={{ margin: "12px 0" }} />
+
+              <Descriptions column={1}>
+                <Descriptions.Item label="User ID">
+                  {user?.id || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Username">
+                  <Text strong>{user?.username || "N/A"}</Text>
+                </Descriptions.Item>
+                <Descriptions.Item label="Role">
+                  <Tag color="cyan">{user?.profileType || "N/A"}</Tag>
+                </Descriptions.Item>
+                <Descriptions.Item label="Dibuat pada">
+                  <DateField
+                    value={user?.createdAt}
+                    format="DD MMM YYYY HH:mm"
+                  />
+                </Descriptions.Item>
+                <Descriptions.Item label="Terakhir diperbarui">
+                  <DateField
+                    value={user?.updatedAt}
+                    format="DD MMM YYYY HH:mm"
+                  />
+                </Descriptions.Item>
+              </Descriptions>
+            </Card>
+          </Col>
+
+          {/* Profile Details */}
+          <Col xs={24} md={16}>
+            {renderProfileDetails()}
+          </Col>
+        </Row>
+      </Card>
+    </div>
   );
 };

@@ -20,8 +20,6 @@ axiosInstance.interceptors.request.use(
         const { payload } = await jwtVerify(encryptedToken, secret);
         const token = payload.token; // Token yang sebenarnya
 
-        console.log(token);
-
         // Tambahkan token ke header Authorization
         if (token && config?.headers) {
           config.headers.Authorization = `Bearer ${token}`;
@@ -126,10 +124,10 @@ export const dataProvider = (
   update: async ({ resource, id, variables, meta }) => {
     const url = `${apiUrl}/${resource}/${id}`;
 
-    const { headers, method } = meta ?? {};
-    const requestMethod = (method as MethodTypesWithBody) ?? "patch";
+    const { headers } = meta ?? {};
+    // const requestMethod = "put" ?? (method as MethodTypesWithBody) ?? ;
 
-    const { data } = await httpClient[requestMethod](url, variables, {
+    const { data } = await httpClient.put(url, variables, {
       headers,
     });
 

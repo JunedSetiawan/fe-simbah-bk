@@ -4,14 +4,13 @@ import type { AuthProvider } from "@refinedev/core";
 import Cookies from "js-cookie";
 import { SignJWT, jwtVerify } from "jose";
 import { dataProviders } from "@providers/data-provider";
-import { useInvalidate } from "@refinedev/core";
-
 const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET);
+
+import { accessControlProvider } from "@providers/access-control-provider";
 
 export const authProviderClient: AuthProvider = {
   login: async ({ username, password }) => {
     try {
-      console.log(dataProviders.getApiUrl());
       const response = await fetch(dataProviders.getApiUrl() + "/login", {
         method: "POST",
         headers: {
@@ -35,8 +34,6 @@ export const authProviderClient: AuthProvider = {
         .setIssuedAt()
         .setExpirationTime("1d")
         .sign(secret);
-
-      console.log(userData, actualToken);
 
       // Simpan token yang dienkripsi di cookie
       Cookies.set("auth", encryptedToken, {
@@ -70,12 +67,6 @@ export const authProviderClient: AuthProvider = {
     Cookies.remove("auth", { path: "/" });
     localStorage.removeItem("user");
 
-    // const invalidate = useInvalidate();
-
-    // invalidate({
-
-    //   invalidates: ["all"],
-    // });
     return {
       success: true,
       redirectTo: "/login",
@@ -158,3 +149,5 @@ export const authProviderClient: AuthProvider = {
     return { error };
   },
 };
+
+export { accessControlProvider };

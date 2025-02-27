@@ -6,6 +6,7 @@ import {
   useActiveAuthProvider,
   useGetIdentity,
   useLogout,
+  useNavigation,
   useTranslate,
   useWarnAboutChange,
 } from "@refinedev/core";
@@ -20,6 +21,7 @@ import {
   theme,
   Grid,
   ConfigProvider,
+  Tag,
 } from "antd";
 import React, { useContext, useMemo } from "react";
 import {
@@ -151,13 +153,17 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
       />
     );
   };
+  const { push } = useNavigation();
   const userMenu = (
     <AntdMenu
       style={{
         minWidth: "200px",
       }}
     >
-      <AntdMenu.Item style={{ padding: "8px 16px" }}>
+      <AntdMenu.Item
+        style={{ padding: "8px 16px" }}
+        onClick={() => push("/profile")}
+      >
         <div style={{ textAlign: "center", marginBottom: "8px" }}>
           <Avatar
             src={avatar}
@@ -171,9 +177,7 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
               user?.parent?.name ||
               user?.username}
           </div>
-          <div style={{ color: "gray", fontSize: "12px" }}>
-            {user?.profileType}
-          </div>
+          <Tag color="cyan">{user?.profileType}</Tag>
         </div>
       </AntdMenu.Item>
       <AntdMenu.Divider />

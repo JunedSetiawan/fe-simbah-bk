@@ -1,5 +1,5 @@
-import { UsersCreate } from "@components/users";
+import { UserCreate } from "@components/users";
 
 export default function UsersCreatePage() {
-    return <UsersCreate />;
-};
+  return <UserCreate />;
+}

@@ -1,5 +1,5 @@
 import { DevtoolsProvider } from "@providers/devtools";
-import { useNotificationProvider } from "@refinedev/antd";
+import { useNotificationProvider, RefineThemes } from "@refinedev/antd";
 import { GitHubBanner, Refine } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import routerProvider from "@refinedev/nextjs-router";
@@ -9,11 +9,16 @@ import React, { Suspense } from "react";
 import "./global.css";
 
 import { AntdRegistry } from "@ant-design/nextjs-registry";
+import { ConfigProvider } from "antd";
 import { ColorModeContextProvider } from "@contexts/color-mode";
-import { authProviderClient } from "@providers/auth-provider/auth-provider.client";
+import {
+  authProviderClient,
+  accessControlProvider,
+} from "@providers/auth-provider/auth-provider.client";
 import { dataProviders } from "@providers/data-provider";
-import { accessControlProvider } from "@providers/access-control-provider";
+// import { accessControlProvider } from "@providers/access-control-provider";
 import "@refinedev/antd/dist/reset.css";
+import { UserOutlined } from "@ant-design/icons";
 
 export const metadata: Metadata = {
   title: "Refine",
@@ -35,18 +40,35 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Suspense>
-          <RefineKbarProvider>
-            <AntdRegistry>
-              <ColorModeContextProvider defaultMode={defaultMode}>
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: "#3f7f80", // warna hijau
+              // konfigurasi lainnya
+            },
+          }}
+        >
+          <Suspense>
+            <RefineKbarProvider>
+              <AntdRegistry>
+                {/* <ColorModeContextProvider defaultMode={defaultMode}> */}
                 <DevtoolsProvider>
                   <Refine
                     routerProvider={routerProvider}
                     dataProvider={dataProviders}
                     notificationProvider={useNotificationProvider}
                     authProvider={authProviderClient}
-                    // accessControlProvider={accessControlProvider}
+                    accessControlProvider={accessControlProvider}
                     resources={[
+                      {
+                        name: "profile",
+                        list: "/profile",
+                        meta: {
+                          label: "My Profile",
+                          icon: <UserOutlined />,
+                          hide: true,
+                        },
+                      },
                       {
                         name: "dashboard",
                         list: "/",
@@ -96,10 +118,11 @@ export default function RootLayout({
                     <RefineKbar />
                   </Refine>
                 </DevtoolsProvider>
-              </ColorModeContextProvider>
-            </AntdRegistry>
-          </RefineKbarProvider>
-        </Suspense>
+                {/* </ColorModeContextProvider> */}
+              </AntdRegistry>
+            </RefineKbarProvider>
+          </Suspense>
+        </ConfigProvider>
       </body>
     </html>
   );

@@ -1,5 +1,5 @@
-import { UsersShow } from "@components/users";
+import { UserShow } from "@components/users";
 
 export default function UsersShowPage() {
-    return <UsersShow />;
-};
+  return <UserShow />;
+}

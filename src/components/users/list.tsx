@@ -2,31 +2,30 @@
 
 import React from "react";
 import { BaseRecord } from "@refinedev/core";
-import { useTable, List, EditButton, ShowButton } from "@refinedev/antd";
+import {
+  useTable,
+  List,
+  EditButton,
+  ShowButton,
+  DeleteButton,
+} from "@refinedev/antd";
 import { Table, Space } from "antd";
 
+interface Parent {
+  id: string;
+  userId: string;
+  name: string;
+}
 interface Teacher {
   id: string;
   userId: string;
-  nip: string;
   name: string;
-  workSince: number;
-  workStop: string | null;
-  employeeStatus: string | null;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface Student {
   id: string;
   userId: string;
   name: string;
-  kkNumber: string | null;
-  nisn: string;
-  nis: string;
-  avatar: string | null;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface Role {
@@ -55,13 +54,14 @@ interface User {
   updatedAt: string;
   student: Student | null;
   teacher: Teacher | null;
+  parent: Parent | null;
   userRole: UserRole;
 }
 
-interface ApiResponse {
-  message: string;
-  data: User[];
-}
+// interface ApiResponse {
+//   message: string;
+//   data: User[];
+// }
 
 export const UserList = () => {
   const { tableProps } = useTable<User>({
@@ -91,12 +91,11 @@ export const UserList = () => {
     },
   });
 
-  const dataSource =
-    (tableProps.dataSource as unknown as ApiResponse)?.data || [];
+  const dataSource = tableProps.dataSource || [];
 
   return (
     <List>
-      <Table {...tableProps} dataSource={dataSource} rowKey="id">
+      <Table {...tableProps} rowKey="id">
         <Table.Column dataIndex="username" title="Username" />
         <Table.Column dataIndex="profileType" title="Profile Type" />
         <Table.Column
@@ -127,6 +126,17 @@ export const UserList = () => {
           }}
         />
         <Table.Column
+          title="Parent Info"
+          render={(_, record: User) => {
+            if (!record.parent) return "-";
+            return (
+              <div>
+                <div>{record.parent.name}</div>
+              </div>
+            );
+          }}
+        />
+        <Table.Column
           dataIndex="createdAt"
           title="Created At"
           render={(value) => new Date(value).toLocaleDateString()}
@@ -138,6 +148,7 @@ export const UserList = () => {
             <Space>
               <EditButton hideText size="small" recordItemId={record.id} />
               <ShowButton hideText size="small" recordItemId={record.id} />
+              <DeleteButton hideText size="small" recordItemId={record.id} />
             </Space>
           )}
         />
