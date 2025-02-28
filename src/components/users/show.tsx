@@ -40,6 +40,7 @@ export const UserShow = () => {
   const { data, isLoading } = query;
 
   const record = data?.data;
+  console.log(record);
   const profileType = record?.profileType;
 
   // Determine badge color based on profile type
@@ -77,6 +78,16 @@ export const UserShow = () => {
               </Descriptions.Item>
               <Descriptions.Item label="NIP">
                 {record.teacher?.nip || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Wali Kelas">
+                {record.teacherClass?.romanLevel +
+                  " " +
+                  record.teacherClass?.expertise.shortName +
+                  " " +
+                  record.teacherClass?.alphabet +
+                  "-" +
+                  record.teacherClass?.expertise.prody.faculty.schoolYear
+                    .year || "N/A"}
               </Descriptions.Item>
               <Descriptions.Item label="Tahun Mulai Bekerja">
                 {record.teacher?.workSince || "N/A"}
@@ -123,7 +134,14 @@ export const UserShow = () => {
                 {record.student?.kk_number || "N/A"}
               </Descriptions.Item>
               <Descriptions.Item label="Kelas">
-                {record.student?.studentClass?.className || "N/A"}
+                {record.student?.studentClass?.class.romanLevel +
+                  " " +
+                  record.student?.studentClass?.class.expertise.shortName +
+                  " " +
+                  record.student?.studentClass?.class.alphabet +
+                  "-" +
+                  record.student?.studentClass?.class.expertise.prody.faculty
+                    .schoolYear.year || "N/A"}
               </Descriptions.Item>
             </Descriptions>
           </Card>

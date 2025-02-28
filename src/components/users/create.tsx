@@ -177,7 +177,18 @@ export const UserCreate = () => {
             >
               <Input />
             </Form.Item>
-
+            <Form.Item
+              label="Kelas"
+              name={["class_id"]}
+              rules={[
+                {
+                  required: true,
+                  message: "Kelas tidak boleh kosong",
+                },
+              ]}
+            >
+              <Select {...classSelectProps} />
+            </Form.Item>
             <Form.Item label="Nomor Kartu Keluarga (KK)" name={["kk_number"]}>
               <Input />
             </Form.Item>
@@ -237,6 +248,18 @@ export const UserCreate = () => {
               ]}
             >
               <Input />
+            </Form.Item>
+            <Form.Item
+              label="Wali Kelas"
+              name={["class_id"]}
+              rules={[
+                {
+                  required: true,
+                  message: "Wali Kelas tidak boleh kosong",
+                },
+              ]}
+            >
+              <Select {...classSelectProps} />
             </Form.Item>
             <Form.Item
               label="Tahun Awal Bekerja (ex: 2013)"

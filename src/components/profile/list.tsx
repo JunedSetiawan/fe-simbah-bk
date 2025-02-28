@@ -43,7 +43,7 @@ export const ProfilePage: React.FC = () => {
   }>();
 
   // Determine badge color based on profile type
-  const getBadgeColor = (type: any) => {
+  const getBadgeColor = (type: string) => {
     switch (type) {
       case "Guru":
         return "blue";
@@ -277,7 +277,7 @@ export const ProfilePage: React.FC = () => {
                 <Avatar
                   size={100}
                   icon={<UserOutlined />}
-                  style={{ backgroundColor: getBadgeColor(user?.profileType) }}
+                  style={{ backgroundColor: getBadgeColor(user!.profileType) }}
                 />
                 <Title level={3} style={{ marginTop: 16, marginBottom: 0 }}>
                   {(user?.profileType === "Guru" && user?.teacher?.name) ||

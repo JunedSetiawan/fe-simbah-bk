@@ -11,11 +11,12 @@ export const UserEdit = () => {
   const apiUrl = useApiUrl();
   const userData = query?.data?.data;
 
+  console.log(userData);
+
   const { selectProps: roleSelectProps } = useSelect({
     resource: "roles",
     optionLabel: "name",
     optionValue: "id",
-    defaultValue: userData?.userRole?.role?.id,
   });
 
   const { selectProps: classSelectProps } = useSelect({
@@ -64,7 +65,9 @@ export const UserEdit = () => {
 
       // Set role-specific fields
       if (userData.profileType === "Guru" && userData.teacher) {
+        setSelectedClassId(userData?.teacherClass?.id);
         formProps.form.setFieldsValue({
+          class_id: userData?.teacherClass?.id,
           name: userData.teacher.name,
           nip: userData.teacher.nip,
           work_since: userData.teacher.workSince,
@@ -74,6 +77,9 @@ export const UserEdit = () => {
 
       // Set class and student fields for Orang Tua
       if (userData.profileType === "Orang Tua" && userData.parent) {
+        setSelectedClassId(
+          userData.parent.studentParents[0].student.studentClass.classId
+        );
         formProps.form.setFieldsValue({
           class_id:
             userData.parent?.studentParents[0]?.student?.studentClass?.classId,
@@ -97,7 +103,9 @@ export const UserEdit = () => {
       // Set student fields for Siswa
 
       if (userData.profileType === "Siswa" && userData.student) {
+        setSelectedClassId(userData?.student.studentClass.class.id);
         formProps.form.setFieldsValue({
+          class_id: userData?.student.studentClass.class.id,
           name: userData.student.name,
           kk_number: userData.student.kkNumber,
           nisn: userData.student.nisn,
@@ -174,7 +182,7 @@ export const UserEdit = () => {
     placeholder: "Pilih Kelas",
   };
 
-  // console.log(formProps.form?.getFieldsValue());
+  console.log(formProps.form?.getFieldsValue());
 
   return (
     <Edit saveButtonProps={saveButtonProps}>
@@ -248,6 +256,18 @@ export const UserEdit = () => {
                 <Input />
               </Form.Item>
               <Form.Item
+                label="Wali Kelas"
+                name={["class_id"]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Wali Kelas tidak boleh kosong",
+                  },
+                ]}
+              >
+                <Select {...classSelectProps} />
+              </Form.Item>
+              <Form.Item
                 label="Tahun Awal Bekerja (ex: 2013)"
                 name={["work_since"]}
                 rules={[
@@ -277,6 +297,18 @@ export const UserEdit = () => {
               ]}
             >
               <Input />
+            </Form.Item>
+            <Form.Item
+              label="Kelas"
+              name={["class_id"]}
+              rules={[
+                {
+                  required: true,
+                  message: "Kelas tidak boleh kosong",
+                },
+              ]}
+            >
+              <Select {...classSelectProps} />
             </Form.Item>
 
             <Form.Item label="Nomor Kartu Keluarga (KK)" name={["kk_number"]}>
@@ -313,47 +345,6 @@ export const UserEdit = () => {
 
         {selectedRole && selectedRole.label === "Orang Tua" && (
           <>
-            <Divider />
-            <h1>Memilih Siswa dari orang tua tersebut</h1>
-            <Form.Item
-              label="Kelas"
-              name={["class_id"]}
-              rules={[
-                {
-                  required: true,
-                  message: "Kelas is required",
-                },
-              ]}
-            >
-              <Select {...classSelectMergedProps} />
-            </Form.Item>
-            <Form.Item
-              label="Siswa"
-              name={["student_id"]}
-              rules={[
-                {
-                  required: true,
-                  message: "Siswa is required",
-                },
-              ]}
-            >
-              <Select
-                loading={isLoadingStudents}
-                disabled={!selectedClassId || isLoadingStudents}
-                placeholder={
-                  !selectedClassId
-                    ? "Pilih kelas terlebih dahulu"
-                    : "Pilih siswa"
-                }
-                options={studentOptions}
-                showSearch
-                filterOption={(input, option) =>
-                  (option?.label ?? "")
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
-              />
-            </Form.Item>
             <Divider />
             Data Diri Orang Tua / Wali
             <Form.Item
