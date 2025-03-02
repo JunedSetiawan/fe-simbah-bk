@@ -18,7 +18,7 @@ import {
 import { dataProviders } from "@providers/data-provider";
 // import { accessControlProvider } from "@providers/access-control-provider";
 import "@refinedev/antd/dist/reset.css";
-import { UserOutlined } from "@ant-design/icons";
+import { ControlOutlined, HomeOutlined, UserOutlined } from "@ant-design/icons";
 
 export const metadata: Metadata = {
   title: "Refine",
@@ -73,29 +73,10 @@ export default function RootLayout({
                         name: "dashboard",
                         list: "/",
                         meta: {
-                          icon: "🏠",
+                          icon: <HomeOutlined />,
                         },
                       },
-                      {
-                        name: "blog_posts",
-                        list: "/blog-posts",
-                        create: "/blog-posts/create",
-                        edit: "/blog-posts/edit/:id",
-                        show: "/blog-posts/show/:id",
-                        meta: {
-                          canDelete: true,
-                        },
-                      },
-                      {
-                        name: "categories",
-                        list: "/categories",
-                        create: "/categories/create",
-                        edit: "/categories/edit/:id",
-                        show: "/categories/show/:id",
-                        meta: {
-                          canDelete: true,
-                        },
-                      },
+
                       {
                         name: "users",
                         list: "/users",
@@ -104,6 +85,18 @@ export default function RootLayout({
                         show: "/users/show/:id",
                         meta: {
                           canDelete: true,
+                          icon: <UserOutlined />,
+                        },
+                      },
+                      {
+                        name: "regulations",
+                        list: "/regulations",
+                        create: "/regulations/create",
+                        edit: "/regulations/edit/:id",
+                        show: "/regulations/show/:id",
+                        meta: {
+                          canDelete: true,
+                          icon: <ControlOutlined />,
                         },
                       },
                     ]}

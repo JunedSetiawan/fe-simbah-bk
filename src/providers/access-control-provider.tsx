@@ -30,7 +30,17 @@ export const accessControlProvider: AccessControlProvider = {
 
     // Handle Regulations resource
     if (resource === "regulations") {
-      return { can: isSuperAdmin(user) || isAdmin(user) };
+      if (action === "create" || action === "edit" || action === "delete") {
+        return { can: isSuperAdmin(user) || isAdmin(user) };
+      }
+      return {
+        can:
+          isSuperAdmin(user) ||
+          isAdmin(user) ||
+          isTeacher(user) ||
+          isParent(user) ||
+          isStudent(user),
+      };
     }
 
     // Handle Violations resource

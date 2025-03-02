@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useShow } from "@refinedev/core";
+import { CanAccess, useShow } from "@refinedev/core";
 import {
   Show,
   NumberField,
@@ -32,6 +32,7 @@ import {
   BankOutlined,
   BookOutlined,
 } from "@ant-design/icons";
+import UnauthorizedPage from "@app/unauthorized";
 
 const { Title, Text } = Typography;
 
@@ -257,63 +258,67 @@ export const UserShow = () => {
   };
 
   return (
-    <Show isLoading={isLoading} headerButtons={[]}>
-      <Row gutter={[24, 24]}>
-        {/* Account Details */}
-        <Col xs={24} md={8}>
-          <Card bordered={false} className="user-info-card">
-            <div style={{ textAlign: "center", marginBottom: 24 }}>
-              <Avatar
-                size={100}
-                icon={<UserOutlined />}
-                style={{ backgroundColor: getBadgeColor(profileType) }}
-              />
-              <Title level={3} style={{ marginTop: 16, marginBottom: 0 }}>
-                {(profileType === "Guru" && record?.teacher?.name) ||
-                  (profileType === "Siswa" && record?.student?.name) ||
-                  (profileType === "Orang Tua" && record?.parent?.name) ||
-                  record?.username}
-              </Title>
-              <Badge
-                color={getBadgeColor(profileType)}
-                text={<Text strong>{profileType || "User"}</Text>}
-                style={{ margin: "8px 0" }}
-              />
-            </div>
-
-            <Divider style={{ margin: "12px 0" }} />
-
-            <Descriptions column={1}>
-              <Descriptions.Item label="User ID">
-                <NumberField value={record?.id ?? 0} />
-              </Descriptions.Item>
-              <Descriptions.Item label="Username">
-                <TextField value={record?.username} strong />
-              </Descriptions.Item>
-              <Descriptions.Item label="Role">
-                <Tag color="cyan">{record?.userRole?.role?.name || "N/A"}</Tag>
-              </Descriptions.Item>
-              <Descriptions.Item label="Dibuat pada">
-                <DateField
-                  value={record?.createdAt}
-                  format="DD MMM YYYY HH:mm"
+    <CanAccess resource="users" action="show" fallback={<UnauthorizedPage />}>
+      <Show isLoading={isLoading} headerButtons={[]}>
+        <Row gutter={[24, 24]}>
+          {/* Account Details */}
+          <Col xs={24} md={8}>
+            <Card bordered={false} className="user-info-card">
+              <div style={{ textAlign: "center", marginBottom: 24 }}>
+                <Avatar
+                  size={100}
+                  icon={<UserOutlined />}
+                  style={{ backgroundColor: getBadgeColor(profileType) }}
                 />
-              </Descriptions.Item>
-              <Descriptions.Item label="Terakhir diperbarui">
-                <DateField
-                  value={record?.updatedAt}
-                  format="DD MMM YYYY HH:mm"
+                <Title level={3} style={{ marginTop: 16, marginBottom: 0 }}>
+                  {(profileType === "Guru" && record?.teacher?.name) ||
+                    (profileType === "Siswa" && record?.student?.name) ||
+                    (profileType === "Orang Tua" && record?.parent?.name) ||
+                    record?.username}
+                </Title>
+                <Badge
+                  color={getBadgeColor(profileType)}
+                  text={<Text strong>{profileType || "User"}</Text>}
+                  style={{ margin: "8px 0" }}
                 />
-              </Descriptions.Item>
-            </Descriptions>
-          </Card>
-        </Col>
+              </div>
 
-        {/* Profile Details */}
-        <Col xs={24} md={16}>
-          {renderProfileDetails()}
-        </Col>
-      </Row>
-    </Show>
+              <Divider style={{ margin: "12px 0" }} />
+
+              <Descriptions column={1}>
+                <Descriptions.Item label="User ID">
+                  <NumberField value={record?.id ?? 0} />
+                </Descriptions.Item>
+                <Descriptions.Item label="Username">
+                  <TextField value={record?.username} strong />
+                </Descriptions.Item>
+                <Descriptions.Item label="Role">
+                  <Tag color="cyan">
+                    {record?.userRole?.role?.name || "N/A"}
+                  </Tag>
+                </Descriptions.Item>
+                <Descriptions.Item label="Dibuat pada">
+                  <DateField
+                    value={record?.createdAt}
+                    format="DD MMM YYYY HH:mm"
+                  />
+                </Descriptions.Item>
+                <Descriptions.Item label="Terakhir diperbarui">
+                  <DateField
+                    value={record?.updatedAt}
+                    format="DD MMM YYYY HH:mm"
+                  />
+                </Descriptions.Item>
+              </Descriptions>
+            </Card>
+          </Col>
+
+          {/* Profile Details */}
+          <Col xs={24} md={16}>
+            {renderProfileDetails()}
+          </Col>
+        </Row>
+      </Show>
+    </CanAccess>
   );
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { BaseRecord } from "@refinedev/core";
+import { BaseRecord, CanAccess } from "@refinedev/core";
 import {
   useTable,
   List,
@@ -10,6 +10,7 @@ import {
   DeleteButton,
 } from "@refinedev/antd";
 import { Table, Space } from "antd";
+import UnauthorizedPage from "@app/unauthorized";
 
 interface Parent {
   id: string;
@@ -94,65 +95,67 @@ export const UserList = () => {
   const dataSource = tableProps.dataSource || [];
 
   return (
-    <List>
-      <Table {...tableProps} rowKey="id">
-        <Table.Column dataIndex="username" title="Username" />
-        <Table.Column dataIndex="profileType" title="Profile Type" />
-        <Table.Column
-          dataIndex={["userRole", "role", "name"]}
-          title="Role"
-          render={(value) => value || "-"}
-        />
-        <Table.Column
-          title="Teacher Info"
-          render={(_, record: User) => {
-            if (!record.teacher) return "-";
-            return (
-              <div>
-                <div>{record.teacher.name}</div>
-              </div>
-            );
-          }}
-        />
-        <Table.Column
-          title="Student Info"
-          render={(_, record: User) => {
-            if (!record.student) return "-";
-            return (
-              <div>
-                <div>{record.student.name}</div>
-              </div>
-            );
-          }}
-        />
-        <Table.Column
-          title="Parent Info"
-          render={(_, record: User) => {
-            if (!record.parent) return "-";
-            return (
-              <div>
-                <div>{record.parent.name}</div>
-              </div>
-            );
-          }}
-        />
-        <Table.Column
-          dataIndex="createdAt"
-          title="Created At"
-          render={(value) => new Date(value).toLocaleDateString()}
-        />
-        <Table.Column
-          title="Actions"
-          dataIndex="actions"
-          render={(_, record: User) => (
-            <Space>
-              <EditButton hideText size="small" recordItemId={record.id} />
-              <ShowButton hideText size="small" recordItemId={record.id} />
-              <DeleteButton hideText size="small" recordItemId={record.id} />
-            </Space>
-          )}
-        />
-      </Table>
-    </List>
+    <CanAccess resource="users" action="list" fallback={<UnauthorizedPage />}>
+      <List>
+        <Table {...tableProps} rowKey="id">
+          <Table.Column dataIndex="username" title="Username" />
+          <Table.Column dataIndex="profileType" title="Profile Type" />
+          <Table.Column
+            dataIndex={["userRole", "role", "name"]}
+            title="Role"
+            render={(value) => value || "-"}
+          />
+          <Table.Column
+            title="Teacher Info"
+            render={(_, record: User) => {
+              if (!record.teacher) return "-";
+              return (
+                <div>
+                  <div>{record.teacher.name}</div>
+                </div>
+              );
+            }}
+          />
+          <Table.Column
+            title="Student Info"
+            render={(_, record: User) => {
+              if (!record.student) return "-";
+              return (
+                <div>
+                  <div>{record.student.name}</div>
+                </div>
+              );
+            }}
+          />
+          <Table.Column
+            title="Parent Info"
+            render={(_, record: User) => {
+              if (!record.parent) return "-";
+              return (
+                <div>
+                  <div>{record.parent.name}</div>
+                </div>
+              );
+            }}
+          />
+          <Table.Column
+            dataIndex="createdAt"
+            title="Created At"
+            render={(value) => new Date(value).toLocaleDateString()}
+          />
+          <Table.Column
+            title="Actions"
+            dataIndex="actions"
+            render={(_, record: User) => (
+              <Space>
+                <EditButton hideText size="small" recordItemId={record.id} />
+                <ShowButton hideText size="small" recordItemId={record.id} />
+                <DeleteButton hideText size="small" recordItemId={record.id} />
+              </Space>
+            )}
+          />
+        </Table>
+      </List>
+    </CanAccess>
   );
 };
