@@ -50,8 +50,6 @@ export const StudentViolationsShow = () => {
     },
   });
 
-  console.log(data);
-
   if (isLoading) {
     return (
       <div
@@ -76,6 +74,7 @@ export const StudentViolationsShow = () => {
   }
 
   const studentData = data?.data?.student;
+  console.log(studentData);
   const violations = data?.data?.violations || [];
   // Use the totalPoints from the backend if available
   const totalPoints = data?.data?.totalPoints || 0;
@@ -108,7 +107,7 @@ export const StudentViolationsShow = () => {
       <Card>
         <Row gutter={[16, 16]}>
           <Col xs={24} md={16}>
-            <Title level={4}>{studentData?.name}</Title>
+            <Title level={4}>Nama : {studentData?.name}</Title>
             <Descriptions column={{ xs: 1, sm: 2 }} layout="vertical" bordered>
               <Descriptions.Item label="NIS">
                 {studentData?.nis}
@@ -116,16 +115,32 @@ export const StudentViolationsShow = () => {
               <Descriptions.Item label="NISN">
                 {studentData?.nisn}
               </Descriptions.Item>
-              <Descriptions.Item label="Class">
-                {studentData?.class?.roman_level} {studentData?.class?.alphabet}
+              <Descriptions.Item label="Kelas">
+                {/* {sp.student?.studentClass?.class.romanLevel +
+                  " " +
+                  sp.student?.studentClass?.class.expertise.shortName +
+                  " " +
+                  sp.student?.studentClass?.class.alphabet +
+                  "-" +
+                  sp.student?.studentClass?.class.expertise.prody.faculty
+                    .schoolYear.year || "N/A"} */}
+
+                {studentData?.class?.romanLevel +
+                  " " +
+                  studentData?.class?.expertise?.shortName +
+                  " " +
+                  studentData?.class?.alphabet +
+                  "-" +
+                  studentData?.class?.expertise?.prody?.faculty?.schoolYear
+                    ?.year || "N/A"}
               </Descriptions.Item>
-              <Descriptions.Item label="Period">{`${month}/${year}`}</Descriptions.Item>
+              <Descriptions.Item label="Periode">{`bulan ${month} tahun ${year}`}</Descriptions.Item>
             </Descriptions>
           </Col>
           <Col xs={24} md={8}>
             <Card bordered={false} style={{ background: "#f0f2f5" }}>
               <Statistic
-                title="Total Violation Points"
+                title="Total Pelanggaran Points"
                 value={totalPoints} // Will display cleanly without extra zeros
                 valueStyle={{ color: getSeverityColor(totalPoints) }}
                 prefix={<WarningOutlined />}
@@ -162,8 +177,8 @@ export const StudentViolationsShow = () => {
           }}
         >
           <Table.Column
-            dataIndex="date"
-            title="Date"
+            dataIndex="createdAt"
+            title="Dibuat pada"
             width={120}
             render={(value) => <DateField value={value} format="YYYY-MM-DD" />}
             sorter={(a: any, b: any) =>
@@ -172,7 +187,7 @@ export const StudentViolationsShow = () => {
           />
           <Table.Column
             dataIndex="name"
-            title="Violation"
+            title="Nama Pelanggaran"
             render={(value, record: any) => (
               <Space direction="vertical" size={0}>
                 <Text>{value}</Text>
@@ -186,7 +201,7 @@ export const StudentViolationsShow = () => {
           />
           <Table.Column
             dataIndex="description"
-            title="Description"
+            title="Deskripsi"
             ellipsis={{ showTitle: true }}
           />
           <Table.Column
@@ -201,25 +216,24 @@ export const StudentViolationsShow = () => {
             sorter={(a: any, b: any) => a.point - b.point}
           />
           <Table.Column
-            dataIndex="regulationType"
-            title="Type"
-            width={120}
-            render={(value) => {
-              if (!value) return <Tag>Unknown</Tag>;
+            dataIndex={["regulation"]}
+            title="Peraturan yang Dilanggar"
+            render={(value, record: any) => {
+              const regulation = value;
 
-              return value.toLowerCase() === "ketertiban" ? (
-                <Badge status="error" text="Rule Violation" />
-              ) : (
-                <Badge status="success" text="Recognition" />
+              if (!regulation) return "Unknown regulation";
+
+              return (
+                <Space direction="vertical" size={0}>
+                  <Text>{regulation.name}</Text>
+                  {regulation.category && (
+                    <Tag color={getCategoryColor(regulation.category)}>
+                      {regulation.category} - {regulation.type}
+                    </Tag>
+                  )}
+                </Space>
               );
             }}
-            filters={[
-              { text: "Rule Violation", value: "ketertiban" },
-              { text: "Recognition", value: "penghargaan" },
-            ]}
-            onFilter={(value, record: any) =>
-              record.regulationType?.toLowerCase() === value
-            }
           />
           <Table.Column
             dataIndex={["teacher", "name"]}

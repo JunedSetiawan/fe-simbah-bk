@@ -251,15 +251,8 @@ export const ViolationsList = () => {
                     <Text>{regulation.name}</Text>
                     {regulation.category && (
                       <Tag color={getCategoryColor(regulation.category)}>
-                        {regulation.category}
+                        {regulation.category} - {regulation.type}
                       </Tag>
-                    )}
-                    <br />
-                    {regulation.type === "Pelanggaran" && (
-                      <Tag color="error">Pelanggaran</Tag>
-                    )}
-                    {regulation.type === "penghargaan" && (
-                      <Tag color="success">Penghargaan</Tag>
                     )}
                   </Space>
                 );
