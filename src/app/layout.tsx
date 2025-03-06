@@ -18,7 +18,12 @@ import {
 import { dataProviders } from "@providers/data-provider";
 // import { accessControlProvider } from "@providers/access-control-provider";
 import "@refinedev/antd/dist/reset.css";
-import { ControlOutlined, HomeOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  ControlOutlined,
+  HomeOutlined,
+  ReadOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 
 export const metadata: Metadata = {
   title: "Refine",
@@ -73,10 +78,10 @@ export default function RootLayout({
                         name: "dashboard",
                         list: "/",
                         meta: {
+                          label: "Dashboard",
                           icon: <HomeOutlined />,
                         },
                       },
-
                       {
                         name: "users",
                         list: "/users",
@@ -85,6 +90,7 @@ export default function RootLayout({
                         show: "/users/show/:id",
                         meta: {
                           canDelete: true,
+                          label: "Pengguna",
                           icon: <UserOutlined />,
                         },
                       },
@@ -96,7 +102,31 @@ export default function RootLayout({
                         show: "/regulations/show/:id",
                         meta: {
                           canDelete: true,
+                          label: "Peraturan Ketertiban",
                           icon: <ControlOutlined />,
+                        },
+                      },
+                      {
+                        name: "violations",
+                        list: "/violations",
+                        create: "/violations/create",
+                        edit: "/violations/edit/:id",
+                        show: "/violations/show/:id",
+                        meta: {
+                          canDelete: true,
+                          label: "Pelanggaran Ketertiban",
+                          icon: <ReadOutlined />,
+                        },
+                      },
+                      {
+                        name: "student-violations",
+                        show: "/student-violations/show/:id",
+                        meta: {
+                          parent: "violations",
+                          queryOptions: {
+                            syncWithLocation: true,
+                          },
+                          hide: true,
                         },
                       },
                     ]}

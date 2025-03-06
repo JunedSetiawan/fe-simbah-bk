@@ -46,3 +46,6 @@ To learn more about **Refine**, please check out the [Documentation](https://ref
 ## License
 
 MIT
+window.open(
+`/student-violations/show/${studentId}?month=${month}&year=${year}`
+);

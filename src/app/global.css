@@ -65,4 +65,47 @@
     }
 }
 
+/* Tambahkan CSS ini ke file styles.css Anda atau dalam styled-components */
 
+.regulation-list-card {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.regulation-list-card .ant-card-head {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 16px 24px;
+}
+
+.table-row-light {
+    background-color: #ffffff;
+}
+
+.table-row-dark {
+    background-color: #fafafa;
+}
+
+/* Hover effect untuk baris tabel */
+.ant-table-tbody>tr:hover>td {
+    background-color: #e6f7ff !important;
+}
+
+/* Style untuk pagination */
+.ant-pagination-item {
+    border-radius: 6px;
+}
+
+.ant-pagination-item-active {
+    background-color: #1890ff;
+    border-color: #1890ff;
+}
+
+.ant-pagination-item-active a {
+    color: white;
+}
+
+/* Style untuk tombol action */
+.ant-btn-text:hover {
+    background-color: #f0f5ff;
+    color: #1890ff;
+}
