@@ -223,7 +223,8 @@ export const UserCreate = () => {
             </>
           )}
 
-          {selectedRole && selectedRole.label === "Guru" && (
+          {(selectedRole?.label === "Guru" ||
+            selectedRole?.label === "Umum") && (
             <>
               <Form.Item
                 label="NIP"
@@ -251,16 +252,7 @@ export const UserCreate = () => {
               >
                 <Input />
               </Form.Item>
-              <Form.Item
-                label="Wali Kelas"
-                name={["class_id"]}
-                rules={[
-                  {
-                    required: true,
-                    message: "Wali Kelas tidak boleh kosong",
-                  },
-                ]}
-              >
+              <Form.Item label="Wali Kelas" name={["class_id"]}>
                 <Select {...classSelectProps} />
               </Form.Item>
               <Form.Item

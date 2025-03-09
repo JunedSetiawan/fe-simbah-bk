@@ -76,6 +76,7 @@ export const StudentViolationsShow = () => {
   const studentData = data?.data?.student;
   console.log(studentData);
   const violations = data?.data?.violations || [];
+  const totalViolations = violations.length;
   // Use the totalPoints from the backend if available
   const totalPoints = data?.data?.totalPoints || 0;
 
@@ -161,7 +162,10 @@ export const StudentViolationsShow = () => {
           </Col>
         </Row>
 
-        <Divider orientation="left">Violation Records</Divider>
+        <Divider orientation="left">
+          Rekord Pelanggaran - Jumlah pelanggaran yang dibuat{" "}
+          <span className="text-red-500">{totalViolations}</span>
+        </Divider>
 
         <Table
           dataSource={violations}
@@ -180,7 +184,16 @@ export const StudentViolationsShow = () => {
             dataIndex="createdAt"
             title="Dibuat pada"
             width={120}
-            render={(value) => <DateField value={value} format="YYYY-MM-DD" />}
+            render={(value: any) => (
+              <Space>
+                <ClockCircleOutlined style={{ color: "#8c8c8c" }} />
+                <DateField
+                  value={value}
+                  format="DD MMM YYYY"
+                  style={{ color: "#8c8c8c" }}
+                />
+              </Space>
+            )}
             sorter={(a: any, b: any) =>
               new Date(a.date).getTime() - new Date(b.date).getTime()
             }
@@ -237,7 +250,7 @@ export const StudentViolationsShow = () => {
           />
           <Table.Column
             dataIndex={["teacher", "name"]}
-            title="Reported by"
+            title="Dicatat oleh"
             render={(value) => value || "N/A"}
           />
         </Table>

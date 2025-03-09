@@ -58,8 +58,8 @@ export const RegulationShow = () => {
       canEdit
       headerButtons={({ defaultButtons }) => (
         <>
-          {defaultButtons?.edit}
-          {defaultButtons?.list}
+          {(defaultButtons as any)?.edit}
+          {(defaultButtons as any)?.list}
         </>
       )}
     >

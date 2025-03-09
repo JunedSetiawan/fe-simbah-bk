@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { use } from "react";
 import { useGetIdentity } from "@refinedev/core";
 import {
   Typography,
@@ -45,6 +45,8 @@ export const ProfilePage: React.FC = () => {
   // Determine badge color based on profile type
   const getBadgeColor = (type: string) => {
     switch (type) {
+      case "Umum":
+        return "orange";
       case "Guru":
         return "blue";
       case "Siswa":
@@ -55,11 +57,61 @@ export const ProfilePage: React.FC = () => {
         return "default";
     }
   };
+  console.log(user);
 
   const renderProfileDetails = () => {
     if (!user) return null;
 
     switch (user.profileType) {
+      case "Umum":
+        return (
+          <Card
+            title={
+              <Space>
+                <IdcardOutlined /> Informasi Guru (Admin)
+              </Space>
+            }
+            bordered={false}
+            className="custom-card"
+          >
+            <Descriptions bordered column={1}>
+              <Descriptions.Item label="Nama Lengkap">
+                {user.teacher?.name || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="NIP">
+                {user.teacher?.nip || "N/A"}
+              </Descriptions.Item>
+              {/* <Descriptions.Item label="Wali Kelas">
+                      {user.class
+                        ? user.class.romanLevel +
+                          " " +
+                          user.class.expertise.shortName +
+                          " " +
+                          user.class.alphabet +
+                          "-" +
+                          user.class.expertise.prody.faculty.schoolYear.year
+                        : "N/A"}
+                    </Descriptions.Item> */}
+              <Descriptions.Item label="Tahun Mulai Bekerja">
+                {user.teacher?.workSince || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Status Pegawai">
+                {user.teacher?.employeeStatus || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Tanggal Berhenti">
+                {user.teacher?.workStop ? (
+                  <DateField
+                    value={user.teacher.workStop}
+                    format="DD MMM YYYY"
+                  />
+                ) : (
+                  "Masih Aktif"
+                )}
+              </Descriptions.Item>
+            </Descriptions>
+          </Card>
+        );
+
       case "Guru":
         return (
           <Card
@@ -277,7 +329,9 @@ export const ProfilePage: React.FC = () => {
                 <Avatar
                   size={100}
                   icon={<UserOutlined />}
-                  style={{ backgroundColor: getBadgeColor(user!.profileType) }}
+                  style={{
+                    backgroundColor: getBadgeColor(user!.profileType ?? null),
+                  }}
                 />
                 <Title level={3} style={{ marginTop: 16, marginBottom: 0 }}>
                   {(user?.profileType === "Guru" && user?.teacher?.name) ||

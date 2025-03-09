@@ -112,16 +112,16 @@ export const authProviderClient: AuthProvider = {
       try {
         const user = JSON.parse(auth);
 
-        console.log({
-          id: user.id,
-          username: user.username,
-          profileType: user.profileType,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-          teacher: user.teacher, // Relasi teacher
-          student: user.student, // Relasi student
-          parent: user.parent, // Relasi parent
-        });
+        // console.log({
+        //   id: user.id,
+        //   username: user.username,
+        //   profileType: user.profileType,
+        //   createdAt: user.createdAt,
+        //   updatedAt: user.updatedAt,
+        //   teacher: user.teacher, // Relasi teacher
+        //   student: user.student, // Relasi student
+        //   parent: user.parent, // Relasi parent
+        // });
         return {
           id: user.id,
           username: user.username,

@@ -19,8 +19,11 @@ import { dataProviders } from "@providers/data-provider";
 // import { accessControlProvider } from "@providers/access-control-provider";
 import "@refinedev/antd/dist/reset.css";
 import {
+  ControlFilled,
   ControlOutlined,
+  HomeFilled,
   HomeOutlined,
+  ReadFilled,
   ReadOutlined,
   UserOutlined,
 } from "@ant-design/icons";
@@ -70,7 +73,7 @@ export default function RootLayout({
                         list: "/profile",
                         meta: {
                           label: "My Profile",
-                          icon: <UserOutlined />,
+
                           hide: true,
                         },
                       },
@@ -79,7 +82,7 @@ export default function RootLayout({
                         list: "/",
                         meta: {
                           label: "Dashboard",
-                          icon: <HomeOutlined />,
+                          icon: <HomeFilled />,
                         },
                       },
                       {
@@ -103,7 +106,7 @@ export default function RootLayout({
                         meta: {
                           canDelete: true,
                           label: "Peraturan Ketertiban",
-                          icon: <ControlOutlined />,
+                          icon: <ControlFilled />,
                         },
                       },
                       {
@@ -115,7 +118,7 @@ export default function RootLayout({
                         meta: {
                           canDelete: true,
                           label: "Pelanggaran Ketertiban",
-                          icon: <ReadOutlined />,
+                          icon: <ReadFilled />,
                         },
                       },
                       {
@@ -123,9 +126,7 @@ export default function RootLayout({
                         show: "/student-violations/show/:id",
                         meta: {
                           parent: "violations",
-                          queryOptions: {
-                            syncWithLocation: true,
-                          },
+
                           hide: true,
                         },
                       },

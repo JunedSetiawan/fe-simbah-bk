@@ -212,85 +212,103 @@ export const ViolationsList = () => {
         </Form>
       </Card>
 
-      <Tabs activeKey={activeTab} onChange={setActiveTab}>
-        <TabPane tab="All Violations" key="all">
-          {/* Standard violations list (index method) */}
-          <Table {...tableProps} rowKey="id">
-            <Table.Column dataIndex="id" title="ID" width={60} />
-            <Table.Column
-              dataIndex={["createdAt"]}
-              title="Dibuat Pada"
-              sorter
-              render={(value: any) => (
-                <Space>
-                  <ClockCircleOutlined style={{ color: "#8c8c8c" }} />
-                  <DateField
-                    value={value}
-                    format="DD MMM YYYY"
-                    style={{ color: "#8c8c8c" }}
-                  />
-                </Space>
-              )}
-            />
-            <Table.Column
-              dataIndex={["regulation"]}
-              title="Peraturan yang Dilanggar"
-              render={(value, record: any) => {
-                if (regulationIsLoading) return <Spin size="small" />;
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        items={[
+          {
+            key: "all",
+            label: "All Violations",
+            children: (
+              // All Violations Tab Content
+              <Table {...tableProps} rowKey="id">
+                <Table.Column
+                  title="No."
+                  width={60}
+                  render={(_, __, index) => {
+                    const { current = 1, pageSize = 10 } =
+                      tableProps.pagination || {};
+                    return (current - 1) * pageSize + index + 1;
+                  }}
+                />
+                <Table.Column
+                  dataIndex={["createdAt"]}
+                  title="Dibuat Pada"
+                  sorter
+                  render={(value: any) => (
+                    <Space>
+                      <ClockCircleOutlined style={{ color: "#8c8c8c" }} />
+                      <DateField
+                        value={value}
+                        format="DD MMM YYYY"
+                        style={{ color: "#8c8c8c" }}
+                      />
+                    </Space>
+                  )}
+                />
+                <Table.Column
+                  dataIndex={["regulation"]}
+                  title="Peraturan yang Dilanggar"
+                  render={(value, record: any) => {
+                    if (regulationIsLoading) return <Spin size="small" />;
 
-                const regulation =
-                  record.regulation ||
-                  regulationData?.data?.find(
-                    (item) => item.id === record.regulationId
-                  );
+                    const regulation =
+                      record.regulation ||
+                      regulationData?.data?.find(
+                        (item) => item.id === record.regulationId
+                      );
 
-                if (!regulation) return "Unknown regulation";
+                    if (!regulation) return "Unknown regulation";
 
-                return (
-                  <Space direction="vertical" size={0}>
-                    <Text>{regulation.name}</Text>
-                    {regulation.category && (
-                      <Tag color={getCategoryColor(regulation.category)}>
-                        {regulation.category} - {regulation.type}
+                    return (
+                      <Space direction="vertical" size={0}>
+                        <Text>{regulation.name}</Text>
+                        {regulation.category && (
+                          <Tag color={getCategoryColor(regulation.category)}>
+                            {regulation.category} - {regulation.type}
+                          </Tag>
+                        )}
+                      </Space>
+                    );
+                  }}
+                />
+                <Table.Column
+                  dataIndex={["studentClass", "user", "student", "name"]}
+                  title="Nama siswa yang melanggar"
+                />
+                <Table.Column dataIndex="name" title="Nama Pelanggaran" />
+
+                <Table.Column
+                  dataIndex="actionTaken"
+                  title="Tindakan yang diambil"
+                />
+                <Table.Column
+                  title="Point"
+                  render={(_, record: any) => {
+                    const regulation =
+                      record.regulation ||
+                      regulationData?.data?.find(
+                        (item) => item.id === record.regulationId
+                      );
+
+                    const point = regulation?.point || record.point || 0;
+
+                    return (
+                      <Tag
+                        color={
+                          point > 20
+                            ? "red"
+                            : point > 10
+                            ? "default"
+                            : "default"
+                        }
+                      >
+                        {point} points
                       </Tag>
-                    )}
-                  </Space>
-                );
-              }}
-            />
-            <Table.Column
-              dataIndex={["studentClass", "user", "student", "name"]}
-              title="Nama siswa yang melanggar"
-            />
-            <Table.Column dataIndex="name" title="Nama Pelanggaran" />
-
-            <Table.Column
-              dataIndex="actionTaken"
-              title="Tindakan yang diambil"
-            />
-            <Table.Column
-              title="Point"
-              render={(_, record: any) => {
-                const regulation =
-                  record.regulation ||
-                  regulationData?.data?.find(
-                    (item) => item.id === record.regulationId
-                  );
-
-                const point = regulation?.point || record.point || 0;
-
-                return (
-                  <Tag
-                    color={
-                      point > 20 ? "red" : point > 10 ? "default" : "default"
-                    }
-                  >
-                    {point} points
-                  </Tag>
-                );
-              }}
-            />
-            {/* <Table.Column
+                    );
+                  }}
+                />
+                {/* <Table.Column
               title="Tipe"
               render={(_, record: any) => {
                 const regulation =
@@ -320,104 +338,110 @@ export const ViolationsList = () => {
                 return regulation?.type?.toLowerCase() === value;
               }}
             /> */}
-            <Table.Column
-              dataIndex={["teacher", "name"]}
-              title="Guru Pencatat"
-            />
+                <Table.Column
+                  dataIndex={["teacher", "name"]}
+                  title="Guru Pencatat"
+                />
 
-            <Table.Column
-              title="Actions"
-              dataIndex="actions"
-              render={(_, record: BaseRecord) => (
-                <Space>
-                  <EditButton hideText size="small" recordItemId={record.id} />
-                  <ShowButton hideText size="small" recordItemId={record.id} />
-                  <DeleteButton
-                    hideText
-                    size="small"
-                    recordItemId={record.id}
+                <Table.Column
+                  title="Actions"
+                  dataIndex="actions"
+                  render={(_, record: BaseRecord) => (
+                    <Space>
+                      <EditButton
+                        hideText
+                        size="small"
+                        recordItemId={record.id}
+                      />
+                      <ShowButton
+                        hideText
+                        size="small"
+                        recordItemId={record.id}
+                      />
+                      <DeleteButton
+                        hideText
+                        size="small"
+                        recordItemId={record.id}
+                      />
+                    </Space>
+                  )}
+                />
+              </Table>
+            ),
+          },
+          {
+            key: "filtered",
+            label: "Filtered Violations",
+            disabled: !classId || !month || !year,
+            children:
+              studentViolationsLoading || isFiltering ? (
+                <div style={{ textAlign: "center", padding: "20px" }}>
+                  <Spin />
+                  <div style={{ marginTop: "10px" }}>
+                    Loading student violations...
+                  </div>
+                </div>
+              ) : studentViolationsData?.data?.length > 0 ? (
+                <Table
+                  dataSource={
+                    Array.isArray(studentViolationsData?.data)
+                      ? studentViolationsData?.data
+                      : []
+                  }
+                  rowKey="id"
+                  pagination={{ pageSize: 10 }}
+                >
+                  <Table.Column
+                    title="No."
+                    width={60}
+                    render={(_, __, index) => index + 1}
                   />
-                </Space>
-              )}
-            />
-          </Table>
-        </TabPane>
+                  <Table.Column dataIndex="name" title="Nama Siswa" />
+                  <Table.Column dataIndex="nis" title="NIS" />
+                  <Table.Column dataIndex="nisn" title="NISN" />
+                  <Table.Column
+                    title="Kelas"
+                    render={(record) => {
+                      const classData = record.class;
+                      if (!classData) return "N/A";
 
-        <TabPane
-          tab="Filtered Violations"
-          key="filtered"
-          disabled={!classId || !month || !year}
-        >
-          {/* Student violations table (studentViolations method) */}
-          {studentViolationsLoading || isFiltering ? (
-            <div style={{ textAlign: "center", padding: "20px" }}>
-              <Spin />
-              <div style={{ marginTop: "10px" }}>
-                Loading student violations...
-              </div>
-            </div>
-          ) : studentViolationsData?.data?.length > 0 ? (
-            <Table
-              dataSource={
-                Array.isArray(studentViolationsData?.data)
-                  ? studentViolationsData?.data
-                  : []
-              }
-              rowKey="id"
-              pagination={{ pageSize: 10 }}
-            >
-              <Table.Column dataIndex="id" title="ID" width={60} />
-              <Table.Column dataIndex="name" title="Nama Siswa" />
-              <Table.Column dataIndex="nis" title="NIS" />
-              <Table.Column dataIndex="nisn" title="NISN" />
-              <Table.Column
-                title="Kelas"
-                render={(record) => {
-                  const classData = record.class;
-                  if (!classData) return "N/A";
-
-                  return `${classData.romanLevel} ${classData.expertise.shortName} ${classData.alphabet} - ${classData.expertise.prody.faculty.schoolYear.year}`;
-                }}
-              />
-              <Table.Column
-                dataIndex="totalPoints"
-                title="Total Points"
-                render={(value) => (
-                  <Tag
-                    color={value > 60 ? "red" : value > 30 ? "orange" : "green"}
-                  >
-                    {value} points
-                  </Tag>
-                )}
-                sorter={(a: any, b: any) => a.totalPoints - b.totalPoints}
-              />
-              <Table.Column
-                title="Actions"
-                dataIndex="actions"
-                render={(_, record: BaseRecord) => (
-                  <Button
-                    type="primary"
-                    size="small"
-                    onClick={() =>
-                      record.id !== undefined &&
-                      handleViewDetails(String(record.id))
-                    }
-                  >
-                    View Details
-                  </Button>
-                )}
-              />
-            </Table>
-          ) : (
-            <div style={{ textAlign: "center", padding: "20px" }}>
-              <Text type="secondary">
-                No violations found for the selected filters. Please try
-                different criteria.
-              </Text>
-            </div>
-          )}
-        </TabPane>
-      </Tabs>
+                      return `${classData.romanLevel} ${classData.expertise.shortName} ${classData.alphabet} - ${classData.expertise.prody.faculty.schoolYear.year}`;
+                    }}
+                  />
+                  <Table.Column
+                    dataIndex="totalPoints"
+                    title="Total Points"
+                    render={(value) => <Tag color="pink">{value} points</Tag>}
+                    sorter={(a: any, b: any) => a.totalPoints - b.totalPoints}
+                  />
+                  <Table.Column
+                    title="Actions"
+                    dataIndex="actions"
+                    render={(_, record: BaseRecord) => (
+                      <Button
+                        type="primary"
+                        size="small"
+                        onClick={() =>
+                          record.id !== undefined &&
+                          handleViewDetails(String(record.id))
+                        }
+                      >
+                        View Details
+                      </Button>
+                    )}
+                  />
+                </Table>
+              ) : (
+                <div style={{ textAlign: "center", padding: "20px" }}>
+                  <Text type="secondary">
+                    No violations found for the selected filters. Please try
+                    different criteria.
+                  </Text>
+                </div>
+              ),
+          },
+        ]}
+      ></Tabs>
     </List>
   );
 };

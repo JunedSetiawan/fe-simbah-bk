@@ -65,14 +65,25 @@ export const UserEdit = () => {
       });
 
       // Set role-specific fields
-      if (userData.profileType === "Guru" && userData.teacher) {
-        setSelectedClassId(userData?.teacherClass?.id);
+      if (
+        userData.profileType === "Guru" ||
+        (userData.profileType === "Umum" && userData.teacher)
+      ) {
+        // Pastikan teacherClass ada dan memiliki id
+        setSelectedClassId(userData?.teacherClass?.id || null);
+
         formProps.form.setFieldsValue({
+          // Gunakan optional chaining untuk menghindari error jika properti tidak ada
           class_id: userData?.teacherClass?.id,
-          name: userData.teacher.name,
-          nip: userData.teacher.nip,
-          work_since: userData.teacher.workSince,
+          name: userData?.teacher?.name,
+          nip: userData?.teacher?.nip,
+          // Periksa jika workSince atau work_since yang digunakan
+          work_since:
+            userData?.teacher?.workSince || userData?.teacher?.work_since,
         });
+
+        // Log form values setelah set
+        console.log("Form values set:", formProps.form.getFieldsValue());
       }
       // Add logic for other roles (Siswa, Orang Tua) if needed
 
@@ -229,7 +240,8 @@ export const UserEdit = () => {
           </Form.Item>
 
           {selectedRole &&
-            (selectedRole.label === "Guru" || selectedRole.name === "Guru") && (
+            (selectedRole?.label === "Guru" ||
+              selectedRole?.label === "Umum") && (
               <>
                 <Form.Item
                   label="NIP"
@@ -257,16 +269,7 @@ export const UserEdit = () => {
                 >
                   <Input />
                 </Form.Item>
-                <Form.Item
-                  label="Wali Kelas"
-                  name={["class_id"]}
-                  rules={[
-                    {
-                      required: true,
-                      message: "Wali Kelas tidak boleh kosong",
-                    },
-                  ]}
-                >
+                <Form.Item label="Wali Kelas" name={["class_id"]}>
                   <Select {...classSelectProps} />
                 </Form.Item>
                 <Form.Item

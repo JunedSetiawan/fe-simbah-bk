@@ -62,6 +62,55 @@ export const UserShow = () => {
     if (!record) return null;
 
     switch (profileType) {
+      case "Umum":
+        return (
+          <Card
+            title={
+              <Space>
+                <IdcardOutlined /> Informasi Guru (Admin)
+              </Space>
+            }
+            bordered={false}
+            className="custom-card"
+          >
+            <Descriptions bordered column={1}>
+              <Descriptions.Item label="Nama Lengkap">
+                {record.teacher?.name || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="NIP">
+                {record.teacher?.nip || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Wali Kelas">
+                {record.teacherClass
+                  ? record.teacherClass.romanLevel +
+                    " " +
+                    record.teacherClass.expertise.shortName +
+                    " " +
+                    record.teacherClass.alphabet +
+                    "-" +
+                    record.teacherClass.expertise.prody.faculty.schoolYear.year
+                  : "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Tahun Mulai Bekerja">
+                {record.teacher?.workSince || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Status Pegawai">
+                {record.teacher?.employeeStatus || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Tanggal Berhenti">
+                {record.teacher?.workStop ? (
+                  <DateField
+                    value={record.teacher.workStop}
+                    format="DD MMM YYYY"
+                  />
+                ) : (
+                  "Masih Aktif"
+                )}
+              </Descriptions.Item>
+            </Descriptions>
+          </Card>
+        );
+
       case "Guru":
         return (
           <Card
