@@ -13,6 +13,8 @@ export const RegulationEdit = () => {
 
   const regulationsData = query?.data?.data;
 
+  console.log(formProps.form?.getFieldsValue());
+
   return (
     <CanAccess
       resource="regulations"
@@ -91,6 +93,17 @@ export const RegulationEdit = () => {
 
               <Select.Option value="Keamanan">Keamanan</Select.Option>
             </Select>
+          </Form.Item>
+          <Form.Item
+            label="Sanksi / Tindakan"
+            name={["actionTaken"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
           </Form.Item>
         </Form>
       </Edit>

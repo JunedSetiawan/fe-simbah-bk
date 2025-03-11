@@ -154,6 +154,7 @@ export const ViolationsCreate = () => {
     method: "get",
     queryOptions: {
       enabled: !!selectedStudentId,
+      // In the useCustom hook's onSuccess handler:
       onSuccess: (response) => {
         if (response.data && Array.isArray(response.data)) {
           setStudentParents(response.data);
@@ -536,17 +537,6 @@ export const ViolationsCreate = () => {
         <Form.Item
           label="Description"
           name={["description"]}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Action Taken"
-          name="action_taken"
           rules={[
             {
               required: true,

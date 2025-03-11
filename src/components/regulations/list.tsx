@@ -148,18 +148,6 @@ export const RegulationList = () => {
           />
 
           <Table.Column
-            dataIndex="description"
-            title="Deskripsi"
-            render={(value) => (
-              <Tooltip title={value}>
-                <Text ellipsis style={{ maxWidth: 200 }}>
-                  {value}
-                </Text>
-              </Tooltip>
-            )}
-          />
-
-          <Table.Column
             dataIndex="point"
             title="Point"
             sorter
@@ -185,13 +173,6 @@ export const RegulationList = () => {
                 {value.toUpperCase()}
               </Tag>
             )}
-          />
-
-          <Table.Column
-            dataIndex="category"
-            title="Kategori"
-            sorter
-            render={(value) => <Tag color="blue">{value}</Tag>}
           />
 
           <Table.Column

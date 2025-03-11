@@ -34,9 +34,17 @@ import {
   Spin,
   Card,
   Badge,
+  Modal,
 } from "antd";
 import dayjs from "dayjs";
-import { ClockCircleOutlined } from "@ant-design/icons";
+import { ClockCircleOutlined, FilePdfOutlined } from "@ant-design/icons";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import { TDocumentDefinitions } from "pdfmake/interfaces";
+import { generatePdf, downloadPdf } from "@utils/pdfGenerator";
+
+// Register fonts for pdfMake
+pdfMake.vfs = pdfFonts.vfs;
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -49,6 +57,10 @@ export const ViolationsList = () => {
   const [year, setYear] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("all");
   const apiUrl = useApiUrl();
+  const [pdfPreviewVisible, setPdfPreviewVisible] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
+  const [pdfType, setPdfType] = useState<"statement" | "summons" | null>(null);
+  const [selectedViolation, setSelectedViolation] = useState<any>(null);
 
   // Fetch class data for filter dropdown
   const { options: classesOptionSelect } = useSelect({
@@ -129,9 +141,7 @@ export const ViolationsList = () => {
 
   // Handle student detail view
   const navigate = useNavigation();
-
   const getToPath = useGetToPath();
-
   const go = useGo();
   const { show } = useNavigation();
 
@@ -139,7 +149,7 @@ export const ViolationsList = () => {
     if (month && year) {
       go({
         to: {
-          resource: "student-violations", // resource name or identifier
+          resource: "student-violations",
           action: "show",
           id: studentId,
         },
@@ -168,6 +178,244 @@ export const ViolationsList = () => {
     return categoryColors[category?.toLowerCase()] || categoryColors.default;
   };
 
+  // Generate PDF for statement or summons
+  // const generatePdf = (record: any, type: "statement" | "summons") => {
+  //   setSelectedViolation(record);
+  //   setPdfType(type);
+
+  //   const regulation =
+  //     record.regulation ||
+  //     regulationData?.data?.find((item) => item.id === record.regulationId);
+
+  //   const studentName =
+  //     record?.studentClass?.user?.student?.name || "Nama Siswa";
+  //   const className =
+  //     record?.studentClass?.class?.romanLevel +
+  //       " " +
+  //       record?.studentClass?.class?.expertise?.shortName +
+  //       " " +
+  //       record?.studentClass?.class?.alphabet || "Kelas";
+  //   const violationName = record?.name || "Pelanggaran";
+  //   const regulationName = regulation?.name || "Peraturan";
+  //   const points = regulation?.point || record?.point || 0;
+  //   const teacherName = record?.teacher?.name || "Guru";
+  //   const date =
+  //     dayjs(record?.createdAt).format("DD MMMM YYYY") ||
+  //     dayjs().format("DD MMMM YYYY");
+
+  //   // Create document definition based on type
+  //   let docDefinition;
+
+  //   if (type === "statement") {
+  //     docDefinition = {
+  //       content: [
+  //         { text: "SURAT PERNYATAAN", style: "header" },
+  //         { text: "PELANGGARAN TATA TERTIB SEKOLAH", style: "subheader" },
+  //         { text: "\n\n" },
+  //         { text: "Yang bertanda tangan di bawah ini:", style: "paragraph" },
+  //         {
+  //           layout: "noBorders",
+  //           table: {
+  //             widths: ["30%", "5%", "65%"],
+  //             body: [
+  //               ["Nama", ":", studentName],
+  //               ["Kelas", ":", className],
+  //               ["Pelanggaran", ":", violationName],
+  //               ["Peraturan", ":", regulationName],
+  //               ["Point", ":", points + " point"],
+  //             ],
+  //           },
+  //         },
+  //         { text: "\n" },
+  //         {
+  //           text: "Dengan ini saya menyatakan bahwa saya telah melakukan pelanggaran tata tertib sekolah sebagaimana disebutkan di atas. Saya berjanji tidak akan mengulangi pelanggaran tersebut dan akan mematuhi semua peraturan sekolah.",
+  //           style: "paragraph",
+  //         },
+  //         { text: "\n\n" },
+  //         {
+  //           columns: [
+  //             { width: "60%", text: "" },
+  //             {
+  //               width: "40%",
+  //               text: [
+  //                 "Jakarta, " + date + "\n",
+  //                 "Yang membuat pernyataan,\n\n\n\n",
+  //                 studentName,
+  //               ],
+  //               alignment: "center",
+  //             },
+  //           ],
+  //         },
+  //         { text: "\n\n" },
+  //         {
+  //           columns: [
+  //             {
+  //               width: "40%",
+  //               text: ["Mengetahui,\n", "Guru Pencatat\n\n\n\n", teacherName],
+  //               alignment: "center",
+  //             },
+  //             { width: "20%", text: "" },
+  //             {
+  //               width: "40%",
+  //               text: [
+  //                 "Mengetahui,\n",
+  //                 "Wali Kelas\n\n\n\n",
+  //                 "______________________",
+  //               ],
+  //               alignment: "center",
+  //             },
+  //           ],
+  //         },
+  //       ],
+  //       styles: {
+  //         header: {
+  //           fontSize: 16,
+  //           bold: true,
+  //           alignment: "center",
+  //         },
+  //         subheader: {
+  //           fontSize: 14,
+  //           bold: true,
+  //           alignment: "center",
+  //         },
+  //         paragraph: {
+  //           fontSize: 12,
+  //           alignment: "justify",
+  //         },
+  //       },
+  //     };
+  //   } else {
+  //     // summons
+  //     docDefinition = {
+  //       content: [
+  //         { text: "SURAT PANGGILAN ORANG TUA", style: "header" },
+  //         { text: "\n\n" },
+  //         { text: "Kepada Yth,", style: "paragraph" },
+  //         { text: "Orang Tua/Wali Murid", style: "paragraph" },
+  //         { text: studentName, style: "paragraph", bold: true },
+  //         { text: "Kelas " + className, style: "paragraph" },
+  //         { text: "di Tempat", style: "paragraph" },
+  //         { text: "\n" },
+  //         { text: "Dengan hormat,", style: "paragraph" },
+  //         {
+  //           text: "Berdasarkan catatan pelanggaran tata tertib sekolah, dengan ini kami memberitahukan bahwa putra/putri Bapak/Ibu telah melakukan pelanggaran sebagai berikut:",
+  //           style: "paragraph",
+  //         },
+  //         { text: "\n" },
+  //         {
+  //           layout: "noBorders",
+  //           table: {
+  //             widths: ["30%", "5%", "65%"],
+  //             body: [
+  //               ["Jenis Pelanggaran", ":", violationName],
+  //               ["Peraturan", ":", regulationName],
+  //               ["Point", ":", points + " point"],
+  //               ["Tindakan yang diambil", ":", record?.actionTaken || "-"],
+  //             ],
+  //           },
+  //         },
+  //         { text: "\n" },
+  //         {
+  //           text: "Sehubungan dengan hal tersebut, kami mengharapkan kehadiran Bapak/Ibu pada:",
+  //           style: "paragraph",
+  //         },
+  //         { text: "\n" },
+  //         {
+  //           layout: "noBorders",
+  //           table: {
+  //             widths: ["30%", "5%", "65%"],
+  //             body: [
+  //               ["Hari/Tanggal", ":", "___________________"],
+  //               ["Waktu", ":", "___________________"],
+  //               ["Tempat", ":", "Ruang BK / Ruang Kesiswaan"],
+  //               ["Keperluan", ":", "Pembinaan dan Konsultasi"],
+  //             ],
+  //           },
+  //         },
+  //         { text: "\n" },
+  //         {
+  //           text: "Demikian surat panggilan ini kami sampaikan, atas perhatian dan kerjasamanya kami ucapkan terima kasih.",
+  //           style: "paragraph",
+  //         },
+  //         { text: "\n\n" },
+  //         {
+  //           columns: [
+  //             { width: "60%", text: "" },
+  //             {
+  //               width: "40%",
+  //               text: [
+  //                 "Jakarta, " + date + "\n",
+  //                 "Guru BK / Kesiswaan,\n\n\n\n",
+  //                 "______________________",
+  //               ],
+  //               alignment: "center",
+  //             },
+  //           ],
+  //         },
+  //         { text: "\n\n" },
+  //         {
+  //           columns: [
+  //             {
+  //               width: "40%",
+  //               text: [
+  //                 "Mengetahui,\n",
+  //                 "Kepala Sekolah\n\n\n\n",
+  //                 "______________________",
+  //               ],
+  //               alignment: "center",
+  //             },
+  //             { width: "20%", text: "" },
+  //             {
+  //               width: "40%",
+  //               text: [
+  //                 "Mengetahui,\n",
+  //                 "Wali Kelas\n\n\n\n",
+  //                 "______________________",
+  //               ],
+  //               alignment: "center",
+  //             },
+  //           ],
+  //         },
+  //       ],
+  //       styles: {
+  //         header: {
+  //           fontSize: 16,
+  //           bold: true,
+  //           alignment: "center",
+  //         },
+  //         paragraph: {
+  //           fontSize: 12,
+  //           alignment: "justify",
+  //         },
+  //       },
+  //     };
+  //   }
+
+  //   const pdfDocGenerator = pdfMake.createPdf(
+  //     docDefinition as TDocumentDefinitions
+  //   );
+
+  //   // Open PDF preview in modal
+  //   pdfDocGenerator.getDataUrl((dataUrl: any) => {
+  //     setPdfPreviewUrl(dataUrl);
+  //     setPdfPreviewVisible(true);
+  //   });
+  // };'
+
+  const handleGeneratePdf = (record: any, type: "statement" | "summons") => {
+    setSelectedViolation(record);
+    setPdfType(type);
+
+    const regulation =
+      record.regulation ||
+      regulationData?.data?.find((item) => item.id === record.regulationId);
+
+    generatePdf(record, regulation, type, (dataUrl: string) => {
+      setPdfPreviewUrl(dataUrl);
+      setPdfPreviewVisible(true);
+    });
+  };
+
   return (
     <List>
       <Card style={{ marginBottom: 16 }}>
@@ -179,7 +427,11 @@ export const ViolationsList = () => {
         >
           <Row gutter={24}>
             <Col xs={24} sm={8}>
-              <Form.Item name="class" label="Class">
+              <Form.Item
+                name="class"
+                label="Class"
+                rules={[{ required: true }]}
+              >
                 <Select
                   placeholder="Select Class"
                   allowClear
@@ -188,7 +440,11 @@ export const ViolationsList = () => {
               </Form.Item>
             </Col>
             <Col xs={24} sm={8}>
-              <Form.Item name="date" label="Month and Year">
+              <Form.Item
+                name="date"
+                label="Month and Year"
+                rules={[{ required: true }]}
+              >
                 <DatePicker
                   picker="month"
                   placeholder="Select Month/Year"
@@ -308,36 +564,6 @@ export const ViolationsList = () => {
                     );
                   }}
                 />
-                {/* <Table.Column
-              title="Tipe"
-              render={(_, record: any) => {
-                const regulation =
-                  record.regulation ||
-                  regulationData?.data?.find(
-                    (item) => item.id === record.regulationId
-                  );
-
-                if (!regulation?.type) return <Tag>Unknown</Tag>;
-
-                return regulation.type.toLowerCase() === "pelanggaran" ? (
-                  <Tag color="error">Pelanggaran</Tag>
-                ) : (
-                  <Tag color="success">Penghargaan</Tag>
-                );
-              }}
-              filters={[
-                { text: "Pelanggaran", value: "pelanggaran" },
-                { text: "Penghargaan", value: "penghargaan" },
-              ]}
-              onFilter={(value, record: any) => {
-                const regulation =
-                  record.regulation ||
-                  regulationData?.data?.find(
-                    (item) => item.id === record.regulationId
-                  );
-                return regulation?.type?.toLowerCase() === value;
-              }}
-            /> */}
                 <Table.Column
                   dataIndex={["teacher", "name"]}
                   title="Guru Pencatat"
@@ -362,6 +588,19 @@ export const ViolationsList = () => {
                         hideText
                         size="small"
                         recordItemId={record.id}
+                      />
+                      <Button
+                        icon={<FilePdfOutlined />}
+                        size="small"
+                        onClick={() => handleGeneratePdf(record, "statement")}
+                        title="Surat Pernyataan"
+                      />
+                      <Button
+                        icon={<FilePdfOutlined />}
+                        size="small"
+                        onClick={() => handleGeneratePdf(record, "summons")}
+                        danger
+                        title="Surat Panggilan Orang Tua"
                       />
                     </Space>
                   )}
@@ -442,6 +681,265 @@ export const ViolationsList = () => {
           },
         ]}
       ></Tabs>
+
+      {/* PDF Preview Modal */}
+      <Modal
+        title={
+          pdfType === "statement"
+            ? "Surat Pernyataan"
+            : "Surat Panggilan Orang Tua"
+        }
+        open={pdfPreviewVisible}
+        onCancel={() => setPdfPreviewVisible(false)}
+        width={800}
+        footer={[
+          <Button key="close" onClick={() => setPdfPreviewVisible(false)}>
+            Close
+          </Button>,
+          <Button
+            key="download"
+            type="primary"
+            onClick={() => {
+              if (selectedViolation && pdfType) {
+                const regulation =
+                  selectedViolation.regulation ||
+                  regulationData?.data?.find(
+                    (item) => item.id === selectedViolation.regulationId
+                  );
+
+                downloadPdf(selectedViolation, regulation, pdfType);
+              }
+            }}
+          >
+            Download
+          </Button>,
+        ]}
+      >
+        {pdfPreviewUrl && (
+          <iframe
+            src={pdfPreviewUrl}
+            style={{ width: "100%", height: "500px" }}
+            frameBorder="0"
+          ></iframe>
+        )}
+      </Modal>
     </List>
   );
 };
+
+// // Helper function to generate statement PDF definition
+// const generateStatementPdfDefinition = (record: any, regulation: any) => {
+//   const studentName = record?.studentClass?.user?.student?.name || "Nama Siswa";
+//   const className =
+//     record?.studentClass?.class?.romanLevel +
+//       " " +
+//       record?.studentClass?.class?.expertise?.shortName +
+//       " " +
+//       record?.studentClass?.class?.alphabet || "Kelas";
+//   const violationName = record?.name || "Pelanggaran";
+//   const regulationName = regulation?.name || "Peraturan";
+//   const points = regulation?.point || record?.point || 0;
+//   const teacherName = record?.teacher?.name || "Guru";
+//   const date =
+//     dayjs(record?.createdAt).format("DD MMMM YYYY") ||
+//     dayjs().format("DD MMMM YYYY");
+
+//   return {
+//     content: [
+//       { text: "SURAT PERNYATAAN", style: "header" },
+//       { text: "PELANGGARAN TATA TERTIB SEKOLAH", style: "subheader" },
+//       { text: "\n\n" },
+//       { text: "Yang bertanda tangan di bawah ini:", style: "paragraph" },
+//       {
+//         layout: "noBorders",
+//         table: {
+//           widths: ["30%", "5%", "65%"],
+//           body: [
+//             ["Nama", ":", studentName],
+//             ["Kelas", ":", className],
+//             ["Pelanggaran", ":", violationName],
+//             ["Peraturan", ":", regulationName],
+//             ["Point", ":", points + " point"],
+//           ],
+//         },
+//       },
+//       { text: "\n" },
+//       {
+//         text: "Dengan ini saya menyatakan bahwa saya telah melakukan pelanggaran tata tertib sekolah sebagaimana disebutkan di atas. Saya berjanji tidak akan mengulangi pelanggaran tersebut dan akan mematuhi semua peraturan sekolah.",
+//         style: "paragraph",
+//       },
+//       { text: "\n\n" },
+//       {
+//         columns: [
+//           { width: "60%", text: "" },
+//           {
+//             width: "40%",
+//             text: [
+//               "Jakarta, " + date + "\n",
+//               "Yang membuat pernyataan,\n\n\n\n",
+//               studentName,
+//             ],
+//             alignment: "center",
+//           },
+//         ],
+//       },
+//       { text: "\n\n" },
+//       {
+//         columns: [
+//           {
+//             width: "40%",
+//             text: ["Mengetahui,\n", "Guru Pencatat\n\n\n\n", teacherName],
+//             alignment: "center",
+//           },
+//           { width: "20%", text: "" },
+//           {
+//             width: "40%",
+//             text: [
+//               "Mengetahui,\n",
+//               "Wali Kelas\n\n\n\n",
+//               "______________________",
+//             ],
+//             alignment: "center",
+//           },
+//         ],
+//       },
+//     ],
+//     styles: {
+//       header: {
+//         fontSize: 16,
+//         bold: true,
+//         alignment: "center",
+//       },
+//       subheader: {
+//         fontSize: 14,
+//         bold: true,
+//         alignment: "center",
+//       },
+//       paragraph: {
+//         fontSize: 12,
+//         alignment: "justify",
+//       },
+//     },
+//   };
+// };
+
+// // Helper function to generate summons PDF definition
+// const generateSummonsPdfDefinition = (record: any, regulation: any) => {
+//   const studentName = record?.studentClass?.user?.student?.name || "Nama Siswa";
+//   const className =
+//     record?.studentClass?.class?.romanLevel +
+//       " " +
+//       record?.studentClass?.class?.expertise?.shortName +
+//       " " +
+//       record?.studentClass?.class?.alphabet || "Kelas";
+//   const violationName = record?.name || "Pelanggaran";
+//   const regulationName = regulation?.name || "Peraturan";
+//   const points = regulation?.point || record?.point || 0;
+//   const date =
+//     dayjs(record?.createdAt).format("DD MMMM YYYY") ||
+//     dayjs().format("DD MMMM YYYY");
+
+//   return {
+//     content: [
+//       { text: "SURAT PANGGILAN ORANG TUA", style: "header" },
+//       { text: "\n\n" },
+//       { text: "Kepada Yth,", style: "paragraph" },
+//       { text: "Orang Tua/Wali Murid", style: "paragraph" },
+//       { text: studentName, style: "paragraph", bold: true },
+//       { text: "Kelas " + className, style: "paragraph" },
+//       { text: "di Tempat", style: "paragraph" },
+//       { text: "\n" },
+//       { text: "Dengan hormat,", style: "paragraph" },
+//       {
+//         text: "Berdasarkan catatan pelanggaran tata tertib sekolah, dengan ini kami memberitahukan bahwa putra/putri Bapak/Ibu telah melakukan pelanggaran sebagai berikut:",
+//         style: "paragraph",
+//       },
+//       { text: "\n" },
+//       {
+//         layout: "noBorders",
+//         table: {
+//           widths: ["30%", "5%", "65%"],
+//           body: [
+//             ["Jenis Pelanggaran", ":", violationName],
+//             ["Peraturan", ":", regulationName],
+//             ["Point", ":", points + " point"],
+//             ["Tindakan yang diambil", ":", record?.actionTaken || "-"],
+//           ],
+//         },
+//       },
+//       { text: "\n" },
+//       {
+//         text: "Sehubungan dengan hal tersebut, kami mengharapkan kehadiran Bapak/Ibu pada:",
+//         style: "paragraph",
+//       },
+//       { text: "\n" },
+//       {
+//         layout: "noBorders",
+//         table: {
+//           widths: ["30%", "5%", "65%"],
+//           body: [
+//             ["Hari/Tanggal", ":", "___________________"],
+//             ["Waktu", ":", "___________________"],
+//             ["Tempat", ":", "Ruang BK / Ruang Kesiswaan"],
+//             ["Keperluan", ":", "Pembinaan dan Konsultasi"],
+//           ],
+//         },
+//       },
+//       { text: "\n" },
+//       {
+//         text: "Demikian surat panggilan ini kami sampaikan, atas perhatian dan kerjasamanya kami ucapkan terima kasih.",
+//         style: "paragraph",
+//       },
+//       { text: "\n\n" },
+//       {
+//         columns: [
+//           { width: "60%", text: "" },
+//           {
+//             width: "40%",
+//             text: [
+//               "Jakarta, " + date + "\n",
+//               "Guru BK / Kesiswaan,\n\n\n\n",
+//               "______________________",
+//             ],
+//             alignment: "center",
+//           },
+//         ],
+//       },
+//       { text: "\n\n" },
+//       {
+//         columns: [
+//           {
+//             width: "40%",
+//             text: [
+//               "Mengetahui,\n",
+//               "Kepala Sekolah\n\n\n\n",
+//               "______________________",
+//             ],
+//             alignment: "center",
+//           },
+//           { width: "20%", text: "" },
+//           {
+//             width: "40%",
+//             text: [
+//               "Mengetahui,\n",
+//               "Wali Kelas\n\n\n\n",
+//               "______________________",
+//             ],
+//             alignment: "center",
+//           },
+//         ],
+//       },
+//     ],
+//     styles: {
+//       header: {
+//         fontSize: 16,
+//         bold: true,
+//         alignment: "center",
+//       },
+//       paragraph: {
+//         fontSize: 12,
+//         alignment: "justify",
+//       },
+//     },
+//   };
+// };

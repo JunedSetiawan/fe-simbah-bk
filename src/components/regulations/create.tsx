@@ -20,7 +20,7 @@ export const RegulationCreate = () => {
       <Create saveButtonProps={saveButtonProps}>
         <Form {...formProps} layout="vertical">
           <Form.Item
-            label="Name"
+            label="Nama Peraturan"
             name={["name"]}
             rules={[
               {
@@ -31,7 +31,7 @@ export const RegulationCreate = () => {
             <Input />
           </Form.Item>
           <Form.Item
-            label="Description"
+            label="Deskripsi"
             name={["description"]}
             rules={[
               {
@@ -53,7 +53,7 @@ export const RegulationCreate = () => {
             <Input type="number" />
           </Form.Item>
           <Form.Item
-            label="Type"
+            label="Tipe Pelanggaran"
             name={["type"]}
             rules={[
               {
@@ -71,7 +71,7 @@ export const RegulationCreate = () => {
             </Select>
           </Form.Item>
           <Form.Item
-            label="Category"
+            label="Kategori Peraturan"
             name={["category"]}
             rules={[
               {
@@ -89,6 +89,17 @@ export const RegulationCreate = () => {
 
               <Select.Option value="Keamanan">Keamanan</Select.Option>
             </Select>
+          </Form.Item>
+          <Form.Item
+            label="Sanksi / Tindakan"
+            name="action_taken"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
           </Form.Item>
         </Form>
       </Create>

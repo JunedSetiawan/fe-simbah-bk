@@ -137,6 +137,11 @@ export const RegulationShow = () => {
                   </Tag>
                 </Descriptions.Item>
 
+                <Descriptions.Item label="Sanksi / Tindakan">
+                  <Typography.Paragraph style={{ marginBottom: 0 }}>
+                    {record?.actionTaken || "Tidak ada Sanksi / Tindakan"}
+                  </Typography.Paragraph>
+                </Descriptions.Item>
                 {/* <Descriptions.Item label="Status">
                   {record?.is_active === true ? (
                     <Badge status="success" text="Aktif" />
