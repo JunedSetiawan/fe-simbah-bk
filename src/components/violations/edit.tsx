@@ -177,14 +177,6 @@ export const ViolationsEdit = () => {
         >
           <Input />
         </Form.Item>
-
-        <Form.Item
-          label="Action Taken"
-          name="action_taken"
-          rules={[{ required: true }]}
-        >
-          <Input />
-        </Form.Item>
       </Form>
     </Edit>
   );

@@ -173,10 +173,13 @@ export const StudentViolationsShow = () => {
           pagination={{ pageSize: 10 }}
           expandable={{
             expandedRowRender: (value: any, record) => (
-              <p style={{ margin: 0 }}>
-                <Text strong>Action Taken: </Text>
-                {(value as any).actionTaken || "No specific action recorded"}
-              </p>
+              <>
+                <p style={{ margin: 0 }}>
+                  <Text strong>Action Taken: </Text>
+                  {(value.regulation.actionTaken as any) ||
+                    "No specific action recorded"}
+                </p>
+              </>
             ),
           }}
         >

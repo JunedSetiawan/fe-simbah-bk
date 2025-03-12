@@ -2,8 +2,12 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { TDocumentDefinitions } from "pdfmake/interfaces";
 import dayjs from "dayjs";
-
+import "dayjs/locale/id"; // Import Indonesian locale
 // Register fonts for pdfMake
+pdfMake.vfs = pdfFonts.vfs;
+
+// Register Indonesian locale for dayjs
+dayjs.locale("id");
 pdfMake.vfs = pdfFonts.vfs;
 
 // Helper function to convert image to base64
@@ -28,13 +32,36 @@ export const getBase64Image = (
   img.src = imagePath;
 };
 
+// Function to format parent information
+const formatParentsInfo = (studentParents: any[]) => {
+  if (
+    !studentParents ||
+    !Array.isArray(studentParents) ||
+    studentParents.length === 0
+  ) {
+    return "Tidak ada data orang tua";
+  }
+
+  return studentParents
+    .map((sp) => {
+      const parent = sp?.parent || {};
+      return `- ${parent.name || "Nama tidak tersedia"} (${parent.type || ""})`;
+    })
+    .join("\n");
+};
+
 // Generate statement PDF definition
 export const generateStatementPdfDefinition = (
   record: any,
   regulation: any,
   logoBase64?: string
 ) => {
+  console.log("record", record);
+  console.log("regulation", regulation);
   const studentName = record?.studentClass?.user?.student?.name || "Nama Siswa";
+  const studentParents =
+    record?.studentClass?.user?.student?.studentParents || [];
+  const parentsInfo = formatParentsInfo(studentParents);
   const className =
     record?.studentClass?.class?.romanLevel +
       " " +
@@ -45,9 +72,7 @@ export const generateStatementPdfDefinition = (
   const regulationName = regulation?.name || "Peraturan";
   const points = regulation?.point || record?.point || 0;
   const teacherName = record?.teacher?.name || "Guru";
-  const date =
-    dayjs(record?.createdAt).format("DD MMMM YYYY") ||
-    dayjs().format("DD MMMM YYYY");
+  const date = dayjs().locale("id").format("DD MMMM YYYY");
 
   const headerWithLogo = logoBase64
     ? {
@@ -59,8 +84,11 @@ export const generateStatementPdfDefinition = (
           },
           {
             stack: [
-              { text: "SURAT PERNYATAAN", style: "header" },
-              { text: "PELANGGARAN TATA TERTIB SEKOLAH", style: "subheader" },
+              { text: "SMK NEGERI 1 JENANGAN PONOROGO\n\n", style: "header" },
+              {
+                text: "Jl. Niken Gandini No.98, Plampitan, Setono, Kec. Jenangan,\n Kabupaten Ponorogo, Jawa Timur 63492",
+                style: "title",
+              },
             ],
             width: "*",
             alignment: "center",
@@ -76,18 +104,48 @@ export const generateStatementPdfDefinition = (
   return {
     content: [
       headerWithLogo,
+      { text: "\n" },
+      // divider for kop surat
+      {
+        text: "_______________________________________________________________________________________________",
+      },
+      { text: "\n" },
+
+      { text: "SURAT PERNYATAAN", style: "header" },
+      { text: "PELANGGARAN TATA TERTIB SEKOLAH", style: "subheader" },
       { text: "\n\n" },
-      { text: "Yang bertanda tangan di bawah ini:", style: "paragraph" },
+      { text: "Yang bertanda tangan di bawah ini: \n\n", style: "paragraph" },
       {
         layout: "noBorders",
         table: {
-          widths: ["30%", "5%", "65%"],
+          widths: ["25%", "5%", "70%"],
           body: [
-            ["Nama", ":", studentName],
-            ["Kelas", ":", className],
-            ["Pelanggaran", ":", violationName],
-            ["Peraturan", ":", regulationName],
-            ["Point", ":", points + " point"],
+            [
+              { text: "Nama", margin: [0, 0, 0, 8] },
+              { text: ":", margin: [0, 0, 0, 8] },
+              { text: studentName, margin: [0, 0, 0, 8] },
+            ],
+            [
+              { text: "Kelas", margin: [0, 0, 0, 8] },
+              { text: ":", margin: [0, 0, 0, 8] },
+              { text: className, margin: [0, 0, 0, 8] },
+            ],
+
+            [
+              { text: "Pelanggaran", margin: [0, 0, 0, 8] },
+              { text: ":", margin: [0, 0, 0, 8] },
+              { text: violationName, margin: [0, 0, 0, 8] },
+            ],
+            [
+              { text: "Peraturan", margin: [0, 0, 0, 8] },
+              { text: ":", margin: [0, 0, 0, 8] },
+              { text: regulationName, margin: [0, 0, 0, 8] },
+            ],
+            [
+              { text: "Point", margin: [0, 0, 0, 8] },
+              { text: ":", margin: [0, 0, 0, 8] },
+              { text: points + " point", margin: [0, 0, 0, 8] },
+            ],
           ],
         },
       },
@@ -96,17 +154,13 @@ export const generateStatementPdfDefinition = (
         text: "Dengan ini saya menyatakan bahwa saya telah melakukan pelanggaran tata tertib sekolah sebagaimana disebutkan di atas. Saya berjanji tidak akan mengulangi pelanggaran tersebut dan akan mematuhi semua peraturan sekolah.",
         style: "paragraph",
       },
-      { text: "\n\n" },
+      { text: "\n\n\n" },
       {
         columns: [
           { width: "60%", text: "" },
           {
             width: "40%",
-            text: [
-              "Jakarta, " + date + "\n",
-              "Yang membuat pernyataan,\n\n\n\n",
-              studentName,
-            ],
+            text: ["Ponorogo, " + date + "\n"],
             alignment: "center",
           },
         ],
@@ -116,7 +170,7 @@ export const generateStatementPdfDefinition = (
         columns: [
           {
             width: "40%",
-            text: ["Mengetahui,\n", "Guru Pencatat\n\n\n\n", teacherName],
+            text: ["Mengetahui,\n", "Siswa melanggar\n\n\n\n\n", studentName],
             alignment: "center",
           },
           { width: "20%", text: "" },
@@ -124,7 +178,7 @@ export const generateStatementPdfDefinition = (
             width: "40%",
             text: [
               "Mengetahui,\n",
-              "Wali Kelas\n\n\n\n",
+              "Wali Murid / Orang Tua\n\n\n\n\n",
               "______________________",
             ],
             alignment: "center",
@@ -157,7 +211,12 @@ export const generateSummonsPdfDefinition = (
   regulation: any,
   logoBase64?: string
 ) => {
+  console.log("record", record);
+  console.log("regulation", regulation);
   const studentName = record?.studentClass?.user?.student?.name || "Nama Siswa";
+  const studentParents =
+    record?.studentClass?.user?.student?.studentParents || [];
+  const parentsInfo = formatParentsInfo(studentParents);
   const className =
     record?.studentClass?.class?.romanLevel +
       " " +
@@ -167,9 +226,15 @@ export const generateSummonsPdfDefinition = (
   const violationName = record?.name || "Pelanggaran";
   const regulationName = regulation?.name || "Peraturan";
   const points = regulation?.point || record?.point || 0;
-  const date =
-    dayjs(record?.createdAt).format("DD MMMM YYYY") ||
-    dayjs().format("DD MMMM YYYY");
+  const date = dayjs().locale("id").format("DD MMMM YYYY");
+
+  // Get first parent's name if available
+  const parentName =
+    studentParents &&
+    studentParents.length > 0 &&
+    studentParents[0]?.parent?.name
+      ? studentParents[0].parent.name
+      : "Orang Tua/Wali Murid";
 
   const headerWithLogo = logoBase64
     ? {
@@ -180,7 +245,13 @@ export const generateSummonsPdfDefinition = (
             alignment: "left",
           },
           {
-            stack: [{ text: "SURAT PANGGILAN ORANG TUA", style: "header" }],
+            stack: [
+              { text: "SMK NEGERI 1 JENANGAN PONOROGO\n\n", style: "header" },
+              {
+                text: "Jl. Niken Gandini No.98, Plampitan, Setono, Kec. Jenangan,\n Kabupaten Ponorogo, Jawa Timur 63492",
+                style: "title",
+              },
+            ],
             width: "*",
             alignment: "center",
           },
@@ -192,11 +263,19 @@ export const generateSummonsPdfDefinition = (
   return {
     content: [
       headerWithLogo,
-      { text: "\n\n" },
-      { text: "Kepada Yth,", style: "paragraph" },
-      { text: "Orang Tua/Wali Murid", style: "paragraph" },
-      { text: studentName, style: "paragraph", bold: true },
-      { text: "Kelas " + className, style: "paragraph" },
+
+      {
+        text: "_______________________________________________________________________________________________",
+      },
+      { text: "\n" },
+      { text: "SURAT PANGGILAN ORANG TUA \n\n", style: "header" },
+      { text: "Kepada Yth, \n\n", style: "paragraph" },
+      { text: "Orang Tua / Wali Murid", style: "paragraph" },
+      {
+        text: studentName + ", Kelas " + className,
+        style: "paragraph",
+        bold: true,
+      },
       { text: "di Tempat", style: "paragraph" },
       { text: "\n" },
       { text: "Dengan hormat,", style: "paragraph" },
@@ -213,7 +292,8 @@ export const generateSummonsPdfDefinition = (
             ["Jenis Pelanggaran", ":", violationName],
             ["Peraturan", ":", regulationName],
             ["Point", ":", points + " point"],
-            ["Tindakan yang diambil", ":", record?.actionTaken || "-"],
+            ["Tindakan yang diambil", ":", regulation?.actionTaken || "-"],
+            ["Nama Orang Tua", ":", parentsInfo],
           ],
         },
       },
@@ -247,7 +327,7 @@ export const generateSummonsPdfDefinition = (
           {
             width: "40%",
             text: [
-              "Jakarta, " + date + "\n",
+              "Ponorogo, " + date + "\n",
               "Guru BK / Kesiswaan,\n\n\n\n",
               "______________________",
             ],
