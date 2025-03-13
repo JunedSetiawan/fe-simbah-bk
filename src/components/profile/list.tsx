@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use } from "react";
+import React from "react";
 import { useGetIdentity } from "@refinedev/core";
 import {
   Typography,
@@ -10,7 +10,6 @@ import {
   Avatar,
   Row,
   Col,
-  Badge,
   Space,
   Tag,
   Spin,
@@ -18,12 +17,7 @@ import {
 import {
   UserOutlined,
   IdcardOutlined,
-  MailOutlined,
-  PhoneOutlined,
-  CalendarOutlined,
-  HomeOutlined,
   TeamOutlined,
-  BankOutlined,
   BookOutlined,
 } from "@ant-design/icons";
 import { DateField } from "@refinedev/antd";
@@ -57,7 +51,8 @@ export const ProfilePage: React.FC = () => {
         return "default";
     }
   };
-  console.log(user);
+
+  if (!user) return null;
 
   const renderProfileDetails = () => {
     if (!user) return null;
@@ -330,7 +325,7 @@ export const ProfilePage: React.FC = () => {
                   size={100}
                   icon={<UserOutlined />}
                   style={{
-                    backgroundColor: getBadgeColor(user!.profileType ?? null),
+                    backgroundColor: getBadgeColor(user.profileType),
                   }}
                 />
                 <Title level={3} style={{ marginTop: 16, marginBottom: 0 }}>

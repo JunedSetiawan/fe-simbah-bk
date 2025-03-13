@@ -70,7 +70,7 @@ export const ViolationsList = () => {
   });
 
   // Standard violations table (index method)
-  const { tableProps, tableQueryResult } = useTable({
+  const { tableProps, tableQuery } = useTable({
     resource: "violations",
     syncWithLocation: true,
     pagination: {
@@ -177,6 +177,8 @@ export const ViolationsList = () => {
 
     return categoryColors[category?.toLowerCase()] || categoryColors.default;
   };
+
+  console.log(tableQuery, tableProps);
 
   // Generate PDF for statement or summons
   // const generatePdf = (record: any, type: "statement" | "summons") => {
