@@ -10,6 +10,7 @@ import {
   useNavigation,
   useGetToPath,
   useGo,
+  CanAccess,
 } from "@refinedev/core";
 import {
   useTable,
@@ -18,6 +19,7 @@ import {
   ShowButton,
   DeleteButton,
   DateField,
+  CreateButton,
 } from "@refinedev/antd";
 import {
   Table,
@@ -42,6 +44,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { TDocumentDefinitions } from "pdfmake/interfaces";
 import { generatePdf, downloadPdf } from "@utils/pdfGenerator";
+import UnauthorizedPage from "@app/unauthorized";
 
 // Register fonts for pdfMake
 pdfMake.vfs = pdfFonts.vfs;
@@ -61,6 +64,11 @@ export const ViolationsList = () => {
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const [pdfType, setPdfType] = useState<"statement" | "summons" | null>(null);
   const [selectedViolation, setSelectedViolation] = useState<any>(null);
+
+  // const { data: canEdit } = useCan({
+  //   resource: "regulations",
+  //   action: "edit",
+  // });
 
   // Fetch class data for filter dropdown
   const { options: classesOptionSelect } = useSelect({
@@ -419,312 +427,326 @@ export const ViolationsList = () => {
   };
 
   return (
-    <List>
-      <Card style={{ marginBottom: 16 }}>
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleFilter}
-          initialValues={{}}
-        >
-          <Row gutter={24}>
-            <Col xs={24} sm={8}>
-              <Form.Item
-                name="class"
-                label="Class"
-                rules={[{ required: true }]}
-              >
-                <Select
-                  placeholder="Select Class"
-                  allowClear
-                  options={classesOptionSelect}
-                ></Select>
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={8}>
-              <Form.Item
-                name="date"
-                label="Month and Year"
-                rules={[{ required: true }]}
-              >
-                <DatePicker
-                  picker="month"
-                  placeholder="Select Month/Year"
-                  style={{ width: "100%" }}
-                />
-              </Form.Item>
-            </Col>
-            <Col
-              xs={24}
-              sm={8}
-              style={{ display: "flex", alignItems: "center" }}
-            >
-              <Space>
-                <Button type="primary" htmlType="submit">
-                  Filter
-                </Button>
-                <Button onClick={handleReset}>Reset</Button>
-              </Space>
-            </Col>
-          </Row>
-        </Form>
-      </Card>
-
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-        items={[
-          {
-            key: "all",
-            label: "All Violations",
-            children: (
-              // All Violations Tab Content
-              <Table {...tableProps} rowKey="id">
-                <Table.Column
-                  title="No."
-                  width={60}
-                  render={(_, __, index) => {
-                    const { current = 1, pageSize = 10 } =
-                      tableProps.pagination || {};
-                    return (current - 1) * pageSize + index + 1;
-                  }}
-                />
-                <Table.Column
-                  dataIndex={["createdAt"]}
-                  title="Dibuat Pada"
-                  sorter
-                  render={(value: any) => (
-                    <Space>
-                      <ClockCircleOutlined style={{ color: "#8c8c8c" }} />
-                      <DateField
-                        value={value}
-                        format="DD MMM YYYY"
-                        style={{ color: "#8c8c8c" }}
-                      />
-                    </Space>
-                  )}
-                />
-                <Table.Column
-                  dataIndex={["regulation"]}
-                  title="Peraturan yang Dilanggar"
-                  render={(value, record: any) => {
-                    if (regulationIsLoading) return <Spin size="small" />;
-
-                    const regulation =
-                      record.regulation ||
-                      regulationData?.data?.find(
-                        (item) => item.id === record.regulationId
-                      );
-
-                    if (!regulation) return "Unknown regulation";
-
-                    return (
-                      <Space direction="vertical" size={0}>
-                        <Text>{regulation.name}</Text>
-                        {regulation.category && (
-                          <Tag color={getCategoryColor(regulation.category)}>
-                            {regulation.category} - {regulation.type}
-                          </Tag>
-                        )}
-                      </Space>
-                    );
-                  }}
-                />
-                <Table.Column
-                  dataIndex={["studentClass", "user", "student", "name"]}
-                  title="Nama siswa yang melanggar"
-                />
-                <Table.Column dataIndex="name" title="Nama Pelanggaran" />
-
-                <Table.Column
-                  dataIndex={["regulation", "actionTaken"]}
-                  title="Tindakan yang diambil"
-                />
-                <Table.Column
-                  title="Point"
-                  render={(_, record: any) => {
-                    const regulation =
-                      record.regulation ||
-                      regulationData?.data?.find(
-                        (item) => item.id === record.regulationId
-                      );
-
-                    const point = regulation?.point || record.point || 0;
-
-                    return (
-                      <Tag
-                        color={
-                          point > 20
-                            ? "red"
-                            : point > 10
-                            ? "default"
-                            : "default"
-                        }
-                      >
-                        {point} points
-                      </Tag>
-                    );
-                  }}
-                />
-                <Table.Column
-                  dataIndex={["teacher", "name"]}
-                  title="Guru Pencatat"
-                />
-
-                <Table.Column
-                  title="Actions"
-                  dataIndex="actions"
-                  render={(_, record: BaseRecord) => (
-                    <Space>
-                      <EditButton
-                        hideText
-                        size="small"
-                        recordItemId={record.id}
-                      />
-                      <ShowButton
-                        hideText
-                        size="small"
-                        recordItemId={record.id}
-                      />
-                      <DeleteButton
-                        hideText
-                        size="small"
-                        recordItemId={record.id}
-                      />
-                      <Button
-                        icon={<FilePdfOutlined />}
-                        size="small"
-                        onClick={() => handleGeneratePdf(record, "statement")}
-                        title="Surat Pernyataan"
-                      />
-                      <Button
-                        icon={<FilePdfOutlined />}
-                        size="small"
-                        onClick={() => handleGeneratePdf(record, "summons")}
-                        danger
-                        title="Surat Panggilan Orang Tua"
-                      />
-                    </Space>
-                  )}
-                />
-              </Table>
-            ),
-          },
-          {
-            key: "filtered",
-            label: "Filtered Violations",
-            disabled: !classId || !month || !year,
-            children:
-              studentViolationsLoading || isFiltering ? (
-                <div style={{ textAlign: "center", padding: "20px" }}>
-                  <Spin />
-                  <div style={{ marginTop: "10px" }}>
-                    Loading student violations...
-                  </div>
-                </div>
-              ) : studentViolationsData?.data?.length > 0 ? (
-                <Table
-                  dataSource={
-                    Array.isArray(studentViolationsData?.data)
-                      ? studentViolationsData?.data
-                      : []
-                  }
-                  rowKey="id"
-                  pagination={{ pageSize: 10 }}
+    <CanAccess
+      resource="violations"
+      action="list"
+      fallback={<UnauthorizedPage />}
+    >
+      <List>
+        <Card style={{ marginBottom: 16 }}>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleFilter}
+            initialValues={{}}
+          >
+            <Row gutter={24}>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  name="class"
+                  label="Class"
+                  rules={[{ required: true }]}
                 >
+                  <Select
+                    placeholder="Select Class"
+                    allowClear
+                    options={classesOptionSelect}
+                  ></Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  name="date"
+                  label="Month and Year"
+                  rules={[{ required: true }]}
+                >
+                  <DatePicker
+                    picker="month"
+                    placeholder="Select Month/Year"
+                    style={{ width: "100%" }}
+                  />
+                </Form.Item>
+              </Col>
+              <Col
+                xs={24}
+                sm={8}
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <Space>
+                  <Button type="primary" htmlType="submit">
+                    Filter
+                  </Button>
+                  <Button onClick={handleReset}>Reset</Button>
+                </Space>
+              </Col>
+            </Row>
+          </Form>
+        </Card>
+
+        <Tabs
+          activeKey={activeTab}
+          onChange={setActiveTab}
+          items={[
+            {
+              key: "all",
+              label: "All Violations",
+              children: (
+                // All Violations Tab Content
+                <Table {...tableProps} rowKey="id">
                   <Table.Column
                     title="No."
                     width={60}
-                    render={(_, __, index) => index + 1}
-                  />
-                  <Table.Column dataIndex="name" title="Nama Siswa" />
-                  <Table.Column dataIndex="nis" title="NIS" />
-                  <Table.Column dataIndex="nisn" title="NISN" />
-                  <Table.Column
-                    title="Kelas"
-                    render={(record) => {
-                      const classData = record.class;
-                      if (!classData) return "N/A";
-
-                      return `${classData.romanLevel} ${classData.expertise.shortName} ${classData.alphabet} - ${classData.expertise.prody.faculty.schoolYear.year}`;
+                    render={(_, __, index) => {
+                      const { current = 1, pageSize = 10 } =
+                        tableProps.pagination || {};
+                      return (current - 1) * pageSize + index + 1;
                     }}
                   />
                   <Table.Column
-                    dataIndex="totalPoints"
-                    title="Total Points"
-                    render={(value) => <Tag color="pink">{value} points</Tag>}
-                    sorter={(a: any, b: any) => a.totalPoints - b.totalPoints}
+                    dataIndex={["createdAt"]}
+                    title="Dibuat Pada"
+                    sorter
+                    render={(value: any) => (
+                      <Space>
+                        <ClockCircleOutlined style={{ color: "#8c8c8c" }} />
+                        <DateField
+                          value={value}
+                          format="DD MMM YYYY"
+                          style={{ color: "#8c8c8c" }}
+                        />
+                      </Space>
+                    )}
                   />
+                  <Table.Column
+                    dataIndex={["regulation"]}
+                    title="Peraturan yang Dilanggar"
+                    render={(value, record: any) => {
+                      if (regulationIsLoading) return <Spin size="small" />;
+
+                      const regulation =
+                        record.regulation ||
+                        regulationData?.data?.find(
+                          (item) => item.id === record.regulationId
+                        );
+
+                      if (!regulation) return "Unknown regulation";
+
+                      return (
+                        <Space direction="vertical" size={0}>
+                          <Text>{regulation.name}</Text>
+                          {regulation.category && (
+                            <Tag color={getCategoryColor(regulation.category)}>
+                              {regulation.category} - {regulation.type}
+                            </Tag>
+                          )}
+                        </Space>
+                      );
+                    }}
+                  />
+                  <Table.Column
+                    dataIndex={["studentClass", "user", "student", "name"]}
+                    title="Nama siswa yang melanggar"
+                  />
+                  <Table.Column dataIndex="name" title="Nama Pelanggaran" />
+
+                  <Table.Column
+                    dataIndex={["regulation", "actionTaken"]}
+                    title="Tindakan yang diambil"
+                  />
+                  <Table.Column
+                    title="Point"
+                    render={(_, record: any) => {
+                      const regulation =
+                        record.regulation ||
+                        regulationData?.data?.find(
+                          (item) => item.id === record.regulationId
+                        );
+
+                      const point = regulation?.point || record.point || 0;
+
+                      return (
+                        <Tag
+                          color={
+                            point > 20
+                              ? "red"
+                              : point > 10
+                              ? "default"
+                              : "default"
+                          }
+                        >
+                          {point} points
+                        </Tag>
+                      );
+                    }}
+                  />
+                  <Table.Column
+                    dataIndex={["teacher", "name"]}
+                    title="Guru Pencatat"
+                  />
+
                   <Table.Column
                     title="Actions"
                     dataIndex="actions"
                     render={(_, record: BaseRecord) => (
-                      <Button
-                        type="primary"
-                        size="small"
-                        onClick={() =>
-                          record.id !== undefined &&
-                          handleViewDetails(String(record.id))
-                        }
-                      >
-                        View Details
-                      </Button>
+                      <Space>
+                        <EditButton
+                          hideText
+                          size="small"
+                          recordItemId={record.id}
+                        />
+                        <ShowButton
+                          hideText
+                          size="small"
+                          recordItemId={record.id}
+                        />
+                        <DeleteButton
+                          hideText
+                          size="small"
+                          recordItemId={record.id}
+                        />
+                        <CanAccess
+                          resource="violations"
+                          action="generatePdf"
+                          fallback={null}
+                        >
+                          <Button
+                            icon={<FilePdfOutlined />}
+                            size="small"
+                            onClick={() =>
+                              handleGeneratePdf(record, "statement")
+                            }
+                            title="Surat Pernyataan"
+                          />
+                          <Button
+                            icon={<FilePdfOutlined />}
+                            size="small"
+                            onClick={() => handleGeneratePdf(record, "summons")}
+                            danger
+                            title="Surat Panggilan Orang Tua"
+                          />
+                        </CanAccess>
+                      </Space>
                     )}
                   />
                 </Table>
-              ) : (
-                <div style={{ textAlign: "center", padding: "20px" }}>
-                  <Text type="secondary">
-                    No violations found for the selected filters. Please try
-                    different criteria.
-                  </Text>
-                </div>
               ),
-          },
-        ]}
-      ></Tabs>
+            },
+            {
+              key: "filtered",
+              label: "Filtered Violations",
+              disabled: !classId || !month || !year,
+              children:
+                studentViolationsLoading || isFiltering ? (
+                  <div style={{ textAlign: "center", padding: "20px" }}>
+                    <Spin />
+                    <div style={{ marginTop: "10px" }}>
+                      Loading student violations...
+                    </div>
+                  </div>
+                ) : studentViolationsData?.data?.length > 0 ? (
+                  <Table
+                    dataSource={
+                      Array.isArray(studentViolationsData?.data)
+                        ? studentViolationsData?.data
+                        : []
+                    }
+                    rowKey="id"
+                    pagination={{ pageSize: 10 }}
+                  >
+                    <Table.Column
+                      title="No."
+                      width={60}
+                      render={(_, __, index) => index + 1}
+                    />
+                    <Table.Column dataIndex="name" title="Nama Siswa" />
+                    <Table.Column dataIndex="nis" title="NIS" />
+                    <Table.Column dataIndex="nisn" title="NISN" />
+                    <Table.Column
+                      title="Kelas"
+                      render={(record) => {
+                        const classData = record.class;
+                        if (!classData) return "N/A";
 
-      {/* PDF Preview Modal */}
-      <Modal
-        title={
-          pdfType === "statement"
-            ? "Surat Pernyataan"
-            : "Surat Panggilan Orang Tua"
-        }
-        open={pdfPreviewVisible}
-        onCancel={() => setPdfPreviewVisible(false)}
-        width={800}
-        footer={[
-          <Button key="close" onClick={() => setPdfPreviewVisible(false)}>
-            Close
-          </Button>,
-          <Button
-            key="download"
-            type="primary"
-            onClick={() => {
-              if (selectedViolation && pdfType) {
-                const regulation =
-                  selectedViolation.regulation ||
-                  regulationData?.data?.find(
-                    (item) => item.id === selectedViolation.regulationId
-                  );
+                        return `${classData.romanLevel} ${classData.expertise.shortName} ${classData.alphabet} - ${classData.expertise.prody.faculty.schoolYear.year}`;
+                      }}
+                    />
+                    <Table.Column
+                      dataIndex="totalPoints"
+                      title="Total Points"
+                      render={(value) => <Tag color="pink">{value} points</Tag>}
+                      sorter={(a: any, b: any) => a.totalPoints - b.totalPoints}
+                    />
+                    <Table.Column
+                      title="Actions"
+                      dataIndex="actions"
+                      render={(_, record: BaseRecord) => (
+                        <Button
+                          type="primary"
+                          size="small"
+                          onClick={() =>
+                            record.id !== undefined &&
+                            handleViewDetails(String(record.id))
+                          }
+                        >
+                          View Details
+                        </Button>
+                      )}
+                    />
+                  </Table>
+                ) : (
+                  <div style={{ textAlign: "center", padding: "20px" }}>
+                    <Text type="secondary">
+                      No violations found for the selected filters. Please try
+                      different criteria.
+                    </Text>
+                  </div>
+                ),
+            },
+          ]}
+        ></Tabs>
 
-                downloadPdf(selectedViolation, regulation, pdfType);
-              }
-            }}
-          >
-            Download
-          </Button>,
-        ]}
-      >
-        {pdfPreviewUrl && (
-          <iframe
-            src={pdfPreviewUrl}
-            style={{ width: "100%", height: "500px" }}
-            frameBorder="0"
-          ></iframe>
-        )}
-      </Modal>
-    </List>
+        {/* PDF Preview Modal */}
+        <Modal
+          title={
+            pdfType === "statement"
+              ? "Surat Pernyataan"
+              : "Surat Panggilan Orang Tua"
+          }
+          open={pdfPreviewVisible}
+          onCancel={() => setPdfPreviewVisible(false)}
+          width={800}
+          footer={[
+            <Button key="close" onClick={() => setPdfPreviewVisible(false)}>
+              Close
+            </Button>,
+            <Button
+              key="download"
+              type="primary"
+              onClick={() => {
+                if (selectedViolation && pdfType) {
+                  const regulation =
+                    selectedViolation.regulation ||
+                    regulationData?.data?.find(
+                      (item) => item.id === selectedViolation.regulationId
+                    );
+
+                  downloadPdf(selectedViolation, regulation, pdfType);
+                }
+              }}
+            >
+              Download
+            </Button>,
+          ]}
+        >
+          {pdfPreviewUrl && (
+            <iframe
+              src={pdfPreviewUrl}
+              style={{ width: "100%", height: "500px" }}
+              frameBorder="0"
+            ></iframe>
+          )}
+        </Modal>
+      </List>
+    </CanAccess>
   );
 };

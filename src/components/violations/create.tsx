@@ -17,9 +17,11 @@ import {
   useCustom,
   useCreate,
   useNavigation,
+  CanAccess,
 } from "@refinedev/core";
 import { SelectProps } from "antd/lib";
 import axios from "axios";
+import UnauthorizedPage from "@app/unauthorized";
 
 // Define interfaces
 interface Student {
@@ -434,136 +436,144 @@ export const ViolationsCreate = () => {
   };
 
   return (
-    <Create
-      saveButtonProps={{
-        ...saveButtonProps,
-        onClick: () => formProps.form?.submit(),
-        loading: isSubmitting,
-        disabled: isSubmitting,
-      }}
+    <CanAccess
+      resource="violations"
+      action="create"
+      fallback={<UnauthorizedPage />}
     >
-      <Form {...formProps} layout="vertical" onFinish={handleSubmit}>
-        <h1>Pilih Siswa</h1>
-        <Form.Item
-          label="Kelas"
-          name={["class_id"]}
-          rules={[
-            {
-              required: true,
-              message: "Kelas is required",
-            },
-          ]}
-        >
-          <Select {...classSelectMergedProps} />
-        </Form.Item>
-        <Form.Item
-          label="Siswa"
-          name={["student_id"]}
-          rules={[
-            {
-              required: true,
-              message: "Siswa is required",
-            },
-          ]}
-        >
-          <Select
-            loading={isLoadingStudents}
-            disabled={!selectedClassId || isLoadingStudents}
-            placeholder={
-              !selectedClassId ? "Pilih kelas terlebih dahulu" : "Pilih siswa"
-            }
-            options={studentOptions}
-            showSearch
-            filterOption={(input, option) =>
-              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
-            }
-            onChange={handleStudentChange}
-          />
-        </Form.Item>
+      <Create
+        saveButtonProps={{
+          ...saveButtonProps,
+          onClick: () => formProps.form?.submit(),
+          loading: isSubmitting,
+          disabled: isSubmitting,
+        }}
+      >
+        <Form {...formProps} layout="vertical" onFinish={handleSubmit}>
+          <h1>Pilih Siswa</h1>
+          <Form.Item
+            label="Kelas"
+            name={["class_id"]}
+            rules={[
+              {
+                required: true,
+                message: "Kelas is required",
+              },
+            ]}
+          >
+            <Select {...classSelectMergedProps} />
+          </Form.Item>
+          <Form.Item
+            label="Siswa"
+            name={["student_id"]}
+            rules={[
+              {
+                required: true,
+                message: "Siswa is required",
+              },
+            ]}
+          >
+            <Select
+              loading={isLoadingStudents}
+              disabled={!selectedClassId || isLoadingStudents}
+              placeholder={
+                !selectedClassId ? "Pilih kelas terlebih dahulu" : "Pilih siswa"
+              }
+              options={studentOptions}
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+              onChange={handleStudentChange}
+            />
+          </Form.Item>
 
-        {selectedStudentId && (
-          <div style={{ marginBottom: 16 }}>
-            {isLoadingParents ? (
-              <Spin size="small" />
-            ) : studentParents.length > 0 ? (
-              <div>
-                <p>Parents found: {studentParents.length}</p>
-                <ul>
-                  {studentParents.map((sp) => (
-                    <li key={sp.id}>
-                      {sp.parent.name} ({sp.parent.type}) -
-                      {sp.parent.phone ||
-                        sp.parent.phoneMobile ||
-                        "No phone number"}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : (
-              <p style={{ color: "red" }}>
-                Warning: No parents found for this student. WhatsApp
-                notifications cannot be sent.
+          {selectedStudentId && (
+            <div style={{ marginBottom: 16 }}>
+              {isLoadingParents ? (
+                <Spin size="small" />
+              ) : studentParents.length > 0 ? (
+                <div>
+                  <p>Parents found: {studentParents.length}</p>
+                  <ul>
+                    {studentParents.map((sp) => (
+                      <li key={sp.id}>
+                        {sp.parent.name} ({sp.parent.type}) -
+                        {sp.parent.phone ||
+                          sp.parent.phoneMobile ||
+                          "No phone number"}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <p style={{ color: "red" }}>
+                  Warning: No parents found for this student. WhatsApp
+                  notifications cannot be sent.
+                </p>
+              )}
+            </div>
+          )}
+
+          <Form.Item
+            label="Peraturan Pelanggaran yang terlibat"
+            name={"regulation_id"}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Select
+              placeholder="Pilih Peraturan Pelanggaran"
+              {...regulationSelectProps}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Name"
+            name={["name"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Description"
+            name={["description"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Modal
+            title="Sending WhatsApp Notifications"
+            open={messageModal}
+            footer={null}
+            closable={false}
+          >
+            <div style={{ textAlign: "center" }}>
+              <p>
+                Sending messages to parents:{" "}
+                {messageProgress.sent + messageProgress.failed}/
+                {messageProgress.total}
               </p>
-            )}
-          </div>
-        )}
-
-        <Form.Item
-          label="Peraturan Pelanggaran yang terlibat"
-          name={"regulation_id"}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Select
-            placeholder="Pilih Peraturan Pelanggaran"
-            {...regulationSelectProps}
-          />
-        </Form.Item>
-
-        <Form.Item
-          label="Name"
-          name={["name"]}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Description"
-          name={["description"]}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-
-        <Modal
-          title="Sending WhatsApp Notifications"
-          open={messageModal}
-          footer={null}
-          closable={false}
-        >
-          <div style={{ textAlign: "center" }}>
-            <p>
-              Sending messages to parents:{" "}
-              {messageProgress.sent + messageProgress.failed}/
-              {messageProgress.total}
-            </p>
-            <p>Successful: {messageProgress.sent}</p>
-            <p>Failed: {messageProgress.failed}</p>
-            <Spin />
-          </div>
-        </Modal>
-      </Form>
-    </Create>
+              <p>Successful: {messageProgress.sent}</p>
+              <p>Failed: {messageProgress.failed}</p>
+              <Spin />
+            </div>
+          </Modal>
+        </Form>
+      </Create>
+    </CanAccess>
   );
 };

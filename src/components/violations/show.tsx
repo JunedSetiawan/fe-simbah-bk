@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { useShow, useOne } from "@refinedev/core";
+import React, { useEffect } from "react";
+import { useShow, useOne, CanAccess } from "@refinedev/core";
 import { Show, DateField } from "@refinedev/antd";
 import {
   Card,
@@ -23,14 +23,15 @@ import {
   TeamOutlined,
   IdcardOutlined,
 } from "@ant-design/icons";
+import UnauthorizedPage from "@app/unauthorized";
 
 const { Title, Text } = Typography;
 
 export const ViolationsShow = () => {
-  const { queryResult } = useShow();
-  const { data, isLoading, isError } = queryResult;
+  const { query } = useShow();
+  const { isLoading, isError } = query;
 
-  const record = data?.data;
+  const record = query?.data?.data;
 
   const { data: regulationData, isLoading: regulationIsLoading } = useOne({
     resource: "regulations",
@@ -39,6 +40,11 @@ export const ViolationsShow = () => {
       enabled: !!record,
     },
   });
+
+  // if data response code 403 redirect unauthorized page
+  if (query.error && query.error.statusCode === 403) {
+    return <UnauthorizedPage />;
+  }
 
   if (isLoading || regulationIsLoading) {
     return (

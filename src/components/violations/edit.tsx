@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { Edit, useForm, useSelect } from "@refinedev/antd";
 import { Form, Input, Select, notification, SelectProps, Divider } from "antd";
-import { useApiUrl, useCustom } from "@refinedev/core";
+import { CanAccess, useApiUrl, useCustom } from "@refinedev/core";
+import UnauthorizedPage from "@app/unauthorized";
 
 export const ViolationsEdit = () => {
   const { formProps, saveButtonProps, query } = useForm({
@@ -127,57 +128,65 @@ export const ViolationsEdit = () => {
   };
 
   return (
-    <Edit saveButtonProps={saveButtonProps} mutationMode="pessimistic">
-      <Form {...formProps} layout="vertical">
-        <Form.Item
-          label="Kelas"
-          name="class_id"
-          rules={[{ required: true, message: "Kelas is required" }]}
-        >
-          <Select {...classSelectMergedProps} />
-        </Form.Item>
+    <CanAccess
+      resource="violations"
+      action="edit"
+      fallback={<UnauthorizedPage />}
+    >
+      <Edit saveButtonProps={saveButtonProps} mutationMode="pessimistic">
+        <Form {...formProps} layout="vertical">
+          <Form.Item
+            label="Kelas"
+            name="class_id"
+            rules={[{ required: true, message: "Kelas is required" }]}
+          >
+            <Select {...classSelectMergedProps} />
+          </Form.Item>
 
-        <Form.Item
-          label="Siswa"
-          name="student_id"
-          rules={[{ required: true, message: "Siswa is required" }]}
-        >
-          <Select
-            loading={isLoadingStudents}
-            disabled={!selectedClassId || isLoadingStudents}
-            placeholder={
-              !selectedClassId ? "Pilih kelas terlebih dahulu" : "Pilih siswa"
-            }
-            options={studentOptions}
-            showSearch
-            filterOption={(input, option) =>
-              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
-            }
-          />
-        </Form.Item>
+          <Form.Item
+            label="Siswa"
+            name="student_id"
+            rules={[{ required: true, message: "Siswa is required" }]}
+          >
+            <Select
+              loading={isLoadingStudents}
+              disabled={!selectedClassId || isLoadingStudents}
+              placeholder={
+                !selectedClassId ? "Pilih kelas terlebih dahulu" : "Pilih siswa"
+              }
+              options={studentOptions}
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+            />
+          </Form.Item>
 
-        <Divider />
+          <Divider />
 
-        <Form.Item
-          label="Regulation"
-          name="regulation_id"
-          rules={[{ required: true }]}
-        >
-          <Select {...regulationSelectProps} />
-        </Form.Item>
+          <Form.Item
+            label="Regulation"
+            name="regulation_id"
+            rules={[{ required: true }]}
+          >
+            <Select {...regulationSelectProps} />
+          </Form.Item>
 
-        <Form.Item label="Name" name="name" rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
+          <Form.Item label="Name" name="name" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
 
-        <Form.Item
-          label="Description"
-          name="description"
-          rules={[{ required: true }]}
-        >
-          <Input />
-        </Form.Item>
-      </Form>
-    </Edit>
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+        </Form>
+      </Edit>
+    </CanAccess>
   );
 };
