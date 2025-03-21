@@ -15,14 +15,15 @@ import {
   Row,
   Col,
   Statistic,
-  Badge,
   Space,
+  Avatar,
 } from "antd";
 import {
   WarningOutlined,
-  TrophyOutlined,
-  BookOutlined,
   ClockCircleOutlined,
+  UserOutlined,
+  TeamOutlined,
+  IdcardOutlined,
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -74,10 +75,8 @@ export const StudentViolationsShow = () => {
   }
 
   const studentData = data?.data?.student;
-  console.log(studentData);
   const violations = data?.data?.violations || [];
   const totalViolations = violations.length;
-  // Use the totalPoints from the backend if available
   const totalPoints = data?.data?.totalPoints || 0;
 
   const getSeverityColor = (points: number) => {
@@ -87,7 +86,6 @@ export const StudentViolationsShow = () => {
     return "#52c41a"; // Green - Low
   };
 
-  // Get color for regulation category
   const getCategoryColor = (category: string) => {
     const categoryColors: Record<string, string> = {
       kedisiplinan: "blue",
@@ -103,76 +101,113 @@ export const StudentViolationsShow = () => {
     return categoryColors[category?.toLowerCase()] || categoryColors.default;
   };
 
+  // Format class info
+  const classInfo = studentData?.class;
+  const expertise = classInfo?.expertise;
+  const prody = expertise?.prody;
+  const faculty = prody?.faculty;
+  const schoolYear = faculty?.schoolYear;
+
+  const formattedClass = classInfo
+    ? `${classInfo.romanLevel} ${expertise?.shortName} ${classInfo.alphabet}-${
+        schoolYear?.year || ""
+      }`
+    : "N/A";
+
   return (
     <Show title="Student Violation Details" canEdit={false}>
       <Card>
-        <Row gutter={[16, 16]}>
-          <Col xs={24} md={16}>
-            <Title level={4}>Nama : {studentData?.name}</Title>
-            <Descriptions column={{ xs: 1, sm: 2 }} layout="vertical" bordered>
-              <Descriptions.Item label="NIS">
-                {studentData?.nis}
-              </Descriptions.Item>
-              <Descriptions.Item label="NISN">
-                {studentData?.nisn}
-              </Descriptions.Item>
-              <Descriptions.Item label="Kelas">
-                {/* {sp.student?.studentClass?.class.romanLevel +
-                  " " +
-                  sp.student?.studentClass?.class.expertise.shortName +
-                  " " +
-                  sp.student?.studentClass?.class.alphabet +
-                  "-" +
-                  sp.student?.studentClass?.class.expertise.prody.faculty
-                    .schoolYear.year || "N/A"} */}
-
-                {studentData?.class?.romanLevel +
-                  " " +
-                  studentData?.class?.expertise?.shortName +
-                  " " +
-                  studentData?.class?.alphabet +
-                  "-" +
-                  studentData?.class?.expertise?.prody?.faculty?.schoolYear
-                    ?.year || "N/A"}
-              </Descriptions.Item>
-              <Descriptions.Item label="Periode">{`bulan ${month} tahun ${year}`}</Descriptions.Item>
-            </Descriptions>
-          </Col>
-          <Col xs={24} md={8}>
-            <Card bordered={false} style={{ background: "#f0f2f5" }}>
-              <Statistic
-                title="Total Pelanggaran Points"
-                value={totalPoints} // Will display cleanly without extra zeros
-                valueStyle={{ color: getSeverityColor(totalPoints) }}
-                prefix={<WarningOutlined />}
-                suffix="points"
-              />
-              <div style={{ marginTop: 10 }}>
-                <Tag color={getSeverityColor(totalPoints)}>
-                  {totalPoints >= 75
-                    ? "Severe"
-                    : totalPoints >= 50
-                    ? "High"
-                    : totalPoints >= 25
-                    ? "Medium"
-                    : "Low"}
-                </Tag>
-              </div>
+        {/* Student Information Section - Redesigned like ViolationsShow */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+          <Col xs={24}>
+            <Card bordered={false} style={{ background: "#f9f9f9" }}>
+              <Row gutter={16} align="middle">
+                <Col xs={24} sm={4} md={3} lg={2}>
+                  <Avatar
+                    size={64}
+                    icon={<UserOutlined />}
+                    style={{ backgroundColor: "#1890ff" }}
+                  />
+                </Col>
+                <Col xs={24} sm={20} md={21} lg={22}>
+                  <Title level={4} style={{ marginBottom: 8 }}>
+                    <TeamOutlined /> Siswa yang Melanggar
+                  </Title>
+                  <Descriptions column={{ xs: 1, sm: 2, md: 3 }} size="small">
+                    <Descriptions.Item label="Nama">
+                      <Text strong>{studentData?.name || "N/A"}</Text>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="NIS">
+                      <IdcardOutlined /> {studentData?.nis || "N/A"}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="NISN">
+                      {studentData?.nisn || "N/A"}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Kelas">
+                      <Tag color="blue">{formattedClass}</Tag>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Jurusan">
+                      {expertise?.name || "N/A"}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Program Studi">
+                      {prody?.name || "N/A"}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Periode">{`bulan ${month} tahun ${year}`}</Descriptions.Item>
+                  </Descriptions>
+                </Col>
+              </Row>
             </Card>
           </Col>
         </Row>
 
-        <Divider orientation="left">
-          Rekord Pelanggaran - Jumlah pelanggaran yang dibuat{" "}
-          <span className="text-red-500">{totalViolations}</span>
-        </Divider>
+        {/* Points Summary Section */}
+        <Row gutter={[16, 16]}>
+          <Col xs={24}>
+            <Card bordered={false} style={{ background: "#f0f2f5" }}>
+              <Row gutter={[16, 16]} justify="space-between" align="middle">
+                <Col xs={24} sm={16}>
+                  <Title level={4}>Ringkasan Pelanggaran</Title>
+                  <Text>
+                    Total pelanggaran yang dibuat:{" "}
+                    <Text strong type="danger">
+                      {totalViolations}
+                    </Text>{" "}
+                    pelanggaran
+                  </Text>
+                </Col>
+                <Col xs={24} sm={8}>
+                  <Statistic
+                    title="Total Pelanggaran Points"
+                    value={totalPoints}
+                    valueStyle={{ color: getSeverityColor(totalPoints) }}
+                    prefix={<WarningOutlined />}
+                    suffix="points"
+                  />
+                  <div style={{ marginTop: 10 }}>
+                    <Tag color={getSeverityColor(totalPoints)}>
+                      {totalPoints >= 75
+                        ? "Severe"
+                        : totalPoints >= 50
+                        ? "High"
+                        : totalPoints >= 25
+                        ? "Medium"
+                        : "Low"}
+                    </Tag>
+                  </div>
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+        </Row>
+
+        <Divider orientation="left">Rekord Pelanggaran</Divider>
 
         <Table
           dataSource={violations}
           rowKey="id"
           pagination={{ pageSize: 10 }}
           expandable={{
-            expandedRowRender: (value: any, record) => (
+            expandedRowRender: (value: any) => (
               <>
                 <p style={{ margin: 0 }}>
                   <Text strong>Action Taken: </Text>

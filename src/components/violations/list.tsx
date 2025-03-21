@@ -7,8 +7,6 @@ import {
   useCustom,
   useApiUrl,
   useSelect,
-  useNavigation,
-  useGetToPath,
   useGo,
   CanAccess,
 } from "@refinedev/core";
@@ -19,7 +17,11 @@ import {
   ShowButton,
   DeleteButton,
   DateField,
-  CreateButton,
+  FilterDropdown,
+  getDefaultFilter,
+  rangePickerFilterMapper,
+  MapValueEvent,
+  FilterDropdownProps,
 } from "@refinedev/antd";
 import {
   Table,
@@ -35,23 +37,23 @@ import {
   Tag,
   Spin,
   Card,
-  Badge,
   Modal,
+  Input,
 } from "antd";
 import dayjs from "dayjs";
 import { ClockCircleOutlined, FilePdfOutlined } from "@ant-design/icons";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import { TDocumentDefinitions } from "pdfmake/interfaces";
+// import type { FilterDropdownProps } from "antd/lib/table/interface";
+
 import { generatePdf, downloadPdf } from "@utils/pdfGenerator";
 import UnauthorizedPage from "@app/unauthorized";
 
 // Register fonts for pdfMake
 pdfMake.vfs = pdfFonts.vfs;
 
-const { Title, Text } = Typography;
-const { TabPane } = Tabs;
-const { Option } = Select;
+const { Text } = Typography;
+const { RangePicker } = DatePicker;
 
 export const ViolationsList = () => {
   const [form] = Form.useForm();
@@ -64,11 +66,7 @@ export const ViolationsList = () => {
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const [pdfType, setPdfType] = useState<"statement" | "summons" | null>(null);
   const [selectedViolation, setSelectedViolation] = useState<any>(null);
-
-  // const { data: canEdit } = useCan({
-  //   resource: "regulations",
-  //   action: "edit",
-  // });
+  const [isFiltering, setIsFiltering] = useState(false);
 
   // Fetch class data for filter dropdown
   const { options: classesOptionSelect } = useSelect({
@@ -78,14 +76,38 @@ export const ViolationsList = () => {
   });
 
   // Standard violations table (index method)
-  const { tableProps, tableQuery } = useTable({
+  const { tableProps, tableQuery, filters, setFilters } = useTable({
     resource: "violations",
     syncWithLocation: true,
     pagination: {
       pageSize: 10,
     },
+    filters: {
+      initial: [
+        {
+          field: "createdAt",
+          operator: "between",
+          value: undefined,
+        },
+        {
+          field: "name",
+          operator: "contains",
+          value: undefined,
+        },
+        {
+          field: "regulation.name",
+          operator: "contains",
+          value: undefined,
+        },
+        {
+          field: "studentClass.user.student.name",
+          operator: "contains",
+          value: undefined,
+        },
+      ],
+    },
   });
-  const [isFiltering, setIsFiltering] = useState(false);
+
   // Student violations data (studentViolations method)
   const { data: studentViolationsData, isLoading: studentViolationsLoading } =
     useCustom({
@@ -101,7 +123,6 @@ export const ViolationsList = () => {
       queryOptions: {
         enabled: !!classId && !!month && !!year,
         onSettled: () => {
-          // Set isFiltering ke false ketika data berhasil diambil atau terjadi error
           setIsFiltering(false);
         },
       },
@@ -116,14 +137,19 @@ export const ViolationsList = () => {
     },
   });
 
+  // Fetch regulations for the regulations filter dropdown
+  const { options: regulationsOptions } = useSelect({
+    resource: "regulations",
+    optionLabel: "name",
+    optionValue: "id",
+  });
+
   // Handle filter submission
   const handleFilter = (values: any) => {
     const selectedDate = values.date ? dayjs(values.date) : null;
 
-    // Aktifkan loading state dulu
     setIsFiltering(true);
 
-    // Update filter values
     setClassId(values.class || null);
     setMonth(selectedDate ? selectedDate.format("MM") : null);
     setYear(selectedDate ? selectedDate.format("YYYY") : null);
@@ -131,7 +157,6 @@ export const ViolationsList = () => {
     if (values.class && selectedDate) {
       setActiveTab("filtered");
     } else {
-      // Jika tidak ada filter yang valid, berhenti loading
       setIsFiltering(false);
       setActiveTab("all");
     }
@@ -147,11 +172,7 @@ export const ViolationsList = () => {
     setIsFiltering(false);
   };
 
-  // Handle student detail view
-  const navigate = useNavigation();
-  const getToPath = useGetToPath();
   const go = useGo();
-  const { show } = useNavigation();
 
   const handleViewDetails = (studentId: string) => {
     if (month && year) {
@@ -185,232 +206,6 @@ export const ViolationsList = () => {
 
     return categoryColors[category?.toLowerCase()] || categoryColors.default;
   };
-
-  console.log(tableQuery, tableProps);
-
-  // Generate PDF for statement or summons
-  // const generatePdf = (record: any, type: "statement" | "summons") => {
-  //   setSelectedViolation(record);
-  //   setPdfType(type);
-
-  //   const regulation =
-  //     record.regulation ||
-  //     regulationData?.data?.find((item) => item.id === record.regulationId);
-
-  //   const studentName =
-  //     record?.studentClass?.user?.student?.name || "Nama Siswa";
-  //   const className =
-  //     record?.studentClass?.class?.romanLevel +
-  //       " " +
-  //       record?.studentClass?.class?.expertise?.shortName +
-  //       " " +
-  //       record?.studentClass?.class?.alphabet || "Kelas";
-  //   const violationName = record?.name || "Pelanggaran";
-  //   const regulationName = regulation?.name || "Peraturan";
-  //   const points = regulation?.point || record?.point || 0;
-  //   const teacherName = record?.teacher?.name || "Guru";
-  //   const date =
-  //     dayjs(record?.createdAt).format("DD MMMM YYYY") ||
-  //     dayjs().format("DD MMMM YYYY");
-
-  //   // Create document definition based on type
-  //   let docDefinition;
-
-  //   if (type === "statement") {
-  //     docDefinition = {
-  //       content: [
-  //         { text: "SURAT PERNYATAAN", style: "header" },
-  //         { text: "PELANGGARAN TATA TERTIB SEKOLAH", style: "subheader" },
-  //         { text: "\n\n" },
-  //         { text: "Yang bertanda tangan di bawah ini:", style: "paragraph" },
-  //         {
-  //           layout: "noBorders",
-  //           table: {
-  //             widths: ["30%", "5%", "65%"],
-  //             body: [
-  //               ["Nama", ":", studentName],
-  //               ["Kelas", ":", className],
-  //               ["Pelanggaran", ":", violationName],
-  //               ["Peraturan", ":", regulationName],
-  //               ["Point", ":", points + " point"],
-  //             ],
-  //           },
-  //         },
-  //         { text: "\n" },
-  //         {
-  //           text: "Dengan ini saya menyatakan bahwa saya telah melakukan pelanggaran tata tertib sekolah sebagaimana disebutkan di atas. Saya berjanji tidak akan mengulangi pelanggaran tersebut dan akan mematuhi semua peraturan sekolah.",
-  //           style: "paragraph",
-  //         },
-  //         { text: "\n\n" },
-  //         {
-  //           columns: [
-  //             { width: "60%", text: "" },
-  //             {
-  //               width: "40%",
-  //               text: [
-  //                 "Jakarta, " + date + "\n",
-  //                 "Yang membuat pernyataan,\n\n\n\n",
-  //                 studentName,
-  //               ],
-  //               alignment: "center",
-  //             },
-  //           ],
-  //         },
-  //         { text: "\n\n" },
-  //         {
-  //           columns: [
-  //             {
-  //               width: "40%",
-  //               text: ["Mengetahui,\n", "Guru Pencatat\n\n\n\n", teacherName],
-  //               alignment: "center",
-  //             },
-  //             { width: "20%", text: "" },
-  //             {
-  //               width: "40%",
-  //               text: [
-  //                 "Mengetahui,\n",
-  //                 "Wali Kelas\n\n\n\n",
-  //                 "______________________",
-  //               ],
-  //               alignment: "center",
-  //             },
-  //           ],
-  //         },
-  //       ],
-  //       styles: {
-  //         header: {
-  //           fontSize: 16,
-  //           bold: true,
-  //           alignment: "center",
-  //         },
-  //         subheader: {
-  //           fontSize: 14,
-  //           bold: true,
-  //           alignment: "center",
-  //         },
-  //         paragraph: {
-  //           fontSize: 12,
-  //           alignment: "justify",
-  //         },
-  //       },
-  //     };
-  //   } else {
-  //     // summons
-  //     docDefinition = {
-  //       content: [
-  //         { text: "SURAT PANGGILAN ORANG TUA", style: "header" },
-  //         { text: "\n\n" },
-  //         { text: "Kepada Yth,", style: "paragraph" },
-  //         { text: "Orang Tua/Wali Murid", style: "paragraph" },
-  //         { text: studentName, style: "paragraph", bold: true },
-  //         { text: "Kelas " + className, style: "paragraph" },
-  //         { text: "di Tempat", style: "paragraph" },
-  //         { text: "\n" },
-  //         { text: "Dengan hormat,", style: "paragraph" },
-  //         {
-  //           text: "Berdasarkan catatan pelanggaran tata tertib sekolah, dengan ini kami memberitahukan bahwa putra/putri Bapak/Ibu telah melakukan pelanggaran sebagai berikut:",
-  //           style: "paragraph",
-  //         },
-  //         { text: "\n" },
-  //         {
-  //           layout: "noBorders",
-  //           table: {
-  //             widths: ["30%", "5%", "65%"],
-  //             body: [
-  //               ["Jenis Pelanggaran", ":", violationName],
-  //               ["Peraturan", ":", regulationName],
-  //               ["Point", ":", points + " point"],
-  //               ["Tindakan yang diambil", ":", record?.actionTaken || "-"],
-  //             ],
-  //           },
-  //         },
-  //         { text: "\n" },
-  //         {
-  //           text: "Sehubungan dengan hal tersebut, kami mengharapkan kehadiran Bapak/Ibu pada:",
-  //           style: "paragraph",
-  //         },
-  //         { text: "\n" },
-  //         {
-  //           layout: "noBorders",
-  //           table: {
-  //             widths: ["30%", "5%", "65%"],
-  //             body: [
-  //               ["Hari/Tanggal", ":", "___________________"],
-  //               ["Waktu", ":", "___________________"],
-  //               ["Tempat", ":", "Ruang BK / Ruang Kesiswaan"],
-  //               ["Keperluan", ":", "Pembinaan dan Konsultasi"],
-  //             ],
-  //           },
-  //         },
-  //         { text: "\n" },
-  //         {
-  //           text: "Demikian surat panggilan ini kami sampaikan, atas perhatian dan kerjasamanya kami ucapkan terima kasih.",
-  //           style: "paragraph",
-  //         },
-  //         { text: "\n\n" },
-  //         {
-  //           columns: [
-  //             { width: "60%", text: "" },
-  //             {
-  //               width: "40%",
-  //               text: [
-  //                 "Jakarta, " + date + "\n",
-  //                 "Guru BK / Kesiswaan,\n\n\n\n",
-  //                 "______________________",
-  //               ],
-  //               alignment: "center",
-  //             },
-  //           ],
-  //         },
-  //         { text: "\n\n" },
-  //         {
-  //           columns: [
-  //             {
-  //               width: "40%",
-  //               text: [
-  //                 "Mengetahui,\n",
-  //                 "Kepala Sekolah\n\n\n\n",
-  //                 "______________________",
-  //               ],
-  //               alignment: "center",
-  //             },
-  //             { width: "20%", text: "" },
-  //             {
-  //               width: "40%",
-  //               text: [
-  //                 "Mengetahui,\n",
-  //                 "Wali Kelas\n\n\n\n",
-  //                 "______________________",
-  //               ],
-  //               alignment: "center",
-  //             },
-  //           ],
-  //         },
-  //       ],
-  //       styles: {
-  //         header: {
-  //           fontSize: 16,
-  //           bold: true,
-  //           alignment: "center",
-  //         },
-  //         paragraph: {
-  //           fontSize: 12,
-  //           alignment: "justify",
-  //         },
-  //       },
-  //     };
-  //   }
-
-  //   const pdfDocGenerator = pdfMake.createPdf(
-  //     docDefinition as TDocumentDefinitions
-  //   );
-
-  //   // Open PDF preview in modal
-  //   pdfDocGenerator.getDataUrl((dataUrl: any) => {
-  //     setPdfPreviewUrl(dataUrl);
-  //     setPdfPreviewVisible(true);
-  //   });
-  // };'
 
   const handleGeneratePdf = (record: any, type: "statement" | "summons") => {
     setSelectedViolation(record);
@@ -506,6 +301,16 @@ export const ViolationsList = () => {
                     dataIndex={["createdAt"]}
                     title="Dibuat Pada"
                     sorter
+                    filterDropdown={(props) => (
+                      <FilterDropdown
+                        {...props}
+                        mapValue={(selectedKeys, event) => {
+                          return rangePickerFilterMapper(selectedKeys, event);
+                        }}
+                      >
+                        <DatePicker.RangePicker />
+                      </FilterDropdown>
+                    )}
                     render={(value: any) => (
                       <Space>
                         <ClockCircleOutlined style={{ color: "#8c8c8c" }} />
@@ -518,8 +323,21 @@ export const ViolationsList = () => {
                     )}
                   />
                   <Table.Column
-                    dataIndex={["regulation"]}
+                    dataIndex={["regulation", "name"]}
                     title="Peraturan yang Dilanggar"
+                    // filterDropdown={(props: FilterDropdownProps) => (
+                    //   <FilterDropdown {...props}>
+                    //     <Input
+                    //       placeholder="Search regulation"
+                    //       style={{ width: "100%" }}
+                    //     />
+                    //   </FilterDropdown>
+                    // )}
+                    defaultFilteredValue={getDefaultFilter(
+                      "regulation.name",
+                      filters,
+                      "contains"
+                    )}
                     render={(value, record: any) => {
                       if (regulationIsLoading) return <Spin size="small" />;
 
@@ -545,9 +363,48 @@ export const ViolationsList = () => {
                   />
                   <Table.Column
                     dataIndex={["studentClass", "user", "student", "name"]}
-                    title="Nama siswa yang melanggar"
+                    title="Nama Siswa yang Melanggar"
+                    // filterDropdown={(props: FilterDropdownProps) => (
+                    //   <FilterDropdown {...props}>
+                    //     <Input
+                    //       placeholder="Search student"
+                    //       style={{ width: "100%" }}
+                    //     />
+                    //   </FilterDropdown>
+                    // )}
+                    defaultFilteredValue={getDefaultFilter(
+                      "studentClass.user.student.name",
+                      filters,
+                      "contains"
+                    )}
+                    render={(text, record) => {
+                      const studentName = text; // Nama siswa
+                      const className = record.studentClass.class.romanLevel; // Kelas (XI)
+                      const prodyName =
+                        record.studentClass.class.expertise.shortName; // Prody (RPL)
+                      const classAlphabet = record.studentClass.class.alphabet; // Kelas (B)
+
+                      // Gabungkan menjadi format "siswa - XI RPL B"
+                      return `${studentName} - ${className} ${prodyName} ${classAlphabet}`;
+                    }}
                   />
-                  <Table.Column dataIndex="name" title="Nama Pelanggaran" />
+                  <Table.Column
+                    dataIndex="name"
+                    title="Nama Pelanggaran"
+                    // filterDropdown={(props: FilterDropdownProps) => (
+                    //   <FilterDropdown {...props}>
+                    //     <Input
+                    //       placeholder="Search violation"
+                    //       style={{ width: "100%" }}
+                    //     />
+                    //   </FilterDropdown>
+                    // )}
+                    defaultFilteredValue={getDefaultFilter(
+                      "name",
+                      filters,
+                      "contains"
+                    )}
+                  />
 
                   <Table.Column
                     dataIndex={["regulation", "actionTaken"]}
