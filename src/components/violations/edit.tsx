@@ -53,20 +53,18 @@ export const ViolationsEdit = () => {
   // Atur data form saat query selesai
   useEffect(() => {
     if (data && formProps.form) {
-      // Konversi data ke snake_case
       const formData = {
         name: data.name,
         description: data.description,
         action_taken: data.actionTaken,
         regulation_id: data.regulationId,
         class_id: initialClassId,
-        // Student ID akan diatur setelah daftar siswa dimuat
       };
 
       formProps.form.setFieldsValue(formData);
       setSelectedClassId(initialClassId);
     }
-  }, [data, formProps.form]);
+  }, [data, formProps.form, initialClassId]);
 
   // Fetch daftar siswa ketika kelas dipilih
   const { isLoading: isLoadingStudents } = useCustom({

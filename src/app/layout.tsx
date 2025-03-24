@@ -1,16 +1,15 @@
 import { DevtoolsProvider } from "@providers/devtools";
-import { useNotificationProvider, RefineThemes } from "@refinedev/antd";
-import { GitHubBanner, Refine } from "@refinedev/core";
+import { useNotificationProvider } from "@refinedev/antd";
+import { Refine } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import routerProvider from "@refinedev/nextjs-router";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import React, { Suspense } from "react";
-import "./global.css";
 
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { ConfigProvider } from "antd";
-import { ColorModeContextProvider } from "@contexts/color-mode";
+
 import {
   authProviderClient,
   accessControlProvider,
@@ -20,13 +19,11 @@ import { dataProviders } from "@providers/data-provider";
 import "@refinedev/antd/dist/reset.css";
 import {
   ControlFilled,
-  ControlOutlined,
   HomeFilled,
-  HomeOutlined,
   ReadFilled,
-  ReadOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import "./global.css";
 
 export const metadata: Metadata = {
   title: "Refine",
@@ -34,6 +31,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
   },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

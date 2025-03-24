@@ -6,9 +6,9 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "dev": "cross-env NODE_OPTIONS=--max_old_space_size=4096 refine dev",
-    "build": "refine build",
-    "start": "refine start",
+    "dev": "cross-env NODE_OPTIONS=--max_old_space_size=4096 NODE_ENV=production refine dev",
+    "build": "cross-env refine build ",
+    "start": "node .next/standalone/server.js",
     "lint": "next lint",
     "refine": "refine"
   },
@@ -38,11 +38,13 @@
     "jspdf-autotable": "^5.0.2",
     "jwt-decode": "^4.0.0",
     "next": "^14.1.0",
+    "next-pwa": "^5.6.0",
     "pdfmake": "^0.2.18",
     "postcss": "^8.5.2",
     "query-string": "^7.1.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "sharp": "^0.33.5",
     "tailwindcss": "^4.0.6"
   },
   "devDependencies": {
@@ -52,8 +54,10 @@
     "@types/react-dom": "^18.0.0",
     "@typescript-eslint/parser": "^6.21.0",
     "cross-env": "^7.0.3",
+    "css-loader": "^7.1.2",
     "eslint": "^8",
     "eslint-config-next": "^14.1.0",
+    "style-loader": "^4.0.0",
     "typescript": "^5.4.2"
   },
   "refine": {

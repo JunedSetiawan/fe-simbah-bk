@@ -7,7 +7,7 @@ import { NavigateToResource } from "@refinedev/nextjs-router";
 import { ThemedLayoutV2 } from "@components/layout";
 import { Header } from "@components/header";
 
-export default function IndexPage({ children }: React.PropsWithChildren) {
+export default function IndexPage() {
   return (
     <Suspense>
       <Authenticated key="home-page">
