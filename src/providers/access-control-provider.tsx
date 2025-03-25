@@ -44,41 +44,8 @@ export const accessControlProvider: AccessControlProvider = {
       };
     }
 
-    // Handle Violations resource
-    // Handle Violations resource
-    // Handle Violations resource
     if (resource === "violations") {
       if (action === "list" || action === "show") {
-        // if (isStudent(user) && action === "show") {
-        //   const record = params?.record; // Access the violation record
-
-        //   if (isStudent(user) && action === "show") {
-        //     // Check if the violation belongs to the current student
-        //     if (record && record.studentClass?.student_x_user_id) {
-        //       return {
-        //         can: user.id === record.studentClass.student_x_user_id,
-        //       };
-        //     }
-        //     return { can: false };
-        //   }
-
-        //   if (isParent(user) && action === "show") {
-        //     const record = params?.record; // Access the violation record
-        //     console.log("Record", record);
-        //     // Check if the violation belongs to the parent's child
-        //     if (record && record.studentClass?.user?.student?.studentParents) {
-        //       const studentParents =
-        //         record.studentClass.user.student.studentParents;
-        //       return {
-        //         can: studentParents.some(
-        //           (sp: any) => sp.parentXUserId === user.id
-        //         ),
-        //       };
-        //     }
-        //     return { can: false };
-        //   }
-        // }
-
         return {
           can:
             isSuperAdmin(user) ||
@@ -139,23 +106,6 @@ export const accessControlProvider: AccessControlProvider = {
     // Handle Counseling resource
     if (resource === "counselings") {
       if (action === "list" || action === "show") {
-        if (isStudent(user) && action === "show") {
-          // Check if the counseling belongs to the current student
-          const counseling = params?.resource;
-          if (
-            counseling &&
-            (counseling as any).studentClasses &&
-            (counseling as any).studentClasses.student_x_user_id
-          ) {
-            return {
-              can:
-                user.id ===
-                (counseling as any).studentClasses.student_x_user_id,
-            };
-          }
-          return { can: false };
-        }
-
         return {
           can:
             isSuperAdmin(user) ||
