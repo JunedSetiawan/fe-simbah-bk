@@ -227,7 +227,7 @@ export const ViolationsList = () => {
       action="list"
       fallback={<UnauthorizedPage />}
     >
-      <List>
+      <List title="Daftar Pelanggaran Ketertiban">
         <Card style={{ marginBottom: 16 }}>
           <Form
             form={form}
@@ -461,11 +461,19 @@ export const ViolationsList = () => {
                           size="small"
                           recordItemId={record.id}
                         />
-                        <CanAccess
-                          resource="violations"
-                          action="generatePdf"
-                          fallback={null}
-                        >
+                      </Space>
+                    )}
+                  />
+                  <Table.Column
+                    title="Cetak Surat"
+                    dataIndex="actions"
+                    render={(_, record: BaseRecord) => (
+                      <CanAccess
+                        resource="violations"
+                        action="generatePdf"
+                        fallback={null}
+                      >
+                        <Space>
                           <Button
                             icon={<FilePdfOutlined />}
                             size="small"
@@ -481,8 +489,8 @@ export const ViolationsList = () => {
                             danger
                             title="Surat Panggilan Orang Tua"
                           />
-                        </CanAccess>
-                      </Space>
+                        </Space>
+                      </CanAccess>
                     )}
                   />
                 </Table>

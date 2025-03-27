@@ -1,5 +1,5 @@
-import { CounselingsCreate } from "@components/counselings";
+import { CounselingCreate } from "@components/counselings";
 
 export default function CounselingsCreatePage() {
-    return <CounselingsCreate />;
-};
+  return <CounselingCreate />;
+}

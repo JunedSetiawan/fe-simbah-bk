@@ -1,5 +1,5 @@
-import { CounselingsShow } from "@components/counselings";
+import { CounselingShow } from "@components/counselings";
 
 export default function CounselingsShowPage() {
-    return <CounselingsShow />;
-};
+  return <CounselingShow />;
+}

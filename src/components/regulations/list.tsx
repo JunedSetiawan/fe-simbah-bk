@@ -125,15 +125,13 @@ export const RegulationList = () => {
           }}
         >
           <Table.Column
-            dataIndex="id"
-            title="ID"
-            width={80}
-            sorter
-            render={(value) => (
-              <Text code style={{ fontWeight: "bold" }}>
-                {value}
-              </Text>
-            )}
+            title="No."
+            width={60}
+            render={(_, __, index) => {
+              const { current = 1, pageSize = 10 } =
+                tableProps.pagination || {};
+              return (current - 1) * pageSize + index + 1;
+            }}
           />
 
           <Table.Column

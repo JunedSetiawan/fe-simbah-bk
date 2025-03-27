@@ -1,5 +1,5 @@
-import { CounselingsList } from "@components/counselings";
+import { CounselingList } from "@components/counselings";
 
 export default function CounselingsListPage() {
-    return <CounselingsList />;
-};
+  return <CounselingList />;
+}
