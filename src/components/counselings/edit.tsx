@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import { Edit, useForm, useSelect } from "@refinedev/antd";
 import { Form, Input, DatePicker, notification, Select, Divider } from "antd";
 import dayjs from "dayjs";
-import { useApiUrl, useCustom } from "@refinedev/core";
+import { CanAccess, useApiUrl, useCustom } from "@refinedev/core";
+import UnauthorizedPage from "@app/unauthorized";
 
 export const CounselingsEdit = () => {
   const { formProps, saveButtonProps, query } = useForm({
@@ -124,104 +125,112 @@ export const CounselingsEdit = () => {
   };
 
   return (
-    <Edit saveButtonProps={saveButtonProps} mutationMode="pessimistic">
-      <Form {...formProps} layout="vertical">
-        <Form.Item
-          label="Kelas"
-          name="class_id"
-          rules={[{ required: true, message: "Kelas is required" }]}
-        >
-          <Select {...classSelectMergedProps} />
-        </Form.Item>
+    <CanAccess
+      resource="violations"
+      action="edit"
+      fallback={<UnauthorizedPage />}
+    >
+      <Edit saveButtonProps={saveButtonProps} mutationMode="pessimistic">
+        <Form {...formProps} layout="vertical">
+          <Form.Item
+            label="Kelas"
+            name="class_id"
+            rules={[{ required: true, message: "Kelas is required" }]}
+          >
+            <Select {...classSelectMergedProps} />
+          </Form.Item>
 
-        <Form.Item
-          label="Siswa"
-          name="student_id"
-          rules={[{ required: true, message: "Siswa is required" }]}
-        >
-          <Select
-            loading={isLoadingStudents}
-            disabled={!selectedClassId || isLoadingStudents}
-            placeholder={
-              !selectedClassId ? "Pilih kelas terlebih dahulu" : "Pilih siswa"
-            }
-            options={studentOptions}
-            showSearch
-            filterOption={(input, option) =>
-              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
-            }
-          />
-        </Form.Item>
+          <Form.Item
+            label="Siswa"
+            name="student_id"
+            rules={[{ required: true, message: "Siswa is required" }]}
+          >
+            <Select
+              loading={isLoadingStudents}
+              disabled={!selectedClassId || isLoadingStudents}
+              placeholder={
+                !selectedClassId ? "Pilih kelas terlebih dahulu" : "Pilih siswa"
+              }
+              options={studentOptions}
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+            />
+          </Form.Item>
 
-        <Divider />
+          <Divider />
 
-        <Form.Item
-          label="Service Field"
-          name={["serviceField"]}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Service Type"
-          name={["serviceType"]}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Case"
-          name={["case"]}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Summary"
-          name={["summary"]}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Follow Up"
-          name={["followUp"]}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Description"
-          name={["description"]}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-      </Form>
-    </Edit>
+          <Form.Item
+            label="Service Field"
+            name={["serviceField"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Service Type"
+            name={["serviceType"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Case"
+            name={["case"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Summary"
+            name={["summary"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Follow Up"
+            name={["followUp"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Description"
+            name={["description"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+        </Form>
+      </Edit>
+    </CanAccess>
   );
 };

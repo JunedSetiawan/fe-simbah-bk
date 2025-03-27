@@ -21,6 +21,7 @@ import {
   ProfileOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
+import UnauthorizedPage from "@app/unauthorized";
 
 const { Title, Text } = Typography;
 
@@ -28,6 +29,10 @@ export const CounselingShow = () => {
   const { query } = useShow();
   const { data, isLoading } = query;
   const record = data?.data;
+  // if data response code 403 redirect unauthorized page
+  if (query.error && query.error.statusCode === 403) {
+    return <UnauthorizedPage />;
+  }
 
   if (isLoading) {
     return (
