@@ -70,24 +70,8 @@ export const accessControlProvider: AccessControlProvider = {
     // Default deny for unhandled resources
 
     // Handle Home Visits resource
-    if (resource === "homeVisits") {
+    if (resource === "home-visits") {
       if (action === "list" || action === "show") {
-        if (isStudent(user) && action === "show") {
-          // Check if the home visit belongs to the current student
-          const homeVisit = params?.resource;
-          if (
-            homeVisit &&
-            (homeVisit as any).studentClasses &&
-            (homeVisit as any).studentClasses.student_x_user_id
-          ) {
-            return {
-              can:
-                user.id === (homeVisit as any).studentClasses.student_x_user_id,
-            };
-          }
-          return { can: false };
-        }
-
         return {
           can:
             isSuperAdmin(user) ||
@@ -95,6 +79,11 @@ export const accessControlProvider: AccessControlProvider = {
             isTeacher(user) ||
             isStudent(user) ||
             isParent(user),
+        };
+      }
+      if (action === "cancel") {
+        return {
+          can: isSuperAdmin(user) || isAdmin(user) || isTeacher(user),
         };
       }
 
@@ -113,6 +102,30 @@ export const accessControlProvider: AccessControlProvider = {
             isTeacher(user) ||
             isStudent(user) ||
             isParent(user),
+        };
+      }
+
+      return {
+        can: isSuperAdmin(user) || isAdmin(user) || isTeacher(user),
+      };
+    }
+
+    // Handle Award resource
+    if (resource === "awards") {
+      if (action === "list" || action === "show") {
+        return {
+          can:
+            isSuperAdmin(user) ||
+            isAdmin(user) ||
+            isTeacher(user) ||
+            isStudent(user) ||
+            isParent(user),
+        };
+      }
+
+      if (action === "approval") {
+        return {
+          can: isSuperAdmin(user) || isAdmin(user),
         };
       }
 

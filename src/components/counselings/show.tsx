@@ -27,7 +27,7 @@ const { Title, Text } = Typography;
 
 export const CounselingShow = () => {
   const { query } = useShow();
-  const { data, isLoading } = query;
+  const { data, isLoading, isError } = query;
   const record = data?.data;
   // if data response code 403 redirect unauthorized page
   if (query.error && query.error.statusCode === 403) {
@@ -44,6 +44,17 @@ export const CounselingShow = () => {
     );
   }
 
+  if (isError) {
+    return (
+      <Card>
+        <Title level={4} type="danger">
+          Error
+        </Title>
+        <Text>Failed to load violation details. Please try again later.</Text>
+      </Card>
+    );
+  }
+
   // Extract data for easier access
   const studentName = record?.studentClasses.user.student.name || "-";
   const nis = record?.studentClasses.user.student.nis || "-";
@@ -56,7 +67,10 @@ export const CounselingShow = () => {
   const workSince = record?.teacher.workSince || "-";
 
   return (
-    <Show title={<Title level={3}>Detail Konseling</Title>}>
+    <Show
+      isLoading={isLoading}
+      title={<Title level={3}>Detail Konseling</Title>}
+    >
       {/* Header Section */}
       <Card bordered={false} style={{ marginBottom: 24 }}>
         <Row gutter={16}>

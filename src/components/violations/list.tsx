@@ -444,6 +444,7 @@ export const ViolationsList = () => {
                   <Table.Column
                     title="Actions"
                     dataIndex="actions"
+                    fixed="right"
                     render={(_, record: BaseRecord) => (
                       <Space>
                         <EditButton
@@ -467,6 +468,7 @@ export const ViolationsList = () => {
                   <Table.Column
                     title="Cetak Surat"
                     dataIndex="actions"
+                    fixed="right"
                     render={(_, record: BaseRecord) => (
                       <CanAccess
                         resource="violations"
@@ -481,14 +483,18 @@ export const ViolationsList = () => {
                               handleGeneratePdf(record, "statement")
                             }
                             title="Surat Pernyataan"
-                          />
+                          >
+                            Surat Pernyataan
+                          </Button>
                           <Button
                             icon={<FilePdfOutlined />}
                             size="small"
                             onClick={() => handleGeneratePdf(record, "summons")}
                             danger
                             title="Surat Panggilan Orang Tua"
-                          />
+                          >
+                            Surat Panggilan Orang Tua
+                          </Button>
                         </Space>
                       </CanAccess>
                     )}
@@ -542,6 +548,7 @@ export const ViolationsList = () => {
                       sorter={(a: any, b: any) => a.totalPoints - b.totalPoints}
                     />
                     <Table.Column
+                      fixed="right"
                       title="Actions"
                       dataIndex="actions"
                       render={(_, record: BaseRecord) => (

@@ -18,10 +18,12 @@ import { dataProviders } from "@providers/data-provider";
 // import { accessControlProvider } from "@providers/access-control-provider";
 import "@refinedev/antd/dist/reset.css";
 import {
+  CalendarFilled,
   ContactsFilled,
   ControlFilled,
   HomeFilled,
   ReadFilled,
+  TrophyFilled,
   UserOutlined,
 } from "@ant-design/icons";
 
@@ -77,7 +79,7 @@ export default function RootLayout({
                         list: "/",
                         meta: {
                           label: "Dashboard",
-                          icon: <HomeFilled />,
+                          icon: <HomeFilled style={{ fontSize: "1.2em" }} />,
                         },
                       },
                       {
@@ -89,7 +91,7 @@ export default function RootLayout({
                         meta: {
                           canDelete: true,
                           label: "Pengguna",
-                          icon: <UserOutlined />,
+                          icon: <UserOutlined style={{ fontSize: "1.2em" }} />,
                         },
                       },
                       {
@@ -101,7 +103,7 @@ export default function RootLayout({
                         meta: {
                           canDelete: true,
                           label: "Peraturan Ketertiban",
-                          icon: <ControlFilled />,
+                          icon: <ControlFilled style={{ fontSize: "1.2em" }} />,
                         },
                       },
                       {
@@ -113,7 +115,19 @@ export default function RootLayout({
                         meta: {
                           canDelete: true,
                           label: "Pelanggaran Ketertiban",
-                          icon: <ReadFilled />,
+                          icon: <ReadFilled style={{ fontSize: "1.2em" }} />,
+                        },
+                      },
+                      {
+                        name: "awards",
+                        list: "/awards",
+                        create: "/awards/create",
+                        edit: "/awards/edit/:id",
+                        show: "/awards/show/:id",
+                        meta: {
+                          canDelete: true,
+                          label: "Prestasi Ketertiban",
+                          icon: <TrophyFilled style={{ fontSize: "1.2em" }} />,
                         },
                       },
                       {
@@ -134,7 +148,23 @@ export default function RootLayout({
                         meta: {
                           canDelete: true,
                           label: "Bimbingan Konseling",
-                          icon: <ContactsFilled />,
+                          icon: (
+                            <ContactsFilled style={{ fontSize: "1.2em" }} />
+                          ),
+                        },
+                      },
+                      {
+                        name: "home-visits",
+                        list: "/home-visits",
+                        create: "/home-visits/create",
+                        edit: "/home-visits/edit/:id",
+                        show: "/home-visits/show/:id",
+                        meta: {
+                          canDelete: true,
+                          label: "Kunjungan Rumah",
+                          icon: (
+                            <CalendarFilled style={{ fontSize: "1.2em" }} />
+                          ),
                         },
                       },
                     ]}

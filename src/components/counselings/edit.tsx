@@ -126,7 +126,7 @@ export const CounselingsEdit = () => {
 
   return (
     <CanAccess
-      resource="violations"
+      resource="couselings"
       action="edit"
       fallback={<UnauthorizedPage />}
     >
@@ -164,7 +164,7 @@ export const CounselingsEdit = () => {
           <Divider />
 
           <Form.Item
-            label="Service Field"
+            label="Bidang Layanan"
             name={["serviceField"]}
             rules={[
               {
@@ -175,7 +175,7 @@ export const CounselingsEdit = () => {
             <Input />
           </Form.Item>
           <Form.Item
-            label="Service Type"
+            label="Jenis Layanan"
             name={["serviceType"]}
             rules={[
               {
@@ -186,7 +186,7 @@ export const CounselingsEdit = () => {
             <Input />
           </Form.Item>
           <Form.Item
-            label="Case"
+            label="Kasus"
             name={["case"]}
             rules={[
               {
@@ -197,7 +197,7 @@ export const CounselingsEdit = () => {
             <Input />
           </Form.Item>
           <Form.Item
-            label="Summary"
+            label="Ringkasan"
             name={["summary"]}
             rules={[
               {
@@ -208,7 +208,7 @@ export const CounselingsEdit = () => {
             <Input />
           </Form.Item>
           <Form.Item
-            label="Follow Up"
+            label="Tindak Lanjut"
             name={["followUp"]}
             rules={[
               {
@@ -219,7 +219,7 @@ export const CounselingsEdit = () => {
             <Input />
           </Form.Item>
           <Form.Item
-            label="Description"
+            label="Deskripsi"
             name={["description"]}
             rules={[
               {

@@ -181,7 +181,7 @@ export const LoginPage: React.FC<LoginProps> = ({
 
         <div className="mt-12 text-center">
           <p className="text-xs text-gray-500">
-            &copy;2025 SMKN 1 Jenangan Ponorogo by Jnd.
+            &copy;2025 SMKN 1 Jenangan Ponorogo.
           </p>
         </div>
       </Card>

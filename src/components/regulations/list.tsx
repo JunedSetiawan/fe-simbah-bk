@@ -192,6 +192,7 @@ export const RegulationList = () => {
           <Table.Column
             title="Actions"
             dataIndex="actions"
+            fixed="right"
             render={(_, record: BaseRecord) => (
               <Space>
                 <Tooltip title="Lihat Detail">

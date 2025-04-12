@@ -1,18 +1,27 @@
 "use client";
 
 import React, { useState } from "react";
-import { Create, useForm } from "@refinedev/antd";
-import { Form, Input, DatePicker, Select, Divider, notification } from "antd";
+import { Create, useForm, getValueFromEvent, useSelect } from "@refinedev/antd";
+import {
+  Form,
+  Input,
+  DatePicker,
+  Upload,
+  Select,
+  Divider,
+  notification,
+} from "antd";
 import dayjs from "dayjs";
-import { CanAccess, useApiUrl, useCustom, useSelect } from "@refinedev/core";
+import { CanAccess, useApiUrl, useCustom } from "@refinedev/core";
 import { SelectProps } from "antd/lib";
 import UnauthorizedPage from "@app/unauthorized";
 
-export const CounselingCreate = () => {
+export const HomeVisitsCreate = () => {
   const { formProps, saveButtonProps, query } = useForm();
+
   const apiUrl = useApiUrl();
 
-  const { options: classSelectProps } = useSelect({
+  const { selectProps: classSelectProps } = useSelect({
     resource: "classes",
     optionLabel: "classname",
     optionValue: "id",
@@ -85,23 +94,39 @@ export const CounselingCreate = () => {
   };
 
   // Fix TypeScript issue by creating a properly typed merge of props
-  const classSelectMergedProps: SelectProps = {
-    options: classSelectProps,
+  const classSelectMergedProps = {
+    ...classSelectProps,
     onChange: (value: any) => {
       handleClassChange(value);
     },
     placeholder: "Pilih Kelas",
   };
 
+  const handleSubmit = async (values: any) => {
+    // Format the date correctly before submission
+    const formattedValues = {
+      ...values,
+      date: values.date
+        ? dayjs(values.date).format("YYYY-MM-DD HH:mm:ss")
+        : undefined,
+    };
+
+    // Use the form's submit handler with formatted values
+    try {
+      await formProps.onFinish?.(formattedValues);
+    } catch (error) {
+      console.error("Form submission error:", error);
+    }
+  };
+
   return (
     <CanAccess
-      resource="counselings"
+      resource="home-visits"
       action="create"
       fallback={<UnauthorizedPage />}
     >
       <Create saveButtonProps={saveButtonProps}>
-        <Form {...formProps} layout="vertical">
-          <h1>Pilih Siswa</h1>
+        <Form {...formProps} layout="vertical" onFinish={handleSubmit}>
           <Form.Item
             label="Kelas"
             name={["class_id"]}
@@ -140,65 +165,33 @@ export const CounselingCreate = () => {
             />
           </Form.Item>
           <Divider />
+          <Form.Item
+            label="Jadwal Kunjungan Rumah"
+            name={["date"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+            getValueProps={(value) => ({
+              value: value ? dayjs(value) : undefined,
+            })}
+          >
+            <DatePicker
+              showTime
+              format="YYYY-MM-DD HH:mm:ss"
+              type="datetime"
+              onChange={(date, dateString) => {
+                // Convert to ISO string when changing
+                const isoDate = date ? date.toISOString() : null;
+                formProps.form?.setFieldsValue({ date: isoDate });
+              }}
+            />
+          </Form.Item>
 
           <Form.Item
-            label="Bidang Layanan"
-            name={["service_field"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Jenis Layanan"
-            name={["service_type"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Kasus"
-            name={["case"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Ringkasan"
-            name={["summary"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Tindak Lanjut"
-            name={["follow_up"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Deskripsi"
-            name={["description"]}
+            label="Alamat Kunjungan"
+            name={["address"]}
             rules={[
               {
                 required: true,

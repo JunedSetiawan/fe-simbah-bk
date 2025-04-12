@@ -98,6 +98,7 @@ export const CounselingList = () => {
         <Table.Column
           title="Aksi"
           dataIndex="actions"
+          fixed="right"
           render={(_, record: BaseRecord) => (
             <Space>
               <Tooltip title="Lihat Detail">

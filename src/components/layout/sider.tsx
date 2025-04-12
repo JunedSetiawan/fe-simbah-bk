@@ -83,7 +83,7 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
 
   const CustomTitle = ({ collapsed }: { collapsed: boolean }) => {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
         {/* Your custom logo */}
         <Image
           src={LogoImage}
@@ -95,7 +95,7 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
             {" "}
             {/* Tambahkan wrapper div dengan flex-col */}
             <h4 className="text-white text-lg font-semibold m-0">
-              E-Konseling
+              V-Konseling
             </h4>
             <h3 className="text-white text-sm m-0 font-light">
               SMKN 1 JENANGAN PONOROGO
@@ -173,6 +173,7 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
               ...linkStyle,
               whiteSpace: "nowrap",
               color: "white",
+              marginTop: "12px",
             }}
           >
             <Link
@@ -260,7 +261,7 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
         mode="inline"
         style={{
           backgroundColor: "rgba(44, 89, 90, 1)",
-          paddingTop: "8px",
+          paddingTop: "25px",
           border: "none",
           overflow: "auto",
           // height: isMobile ? "calc(100vh - 64px)" : "calc(100% - 72px)",
