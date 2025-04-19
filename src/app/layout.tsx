@@ -131,12 +131,18 @@ export default function RootLayout({
                         },
                       },
                       {
+                        name: "management-violations",
+                        meta: {
+                          label: "Rekap Pelanggaran & Penghargaan",
+                          icon: <ControlFilled style={{ fontSize: "1.2em" }} />,
+                        },
+                      },
+
+                      {
                         name: "student-violations",
                         show: "/student-violations/show/:id",
                         meta: {
-                          parent: "violations",
-
-                          hide: true,
+                          parent: "cms",
                         },
                       },
                       {
@@ -165,6 +171,33 @@ export default function RootLayout({
                           icon: (
                             <CalendarFilled style={{ fontSize: "1.2em" }} />
                           ),
+                        },
+                      },
+                      {
+                        name: "violation-summary/class",
+                        list: "/violation-summary/classes",
+                        meta: {
+                          parent: "management-violations",
+                          label: "Rekap per Kelas",
+                          icon: <ReadFilled style={{ fontSize: "1.2em" }} />,
+                        },
+                      },
+                      // {
+                      //   name: "violation-summary/yearly",
+                      //   list: "/violation-summary/yearlies",
+                      //   meta: {
+                      //     parent: "management-violations",
+                      //     label: "Rekap Pelanggaran Siswa per Tahun Ajaran",
+                      //     icon: <ReadFilled style={{ fontSize: "1.2em" }} />,
+                      //   },
+                      // },
+                      {
+                        name: "violation-summary/semester",
+                        list: "/violation-summary/semesters",
+                        meta: {
+                          parent: "management-violations",
+                          label: "Rekap per Semester",
+                          icon: <ReadFilled style={{ fontSize: "1.2em" }} />,
                         },
                       },
                     ]}

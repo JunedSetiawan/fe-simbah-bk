@@ -11,7 +11,7 @@ import {
   useWarnAboutChange,
 } from "@refinedev/core";
 import { createAvatar } from "@dicebear/core";
-import { adventurer, initials, lorelei } from "@dicebear/collection";
+import { adventurer, funEmoji, initials, lorelei } from "@dicebear/collection";
 import {
   Layout as AntdLayout,
   Avatar,
@@ -119,8 +119,36 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
   };
 
   const avatar = useMemo(() => {
-    return createAvatar(adventurer, {
+    return createAvatar(funEmoji, {
       size: 128,
+      backgroundColor: ["b6e3f4", "c0aede", "d1d4f9", "ffd5dc", "ffdfbf"],
+      eyes: [
+        "closed",
+        "closed2",
+        "crying",
+        "cute",
+        "glasses",
+        "love",
+
+        "shades",
+        "sleepClose",
+        "stars",
+        "tearDrop",
+        "wink",
+        "wink2",
+      ],
+      mouth: [
+        "cute",
+        "drip",
+        "faceMask",
+        "kissHeart",
+        "lilSmile",
+
+        "smileLol",
+        "smileTeeth",
+        "tongueOut",
+        "wideSmile",
+      ],
     }).toDataUri();
   }, []);
 
@@ -177,7 +205,11 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
               user?.parent?.name ||
               user?.username}
           </div>
-          <Tag color="cyan">{user?.profileType}</Tag>
+          <Tag color="cyan">
+            {user?.profileType === "Umum"
+              ? "Admin"
+              : user?.profileType || "N/A"}
+          </Tag>
         </div>
       </AntdMenu.Item>
       <AntdMenu.Divider />

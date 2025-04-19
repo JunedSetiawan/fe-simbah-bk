@@ -231,7 +231,7 @@ const VisitTable = ({
 }: any) => {
   const {
     tableProps: filteredTableProps,
-    tableQuery: { refetch },
+    tableQuery: { refetch, data },
   } = useTable({
     syncWithLocation: true,
     filters: {
@@ -245,6 +245,7 @@ const VisitTable = ({
     },
   });
 
+  console.log("data", data?.data);
   // Register this table's refetch function
   React.useEffect(() => {
     if (refetch && registerRefetch) {
@@ -391,6 +392,17 @@ const VisitTable = ({
             </Paragraph>
           )}
         />
+        {/* CreatedBy */}
+        <Table.Column
+          dataIndex={["createdBy"]}
+          title="Dibuat Oleh"
+          width={150}
+          render={(value) => (
+            <Text strong ellipsis style={{ maxWidth: 150 }} title={value}>
+              {value.teacher.name || value.username || "-"}
+            </Text>
+          )}
+        />
         <Table.Column
           dataIndex={["createdAt"]}
           title="Dibuat Pada"
@@ -432,19 +444,20 @@ const VisitTable = ({
                 />
                 {isPending && (
                   <>
-                    <EditButton
-                      icon={<CheckCircleOutlined />}
-                      size="small"
-                      children="Selesaikan"
-                      type="primary"
-                      recordItemId={record.id}
-                      title="Selesaikan kunjungan"
-                    />
                     <CanAccess
                       resource="home-visits"
                       action="cancel"
                       fallback={null}
                     >
+                      <EditButton
+                        icon={<CheckCircleOutlined />}
+                        size="small"
+                        children="Selesaikan"
+                        type="primary"
+                        recordItemId={record.id}
+                        title="Selesaikan kunjungan"
+                      />
+
                       <Popconfirm
                         title="Batalkan kunjungan?"
                         description="Apakah Anda yakin ingin membatalkan kunjungan ini?"

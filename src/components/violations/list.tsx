@@ -193,7 +193,7 @@ export const ViolationsList = () => {
 
   // Get color based on regulation category
   const getCategoryColor = (category: string) => {
-    const categoryColors: Record<string, string> = {
+    const categoryColors = {
       kedisiplinan: "blue",
       akademik: "purple",
       kehadiran: "cyan",
@@ -201,10 +201,22 @@ export const ViolationsList = () => {
       komunikasi: "orange",
       sikap: "magenta",
       pakaian: "gold",
+      "kegiatan pembelajaran": "purple",
+      "pakaian seragam": "gold",
+      perilaku: "magenta",
+      "makan dan minum": "red",
+      "izin meninggalkan sekolah": "blue",
+      "tindakan kenakalan dan kriminalitas": "red",
+      "interaksi dengan teman, guru/karyawan dan pihak lain": "orange",
+      prakerin: "geekblue",
+      "data dan administrasi sekolah": "volcano",
+      "pembelajaran daring": "purple",
+      "lain-lain": "default",
       default: "default",
     };
 
-    return categoryColors[category?.toLowerCase()] || categoryColors.default;
+    const key = category?.toLowerCase() as keyof typeof categoryColors;
+    return categoryColors[key] || categoryColors.default;
   };
 
   const handleGeneratePdf = (record: any, type: "statement" | "summons") => {
@@ -239,11 +251,11 @@ export const ViolationsList = () => {
               <Col xs={24} sm={8}>
                 <Form.Item
                   name="class"
-                  label="Class"
+                  label="Kelas"
                   rules={[{ required: true }]}
                 >
                   <Select
-                    placeholder="Select Class"
+                    placeholder="Pilih Kelas"
                     allowClear
                     options={classesOptionSelect}
                   ></Select>
@@ -252,12 +264,12 @@ export const ViolationsList = () => {
               <Col xs={24} sm={8}>
                 <Form.Item
                   name="date"
-                  label="Month and Year"
+                  label="Bulan/Tahun"
                   rules={[{ required: true }]}
                 >
                   <DatePicker
                     picker="month"
-                    placeholder="Select Month/Year"
+                    placeholder="Pilih Bulan/Tahun"
                     style={{ width: "100%" }}
                   />
                 </Form.Item>
@@ -354,7 +366,7 @@ export const ViolationsList = () => {
                           <Text>{regulation.name}</Text>
                           {regulation.category && (
                             <Tag color={getCategoryColor(regulation.category)}>
-                              {regulation.category} - {regulation.type}
+                              {regulation.category}
                             </Tag>
                           )}
                         </Space>
@@ -387,23 +399,6 @@ export const ViolationsList = () => {
                       // Gabungkan menjadi format "siswa - XI RPL B"
                       return `${studentName} - ${className} ${prodyName} ${classAlphabet}`;
                     }}
-                  />
-                  <Table.Column
-                    dataIndex="name"
-                    title="Nama Pelanggaran"
-                    // filterDropdown={(props: FilterDropdownProps) => (
-                    //   <FilterDropdown {...props}>
-                    //     <Input
-                    //       placeholder="Search violation"
-                    //       style={{ width: "100%" }}
-                    //     />
-                    //   </FilterDropdown>
-                    // )}
-                    defaultFilteredValue={getDefaultFilter(
-                      "name",
-                      filters,
-                      "contains"
-                    )}
                   />
 
                   <Table.Column
@@ -439,6 +434,8 @@ export const ViolationsList = () => {
                   <Table.Column
                     dataIndex={["teacher", "name"]}
                     title="Guru Pencatat"
+                    // teacher name make bold
+                    render={(text) => <Text strong>{text || "N/A"}</Text>}
                   />
 
                   <Table.Column
@@ -483,18 +480,14 @@ export const ViolationsList = () => {
                               handleGeneratePdf(record, "statement")
                             }
                             title="Surat Pernyataan"
-                          >
-                            Surat Pernyataan
-                          </Button>
+                          ></Button>
                           <Button
                             icon={<FilePdfOutlined />}
                             size="small"
                             onClick={() => handleGeneratePdf(record, "summons")}
                             danger
                             title="Surat Panggilan Orang Tua"
-                          >
-                            Surat Panggilan Orang Tua
-                          </Button>
+                          ></Button>
                         </Space>
                       </CanAccess>
                     )}

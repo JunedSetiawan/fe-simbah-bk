@@ -11,6 +11,7 @@ import {
   notification,
   Spin,
   Modal,
+  Alert,
 } from "antd";
 import {
   useApiUrl,
@@ -81,6 +82,7 @@ const WhatsAppService = {
 };
 
 export const ViolationsCreate = () => {
+  const { TextArea } = Input;
   const { list } = useNavigation();
   const { formProps, saveButtonProps } = useForm();
   const apiUrl = useApiUrl();
@@ -457,11 +459,11 @@ export const ViolationsCreate = () => {
             rules={[
               {
                 required: true,
-                message: "Kelas is required",
+                message: "Kelas wajib diisi",
               },
             ]}
           >
-            <Select {...classSelectMergedProps} />
+            <Select {...classSelectMergedProps} placeholder="Pilih kelas" />
           </Form.Item>
           <Form.Item
             label="Siswa"
@@ -469,7 +471,7 @@ export const ViolationsCreate = () => {
             rules={[
               {
                 required: true,
-                message: "Siswa is required",
+                message: "Siswa wajib dipilih",
               },
             ]}
           >
@@ -495,80 +497,85 @@ export const ViolationsCreate = () => {
               {isLoadingParents ? (
                 <Spin size="small" />
               ) : studentParents.length > 0 ? (
-                <div>
-                  <p>Parents found: {studentParents.length}</p>
-                  <ul>
-                    {studentParents.map((sp) => (
-                      <li key={sp.id}>
-                        {sp.parent.name} ({sp.parent.type}) -
-                        {sp.parent.phone ||
-                          sp.parent.phoneMobile ||
-                          "No phone number"}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                <Alert
+                  type="info"
+                  showIcon
+                  description={
+                    <div>
+                      <p>
+                        Ditemukan Data Orang Tua terkait:{" "}
+                        {studentParents.length}
+                      </p>
+                      <ul>
+                        {studentParents.map((sp) => (
+                          <li key={sp.id}>
+                            {sp.parent.name} ({sp.parent.type}) -{" "}
+                            {sp.parent.phone ||
+                              sp.parent.phoneMobile ||
+                              "Nomor telepon tidak ada"}
+                          </li>
+                        ))}
+                      </ul>
+                      <span style={{ fontWeight: "bold" }}>
+                        Nomor Telepon dari Data Orang Tua tersebut akan
+                        dikirimkan Notifikasi WhatsApp secara Otomatis (setelah
+                        data pelanggaran dibuat)
+                      </span>
+                    </div>
+                  }
+                />
               ) : (
                 <p style={{ color: "red" }}>
-                  Warning: No parents found for this student. WhatsApp
-                  notifications cannot be sent.
+                  Peringatan: Tidak ditemukan data orang tua untuk siswa ini.
+                  Notifikasi WhatsApp tidak dapat dikirim.
                 </p>
               )}
             </div>
           )}
 
           <Form.Item
-            label="Peraturan Pelanggaran yang terlibat"
+            label="Peraturan Pelanggaran yang Terlibat"
             name={"regulation_id"}
             rules={[
               {
                 required: true,
+                message: "Silahkan pilih peraturan pelanggaran",
               },
             ]}
           >
             <Select
-              placeholder="Pilih Peraturan Pelanggaran"
+              placeholder="Pilih peraturan pelanggaran"
               {...regulationSelectProps}
             />
           </Form.Item>
 
           <Form.Item
-            label="Name"
-            name={["name"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Description"
+            label="Deskripsi Pelanggaran"
             name={["description"]}
             rules={[
               {
                 required: true,
+                message: "Deskripsi wajib diisi",
               },
             ]}
           >
-            <Input />
+            <TextArea rows={4} placeholder="Jelaskan deskripsi pelanggaran" />
           </Form.Item>
 
           <Modal
-            title="Sending WhatsApp Notifications"
+            title="Mengirim Notifikasi WhatsApp"
             open={messageModal}
             footer={null}
             closable={false}
           >
             <div style={{ textAlign: "center" }}>
               <p>
-                Sending messages to parents:{" "}
+                Mengirim pesan ke orang tua:{" "}
                 {messageProgress.sent + messageProgress.failed}/
                 {messageProgress.total}
               </p>
-              <p>Successful: {messageProgress.sent}</p>
-              <p>Failed: {messageProgress.failed}</p>
+              <p>Berhasil: {messageProgress.sent}</p>
+              <p>Gagal: {messageProgress.failed}</p>
               <Spin />
             </div>
           </Modal>

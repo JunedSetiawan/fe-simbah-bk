@@ -18,6 +18,7 @@ import type { UploadFile } from "antd/lib";
 import UnauthorizedPage from "@app/unauthorized";
 
 export const AwardsCreate = () => {
+  const { TextArea } = Input;
   const apiUrl = useApiUrl();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
@@ -142,7 +143,7 @@ export const AwardsCreate = () => {
             name="class_id"
             rules={[{ required: true, message: "Kelas is required" }]}
           >
-            <Select {...classSelectMergedProps} />
+            <Select {...classSelectMergedProps} placeholder="Pilih Kelas" />
           </Form.Item>
 
           <Form.Item
@@ -184,7 +185,7 @@ export const AwardsCreate = () => {
             name="description"
             rules={[{ required: true, message: "Deskripsi is required" }]}
           >
-            <Input />
+            <TextArea rows={4} placeholder="Masukkan deskripsi penghargaan" />
           </Form.Item>
 
           <Form.Item
@@ -207,7 +208,11 @@ export const AwardsCreate = () => {
           </Form.Item>
 
           <div
-            style={{ color: "#8c8c8c", fontSize: "12px", marginTop: "-20px" }}
+            style={{
+              color: "#8c8c8c",
+              fontSize: "12px",
+              marginTop: "-20px",
+            }}
           >
             Format: JPG, JPEG, PNG. Ukuran max: 2MB
           </div>

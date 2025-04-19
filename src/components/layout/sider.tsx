@@ -94,9 +94,7 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
           <div className="flex flex-col">
             {" "}
             {/* Tambahkan wrapper div dengan flex-col */}
-            <h4 className="text-white text-lg font-semibold m-0">
-              V-Konseling
-            </h4>
+            <h4 className="text-white text-lg font-semibold m-0">SI-PEKA</h4>
             <h3 className="text-white text-sm m-0 font-light">
               SMKN 1 JENANGAN PONOROGO
             </h3>

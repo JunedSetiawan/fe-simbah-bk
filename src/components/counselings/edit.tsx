@@ -8,6 +8,7 @@ import { CanAccess, useApiUrl, useCustom } from "@refinedev/core";
 import UnauthorizedPage from "@app/unauthorized";
 
 export const CounselingsEdit = () => {
+  const { TextArea } = Input;
   const { formProps, saveButtonProps, query } = useForm({
     meta: {
       fields: [
@@ -126,7 +127,7 @@ export const CounselingsEdit = () => {
 
   return (
     <CanAccess
-      resource="couselings"
+      resource="counselings"
       action="edit"
       fallback={<UnauthorizedPage />}
     >
@@ -227,7 +228,7 @@ export const CounselingsEdit = () => {
               },
             ]}
           >
-            <Input />
+            <TextArea rows={4} />
           </Form.Item>
         </Form>
       </Edit>

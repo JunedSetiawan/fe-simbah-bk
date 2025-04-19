@@ -7,6 +7,7 @@ import { CanAccess, useApiUrl, useCustom } from "@refinedev/core";
 import UnauthorizedPage from "@app/unauthorized";
 
 export const ViolationsEdit = () => {
+  const { TextArea } = Input;
   const { formProps, saveButtonProps, query } = useForm({
     meta: {
       fields: [
@@ -183,7 +184,7 @@ export const ViolationsEdit = () => {
             name="description"
             rules={[{ required: true }]}
           >
-            <Input />
+            <TextArea rows={4} />
           </Form.Item>
         </Form>
       </Edit>

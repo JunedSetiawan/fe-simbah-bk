@@ -25,7 +25,11 @@ export const accessControlProvider: AccessControlProvider = {
 
     const user = JSON.parse(userStr) as User;
 
-    if (resource === "dashboard" || resource === "profile") {
+    if (
+      resource === "dashboard" ||
+      resource === "profile" ||
+      resource === "management-violations"
+    ) {
       return { can: true };
     }
 
@@ -44,7 +48,12 @@ export const accessControlProvider: AccessControlProvider = {
       };
     }
 
-    if (resource === "violations") {
+    if (
+      resource === "violations" ||
+      resource === "violation-summary/class" ||
+      resource === "violation-summary/semester" ||
+      resource === "violation-summary/yearly"
+    ) {
       if (action === "list" || action === "show") {
         return {
           can:
@@ -83,7 +92,7 @@ export const accessControlProvider: AccessControlProvider = {
       }
       if (action === "cancel") {
         return {
-          can: isSuperAdmin(user) || isAdmin(user) || isTeacher(user),
+          can: isSuperAdmin(user) || isAdmin(user),
         };
       }
 

@@ -17,6 +17,7 @@ import type { UploadFile } from "antd/lib";
 import UnauthorizedPage from "@app/unauthorized";
 
 export const AwardsEdit = () => {
+  const { TextArea } = Input;
   const apiUrl = useApiUrl();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
@@ -249,7 +250,7 @@ export const AwardsEdit = () => {
             name="description"
             rules={[{ required: true, message: "Deskripsi is required" }]}
           >
-            <Input />
+            <TextArea rows={4} />
           </Form.Item>
 
           <Form.Item

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useGetIdentity } from "@refinedev/core";
 import {
   Typography,
@@ -21,6 +21,8 @@ import {
   BookOutlined,
 } from "@ant-design/icons";
 import { DateField } from "@refinedev/antd";
+import { createAvatar } from "@dicebear/core";
+import { funEmoji } from "@dicebear/collection";
 
 const { Title, Text } = Typography;
 
@@ -35,6 +37,40 @@ export const ProfilePage: React.FC = () => {
     student?: any;
     parent?: any;
   }>();
+
+  // Generate consistent avatar using Dicebear
+  const avatar = useMemo(() => {
+    return createAvatar(funEmoji, {
+      backgroundColor: ["b6e3f4", "c0aede", "d1d4f9", "ffd5dc", "ffdfbf"],
+      eyes: [
+        "closed",
+        "closed2",
+        "crying",
+        "cute",
+        "glasses",
+        "love",
+
+        "shades",
+        "sleepClose",
+        "stars",
+        "tearDrop",
+        "wink",
+        "wink2",
+      ],
+      mouth: [
+        "cute",
+        "drip",
+        "faceMask",
+        "kissHeart",
+        "lilSmile",
+
+        "smileLol",
+        "smileTeeth",
+        "tongueOut",
+        "wideSmile",
+      ],
+    }).toDataUri();
+  }, []);
 
   // Determine badge color based on profile type
   const getBadgeColor = (type: string) => {
@@ -76,17 +112,6 @@ export const ProfilePage: React.FC = () => {
               <Descriptions.Item label="NIP">
                 {user.teacher?.nip || "N/A"}
               </Descriptions.Item>
-              {/* <Descriptions.Item label="Wali Kelas">
-                      {user.class
-                        ? user.class.romanLevel +
-                          " " +
-                          user.class.expertise.shortName +
-                          " " +
-                          user.class.alphabet +
-                          "-" +
-                          user.class.expertise.prody.faculty.schoolYear.year
-                        : "N/A"}
-                    </Descriptions.Item> */}
               <Descriptions.Item label="Tahun Mulai Bekerja">
                 {user.teacher?.workSince || "N/A"}
               </Descriptions.Item>
@@ -323,7 +348,8 @@ export const ProfilePage: React.FC = () => {
               <div style={{ textAlign: "center", marginBottom: 24 }}>
                 <Avatar
                   size={100}
-                  icon={<UserOutlined />}
+                  src={avatar}
+                  alt={user?.username}
                   style={{
                     backgroundColor: getBadgeColor(user.profileType),
                   }}
@@ -335,11 +361,6 @@ export const ProfilePage: React.FC = () => {
                     user?.username ||
                     "User"}
                 </Title>
-                {/* <Badge
-                  color={getBadgeColor(user?.profileType)}
-                  text={<Text strong>{user?.profileType || "User"}</Text>}
-                  style={{ margin: "8px 0" }}
-                /> */}
               </div>
 
               <Divider style={{ margin: "12px 0" }} />
@@ -352,7 +373,11 @@ export const ProfilePage: React.FC = () => {
                   <Text strong>{user?.username || "N/A"}</Text>
                 </Descriptions.Item>
                 <Descriptions.Item label="Role">
-                  <Tag color="cyan">{user?.profileType || "N/A"}</Tag>
+                  <Tag color="cyan">
+                    {user?.profileType === "Umum"
+                      ? "Admin"
+                      : user?.profileType || "N/A"}
+                  </Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="Dibuat pada">
                   <DateField

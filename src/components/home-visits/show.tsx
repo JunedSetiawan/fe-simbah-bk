@@ -299,7 +299,8 @@ export const HomeVisitsShow = () => {
                   children: (
                     <>
                       <Text strong>Dibuat oleh:</Text>{" "}
-                      {record?.createdBy?.username || "-"}
+                      {record?.createdBy?.teacher?.name ||
+                        record?.createdBy?.username}
                     </>
                   ),
                 },

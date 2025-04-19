@@ -2,13 +2,22 @@
 
 import React, { useState } from "react";
 import { Create, useForm } from "@refinedev/antd";
-import { Form, Input, DatePicker, Select, Divider, notification } from "antd";
+import {
+  Form,
+  Input,
+  DatePicker,
+  Select,
+  Divider,
+  notification,
+  Radio,
+} from "antd";
 import dayjs from "dayjs";
 import { CanAccess, useApiUrl, useCustom, useSelect } from "@refinedev/core";
 import { SelectProps } from "antd/lib";
 import UnauthorizedPage from "@app/unauthorized";
 
 export const CounselingCreate = () => {
+  const { TextArea } = Input;
   const { formProps, saveButtonProps, query } = useForm();
   const apiUrl = useApiUrl();
 
@@ -47,7 +56,6 @@ export const CounselingCreate = () => {
           setStudents(response.data.data);
         } else {
           // Fallback if the structure is unexpected
-
           setStudents([]);
           notification.error({
             message: "Error",
@@ -93,6 +101,28 @@ export const CounselingCreate = () => {
     placeholder: "Pilih Kelas",
   };
 
+  // Options for bidang layanan radio buttons
+  const bidangLayananOptions = [
+    { label: "Pribadi", value: "Pribadi" },
+    { label: "Sosial", value: "Sosial" },
+    { label: "Belajar", value: "Belajar" },
+    { label: "Karir", value: "Karir" },
+  ];
+
+  // Options for jenis layanan radio buttons
+  const jenisLayananOptions = [
+    { label: "Orientasi", value: "Orientasi" },
+    { label: "Informasi", value: "Informasi" },
+    { label: "Konseling Perorangan", value: "Konseling Perorangan" },
+    { label: "Konseling Kelompok", value: "Konseling Kelompok" },
+    { label: "Bimbingan Kelompok", value: "Bimbingan Kelompok" },
+    { label: "Konsultasi", value: "Konsultasi" },
+    { label: "Mediasi", value: "Mediasi" },
+    { label: "Advokasi", value: "Advokasi" },
+    { label: "Konferensi Kasus", value: "Konferensi Kasus" },
+    { label: "Alih Tangan Kasus", value: "Alih Tangan Kasus" },
+  ];
+
   return (
     <CanAccess
       resource="counselings"
@@ -108,7 +138,7 @@ export const CounselingCreate = () => {
             rules={[
               {
                 required: true,
-                message: "Kelas is required",
+                message: "Kelas wajib dipilih",
               },
             ]}
           >
@@ -120,7 +150,7 @@ export const CounselingCreate = () => {
             rules={[
               {
                 required: true,
-                message: "Siswa is required",
+                message: "Siswa wajib dipilih",
               },
             ]}
           >
@@ -142,37 +172,50 @@ export const CounselingCreate = () => {
           <Divider />
 
           <Form.Item
-            label="Bidang Layanan"
+            label="Bidang Layanan (pilih salah satu)"
             name={["service_field"]}
             rules={[
               {
                 required: true,
+                message: "Bidang layanan wajib dipilih",
               },
             ]}
           >
-            <Input />
+            <Radio.Group
+              options={bidangLayananOptions}
+              optionType="button"
+              buttonStyle="solid"
+            />
           </Form.Item>
+
           <Form.Item
-            label="Jenis Layanan"
+            label="Jenis Layanan (pilih salah satu)"
             name={["service_type"]}
             rules={[
               {
                 required: true,
+                message: "Jenis layanan wajib dipilih",
               },
             ]}
           >
-            <Input />
+            <Radio.Group
+              options={jenisLayananOptions}
+              optionType="button"
+              buttonStyle="solid"
+            />
           </Form.Item>
+
           <Form.Item
             label="Kasus"
             name={["case"]}
             rules={[
               {
                 required: true,
+                message: "Kasus wajib diisi",
               },
             ]}
           >
-            <Input />
+            <Input placeholder="Masukkan kasus" />
           </Form.Item>
           <Form.Item
             label="Ringkasan"
@@ -180,10 +223,11 @@ export const CounselingCreate = () => {
             rules={[
               {
                 required: true,
+                message: "Ringkasan wajib diisi",
               },
             ]}
           >
-            <Input />
+            <Input placeholder="Masukkan ringkasan" />
           </Form.Item>
           <Form.Item
             label="Tindak Lanjut"
@@ -191,10 +235,11 @@ export const CounselingCreate = () => {
             rules={[
               {
                 required: true,
+                message: "Tindak lanjut wajib diisi",
               },
             ]}
           >
-            <Input />
+            <Input placeholder="Masukkan tindak lanjut" />
           </Form.Item>
           <Form.Item
             label="Deskripsi"
@@ -202,10 +247,11 @@ export const CounselingCreate = () => {
             rules={[
               {
                 required: true,
+                message: "Deskripsi wajib diisi",
               },
             ]}
           >
-            <Input />
+            <TextArea rows={4} placeholder="Masukkan deskripsi" />
           </Form.Item>
         </Form>
       </Create>

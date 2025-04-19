@@ -61,7 +61,7 @@ export const RegulationList = () => {
     switch (type.toLowerCase()) {
       case "pelanggaran":
         return "error";
-      case "prestasi":
+      case "penghargaan":
         return "success";
       case "kehadiran":
         return "processing";

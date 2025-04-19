@@ -37,7 +37,9 @@ const UnauthorizedPage = () => {
                 <Paragraph>
                   Akun Anda saat ini masuk sebagai:{" "}
                   <Text strong>
-                    {identity?.profileType || "Tidak Diketahui"}
+                    {identity?.profileType === "Umum"
+                      ? "Admin"
+                      : identity?.profileType || "N/A"}
                   </Text>
                 </Paragraph>
               </Space>

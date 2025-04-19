@@ -14,6 +14,7 @@ import {
   message,
   Badge,
   Alert,
+  Select,
 } from "antd";
 import dayjs from "dayjs";
 import {
@@ -258,7 +259,25 @@ export const HomeVisitsEdit = () => {
                   },
                 ]}
               >
-                <Input placeholder="Contoh: Orangtua siswa, Wali kelas" />
+                <Select
+                  options={[
+                    {
+                      label: "Guru BK",
+                      value: "Guru BK",
+                    },
+
+                    {
+                      label: "Wali Kelas",
+                      value: "Wali Kelas",
+                    },
+
+                    {
+                      label: "Guru BK & Wali Kelas",
+                      value: "Guru BK & Wali Kelas",
+                    },
+                  ]}
+                  placeholder="Pilih pihak disertakan"
+                />
               </Form.Item>
 
               <Form.Item

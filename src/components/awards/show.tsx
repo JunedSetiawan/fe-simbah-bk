@@ -143,6 +143,7 @@ export const AwardsShow = () => {
     if (!category) return "default";
 
     const categoryColors: Record<string, string> = {
+      // Existing categories
       kedisiplinan: "blue",
       akademik: "purple",
       kehadiran: "cyan",
@@ -150,6 +151,14 @@ export const AwardsShow = () => {
       komunikasi: "orange",
       sikap: "magenta",
       pakaian: "gold",
+
+      // New reward/award categories
+      "non-akademik": "lime",
+      prestasi: "gold",
+      kepemimpinan: "geekblue",
+      sosial: "volcano",
+      kreativitas: "pink",
+      olahraga: "cyan",
     };
 
     return categoryColors[category.toLowerCase()] || "default";

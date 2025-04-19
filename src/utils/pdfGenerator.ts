@@ -68,8 +68,13 @@ export const generateStatementPdfDefinition = (
       record?.studentClass?.class?.expertise?.shortName +
       " " +
       record?.studentClass?.class?.alphabet || "Kelas";
-  const violationName = record?.name || "Pelanggaran";
   const regulationName = regulation?.name || "Peraturan";
+  const regulationDescription =
+    regulation?.description || "Deskripsi Peraturan";
+  // category
+  const regulationCategory = regulation?.category || "Kategori";
+  // action taken
+  const actionTaken = regulation?.actionTaken || "Tindakan";
   const points = regulation?.point || record?.point || 0;
   const teacherName = record?.teacher?.name || "Guru";
   const date = dayjs().locale("id").format("DD MMMM YYYY");
@@ -121,7 +126,7 @@ export const generateStatementPdfDefinition = (
           widths: ["25%", "5%", "70%"],
           body: [
             [
-              { text: "Nama", margin: [0, 0, 0, 8] },
+              { text: "Nama Siswa", margin: [0, 0, 0, 8] },
               { text: ":", margin: [0, 0, 0, 8] },
               { text: studentName, margin: [0, 0, 0, 8] },
             ],
@@ -130,17 +135,27 @@ export const generateStatementPdfDefinition = (
               { text: ":", margin: [0, 0, 0, 8] },
               { text: className, margin: [0, 0, 0, 8] },
             ],
-
             [
-              { text: "Pelanggaran", margin: [0, 0, 0, 8] },
-              { text: ":", margin: [0, 0, 0, 8] },
-              { text: violationName, margin: [0, 0, 0, 8] },
-            ],
-            [
-              { text: "Peraturan", margin: [0, 0, 0, 8] },
+              { text: "Nama Pelanggaran", margin: [0, 0, 0, 8] },
               { text: ":", margin: [0, 0, 0, 8] },
               { text: regulationName, margin: [0, 0, 0, 8] },
             ],
+            [
+              { text: "Kategori", margin: [0, 0, 0, 8] },
+              { text: ":", margin: [0, 0, 0, 8] },
+              { text: regulationCategory, margin: [0, 0, 0, 8] },
+            ],
+            [
+              { text: "Deskripsi", margin: [0, 0, 0, 8] },
+              { text: ":", margin: [0, 0, 0, 8] },
+              { text: regulationDescription, margin: [0, 0, 0, 8] },
+            ],
+            [
+              { text: "Tindakan", margin: [0, 0, 0, 8] },
+              { text: ":", margin: [0, 0, 0, 8] },
+              { text: actionTaken, margin: [0, 0, 0, 8] },
+            ],
+
             [
               { text: "Point", margin: [0, 0, 0, 8] },
               { text: ":", margin: [0, 0, 0, 8] },
@@ -223,8 +238,13 @@ export const generateSummonsPdfDefinition = (
       record?.studentClass?.class?.expertise?.shortName +
       " " +
       record?.studentClass?.class?.alphabet || "Kelas";
-  const violationName = record?.name || "Pelanggaran";
+
   const regulationName = regulation?.name || "Peraturan";
+
+  const regulationDescription =
+    regulation?.description || "Deskripsi Peraturan";
+  const regulationCategory = regulation?.category || "Kategori";
+  const actionTaken = regulation?.actionTaken || "Tindakan";
   const points = regulation?.point || record?.point || 0;
   const date = dayjs().locale("id").format("DD MMMM YYYY");
 
@@ -289,8 +309,17 @@ export const generateSummonsPdfDefinition = (
         table: {
           widths: ["30%", "5%", "65%"],
           body: [
-            ["Jenis Pelanggaran", ":", violationName],
-            ["Peraturan", ":", regulationName],
+            [
+              "Tanggal Melanggar",
+              ":",
+              dayjs(record?.createdAt).format("DD MMMM YYYY"),
+            ],
+            [
+              "Nama Pelanggaran",
+              ":",
+              regulationName + ` (${regulationCategory})`,
+            ],
+            // ["Deskripsi", ":", regulationDescription],
             ["Point", ":", points + " point"],
             ["Tindakan yang diambil", ":", regulation?.actionTaken || "-"],
             ["Nama Orang Tua", ":", parentsInfo],

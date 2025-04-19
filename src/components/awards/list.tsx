@@ -280,8 +280,11 @@ const AwardsTable = ({
     );
   };
 
-  const getCategoryColor = (category: string) => {
+  const getCategoryColor = (category?: string) => {
+    if (!category) return "default";
+
     const categoryColors: Record<string, string> = {
+      // Existing categories
       kedisiplinan: "blue",
       akademik: "purple",
       kehadiran: "cyan",
@@ -289,10 +292,17 @@ const AwardsTable = ({
       komunikasi: "orange",
       sikap: "magenta",
       pakaian: "gold",
-      default: "default",
+
+      // New reward/award categories
+      "non-akademik": "lime",
+      prestasi: "gold",
+      kepemimpinan: "geekblue",
+      sosial: "volcano",
+      kreativitas: "pink",
+      olahraga: "cyan",
     };
 
-    return categoryColors[category?.toLowerCase()] || categoryColors.default;
+    return categoryColors[category.toLowerCase()] || "default";
   };
 
   const getPointColor = (point: number) => {
@@ -389,16 +399,8 @@ const AwardsTable = ({
         sorter
         render={(value) => (
           <span>
-            <Badge
-              count={value}
-              showZero
-              style={{
-                backgroundColor: "#598889",
-                fontWeight: "bold",
-                fontSize: "14px",
-              }}
-            />
-            <span>point</span>
+            <Tag color={"default"}>{value} points</Tag>
+            {/* <span>point</span> */}
           </span>
         )}
       />
@@ -429,7 +431,11 @@ const AwardsTable = ({
         title="Diajukan Oleh"
         render={(proposer) => {
           // Display teacher name if available, otherwise username
-          return proposer?.teacher?.name || proposer?.username || "-";
+          return (
+            <Text strong>
+              {proposer?.teacher.name || proposer?.username || ""}
+            </Text>
+          );
         }}
       />
 

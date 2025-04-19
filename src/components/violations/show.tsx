@@ -93,6 +93,17 @@ export const ViolationsShow = () => {
       komunikasi: "orange",
       sikap: "magenta",
       pakaian: "gold",
+      "kegiatan pembelajaran": "purple",
+      "pakaian seragam": "gold",
+      perilaku: "magenta",
+      "makan dan minum": "red",
+      "izin meninggalkan sekolah": "blue",
+      "tindakan kenakalan dan kriminalitas": "red",
+      "interaksi dengan teman, guru/karyawan dan pihak lain": "orange",
+      prakerin: "geekblue",
+      "data dan administrasi sekolah": "volcano",
+      "pembelajaran daring": "purple",
+      "lain-lain": "default",
       default: "default",
     };
 
