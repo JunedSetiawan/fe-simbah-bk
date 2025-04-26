@@ -8,6 +8,14 @@ const nextConfig = {
     compiler: {
         removeConsole: process.env.NODE_ENV !== "development"     // Remove console.log in production
     },
+    async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://45.13.13:8080/api/:path*' // Your AdonisJS backend URL
+      }
+    ]
+  }
 };
 
 export default withPWA({
