@@ -232,7 +232,27 @@ export const ViolationsList = () => {
       setPdfPreviewVisible(true);
     });
   };
+  // Helper function to determine statement level from actionTaken
+  const getStatementLevel = (actionTaken: string) => {
+    if (actionTaken?.includes("Surat Pernyataan 1")) return 1;
+    if (actionTaken?.includes("Surat Pernyataan 2")) return 2;
+    if (actionTaken?.includes("Surat Pernyataan 3")) return 3;
+    return 0;
+  };
 
+  // Helper function to get button color based on statement level
+  const getStatementButtonColor = (level: number) => {
+    switch (level) {
+      case 1:
+        return ""; // Default color for level 1
+      case 2:
+        return "#faad14"; // Orange color for level 2
+      case 3:
+        return "#f5222d"; // Red color for level 3
+      default:
+        return "";
+    }
+  };
   return (
     <CanAccess
       resource="violations"
@@ -466,31 +486,77 @@ export const ViolationsList = () => {
                     title="Cetak Surat"
                     dataIndex="actions"
                     fixed="right"
-                    render={(_, record: BaseRecord) => (
-                      <CanAccess
-                        resource="violations"
-                        action="generatePdf"
-                        fallback={null}
-                      >
-                        <Space>
-                          <Button
-                            icon={<FilePdfOutlined />}
-                            size="small"
-                            onClick={() =>
-                              handleGeneratePdf(record, "statement")
-                            }
-                            title="Surat Pernyataan"
-                          ></Button>
-                          <Button
-                            icon={<FilePdfOutlined />}
-                            size="small"
-                            onClick={() => handleGeneratePdf(record, "summons")}
-                            danger
-                            title="Surat Panggilan Orang Tua"
-                          ></Button>
-                        </Space>
-                      </CanAccess>
-                    )}
+                    render={(_, record: BaseRecord) => {
+                      const regulation =
+                        record.regulation ||
+                        regulationData?.data?.find(
+                          (item) => item.id === record.regulationId
+                        );
+
+                      const actionTaken = regulation?.actionTaken || "";
+                      const showStatementButton =
+                        actionTaken.includes("Surat Pernyataan");
+                      const showSummonsButton = actionTaken.includes(
+                        "Panggilan Orang Tua"
+                      );
+                      const statementLevel = getStatementLevel(actionTaken);
+                      const statementColor =
+                        getStatementButtonColor(statementLevel);
+
+                      // If neither button should be shown, return null
+                      if (!showStatementButton && !showSummonsButton) {
+                        return null;
+                      }
+
+                      return (
+                        <CanAccess
+                          resource="violations"
+                          action="generatePdf"
+                          fallback={null}
+                        >
+                          <Space>
+                            {showStatementButton && (
+                              <Button
+                                icon={<FilePdfOutlined />}
+                                size="small"
+                                onClick={() =>
+                                  handleGeneratePdf(record, "statement")
+                                }
+                                title={`Surat Pernyataan ${statementLevel}`}
+                                style={
+                                  statementLevel > 1
+                                    ? {
+                                        background: statementColor,
+                                        borderColor: statementColor,
+                                      }
+                                    : {}
+                                }
+                                type={
+                                  statementLevel > 0 ? "primary" : "default"
+                                }
+                              >
+                                {statementLevel > 0
+                                  ? `SP-${statementLevel}`
+                                  : "SP"}
+                              </Button>
+                            )}
+                            {showSummonsButton && (
+                              <Button
+                                icon={<FilePdfOutlined />}
+                                size="small"
+                                onClick={() =>
+                                  handleGeneratePdf(record, "summons")
+                                }
+                                danger
+                                title="Surat Panggilan Orang Tua"
+                              >
+                                SP Ortu
+                              </Button>
+                            )}
+                          </Space>
+                        </CanAccess>
+                      );
+                    }}
                   />
                 </Table>
               ),

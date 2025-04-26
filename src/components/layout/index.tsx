@@ -6,6 +6,7 @@ import { ThemedHeaderV2 as DefaultHeader } from "./header";
 import { ThemedSiderV2 as DefaultSider } from "./sider";
 import { Grid, Layout as AntdLayout } from "antd";
 import type { RefineThemedLayoutV2Props } from "@refinedev/antd";
+import { MobileBottomNavbar } from "./mobileBottomNavbar";
 
 export const ThemedLayoutV2: React.FC<RefineThemedLayoutV2Props> = ({
   children,
@@ -21,6 +22,8 @@ export const ThemedLayoutV2: React.FC<RefineThemedLayoutV2Props> = ({
   const SiderToRender = Sider ?? DefaultSider;
   const HeaderToRender = Header ?? DefaultHeader;
   const isSmall = typeof breakpoint.sm === "undefined" ? true : breakpoint.sm;
+  const isMobile =
+    typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
   const hasSider = !!SiderToRender({ Title });
 
   return (
@@ -37,6 +40,7 @@ export const ThemedLayoutV2: React.FC<RefineThemedLayoutV2Props> = ({
               style={{
                 minHeight: 360,
                 padding: isSmall ? 24 : 12,
+                paddingBottom: isMobile ? "80px" : "16px",
               }}
             >
               {children}

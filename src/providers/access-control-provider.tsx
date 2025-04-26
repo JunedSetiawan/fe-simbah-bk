@@ -143,6 +143,24 @@ export const accessControlProvider: AccessControlProvider = {
       };
     }
 
+    // Handle student-calls resource
+    if (resource === "student-calls") {
+      if (action === "list" || action === "show") {
+        return {
+          can:
+            isSuperAdmin(user) ||
+            isAdmin(user) ||
+            isTeacher(user) ||
+            isStudent(user) ||
+            isParent(user),
+        };
+      }
+
+      return {
+        can: isSuperAdmin(user) || isAdmin(user) || isTeacher(user),
+      };
+    }
+
     // Default deny
     return { can: false };
   },

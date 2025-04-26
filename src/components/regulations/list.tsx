@@ -78,165 +78,154 @@ export const RegulationList = () => {
   };
 
   return (
-    <Suspense
-      fallback={
-        <Row justify="center" align="middle" style={{ minHeight: "300px" }}>
-          <Col>
-            <Spin size="large" />
-          </Col>
-        </Row>
+    <Card
+      bordered={false}
+      className="regulation-list-card"
+      title={
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <FileTextOutlined style={{ fontSize: "24px", color: "#1890ff" }} />
+          <Title level={4} style={{ margin: 0 }}>
+            Daftar Peraturan
+          </Title>
+        </div>
       }
-    >
-      <Card
-        bordered={false}
-        className="regulation-list-card"
-        title={
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <FileTextOutlined style={{ fontSize: "24px", color: "#1890ff" }} />
-            <Title level={4} style={{ margin: 0 }}>
-              Daftar Peraturan
-            </Title>
-          </div>
-        }
-        extra={
-          <CreateButton
-            icon={<PlusOutlined />}
-            type="primary"
-            accessControl={{
-              enabled: true,
-              hideIfUnauthorized: true,
-            }}
-          >
-            Tambah Peraturan
-          </CreateButton>
-        }
-      >
-        <Table
-          {...tableProps}
-          rowKey="id"
-          bordered={false}
-          rowClassName={(record, index) =>
-            index % 2 === 0 ? "table-row-light" : "table-row-dark"
-          }
-          style={{
-            boxShadow: "0 1px 2px rgba(0, 0, 0, 0.03)",
-            borderRadius: "8px",
-            overflow: "hidden",
+      extra={
+        <CreateButton
+          icon={<PlusOutlined />}
+          type="primary"
+          accessControl={{
+            enabled: true,
+            hideIfUnauthorized: true,
           }}
         >
-          <Table.Column
-            title="No."
-            width={60}
-            render={(_, __, index) => {
-              const { current = 1, pageSize = 10 } =
-                tableProps.pagination || {};
-              return (current - 1) * pageSize + index + 1;
-            }}
-          />
+          Tambah Peraturan
+        </CreateButton>
+      }
+    >
+      <Table
+        {...tableProps}
+        rowKey="id"
+        bordered={false}
+        rowClassName={(record, index) =>
+          index % 2 === 0 ? "table-row-light" : "table-row-dark"
+        }
+        style={{
+          boxShadow: "0 1px 2px rgba(0, 0, 0, 0.03)",
+          borderRadius: "8px",
+          overflow: "hidden",
+        }}
+      >
+        <Table.Column
+          title="No."
+          width={60}
+          render={(_, __, index) => {
+            const { current = 1, pageSize = 10 } = tableProps.pagination || {};
+            return (current - 1) * pageSize + index + 1;
+          }}
+        />
 
-          <Table.Column
-            dataIndex="name"
-            title="Nama Peraturan"
-            sorter
-            render={(value) => (
-              <Text strong ellipsis style={{ maxWidth: 250 }} title={value}>
-                {value}
-              </Text>
-            )}
-          />
+        <Table.Column
+          dataIndex="name"
+          title="Nama Peraturan"
+          sorter
+          render={(value) => (
+            <Text strong ellipsis style={{ maxWidth: 250 }} title={value}>
+              {value}
+            </Text>
+          )}
+        />
 
-          <Table.Column
-            dataIndex="point"
-            title="Point"
-            sorter
-            render={(value) => (
-              <Badge
-                count={value}
-                showZero
-                style={{
-                  backgroundColor: getPointColor(value),
-                  fontWeight: "bold",
-                  fontSize: "14px",
-                }}
+        <Table.Column
+          dataIndex="point"
+          title="Point"
+          sorter
+          render={(value) => (
+            <Badge
+              count={value}
+              showZero
+              style={{
+                backgroundColor: getPointColor(value),
+                fontWeight: "bold",
+                fontSize: "14px",
+              }}
+            />
+          )}
+        />
+
+        <Table.Column
+          dataIndex="type"
+          title="Tipe"
+          sorter
+          render={(value) => (
+            <Tag color={getTypeColor(value)} style={{ fontWeight: "bold" }}>
+              {value.toUpperCase()}
+            </Tag>
+          )}
+        />
+
+        <Table.Column
+          dataIndex={["createdAt"]}
+          title="Dibuat Pada"
+          sorter
+          render={(value: any) => (
+            <Space>
+              <ClockCircleOutlined style={{ color: "#8c8c8c" }} />
+              <DateField
+                value={value}
+                format="DD MMM YYYY"
+                style={{ color: "#8c8c8c" }}
               />
-            )}
-          />
+            </Space>
+          )}
+        />
 
-          <Table.Column
-            dataIndex="type"
-            title="Tipe"
-            sorter
-            render={(value) => (
-              <Tag color={getTypeColor(value)} style={{ fontWeight: "bold" }}>
-                {value.toUpperCase()}
-              </Tag>
-            )}
-          />
-
-          <Table.Column
-            dataIndex={["createdAt"]}
-            title="Dibuat Pada"
-            sorter
-            render={(value: any) => (
-              <Space>
-                <ClockCircleOutlined style={{ color: "#8c8c8c" }} />
-                <DateField
-                  value={value}
-                  format="DD MMM YYYY"
-                  style={{ color: "#8c8c8c" }}
+        <Table.Column
+          title="Actions"
+          dataIndex="actions"
+          fixed="right"
+          render={(_, record: BaseRecord) => (
+            <Space>
+              <Tooltip title="Lihat Detail">
+                <ShowButton
+                  hideText
+                  size="middle"
+                  recordItemId={record.id}
+                  icon={<EyeOutlined />}
+                  type="text"
                 />
-              </Space>
-            )}
-          />
+              </Tooltip>
 
-          <Table.Column
-            title="Actions"
-            dataIndex="actions"
-            fixed="right"
-            render={(_, record: BaseRecord) => (
-              <Space>
-                <Tooltip title="Lihat Detail">
-                  <ShowButton
-                    hideText
-                    size="middle"
-                    recordItemId={record.id}
-                    icon={<EyeOutlined />}
-                    type="text"
-                  />
-                </Tooltip>
+              <Tooltip title="Edit">
+                <EditButton
+                  hideText
+                  size="middle"
+                  recordItemId={record.id}
+                  icon={<EditOutlined />}
+                  type="text"
+                  accessControl={{
+                    enabled: true,
+                    hideIfUnauthorized: true,
+                  }}
+                />
+              </Tooltip>
 
-                <Tooltip title="Edit">
-                  <EditButton
-                    hideText
-                    size="middle"
-                    recordItemId={record.id}
-                    icon={<EditOutlined />}
-                    type="text"
-                    accessControl={{
-                      enabled: true,
-                      hideIfUnauthorized: true,
-                    }}
-                  />
-                </Tooltip>
-
-                <Tooltip title="Hapus">
-                  <DeleteButton
-                    hideText
-                    size="middle"
-                    recordItemId={record.id}
-                    icon={<DeleteOutlined />}
-                    type="text"
-                    accessControl={{
-                      enabled: true,
-                      hideIfUnauthorized: true,
-                    }}
-                  />
-                </Tooltip>
-              </Space>
-            )}
-          />
-        </Table>
-      </Card>
-    </Suspense>
+              <Tooltip title="Hapus">
+                <DeleteButton
+                  hideText
+                  size="middle"
+                  recordItemId={record.id}
+                  icon={<DeleteOutlined />}
+                  type="text"
+                  accessControl={{
+                    enabled: true,
+                    hideIfUnauthorized: true,
+                  }}
+                />
+              </Tooltip>
+            </Space>
+          )}
+        />
+      </Table>
+    </Card>
   );
 };

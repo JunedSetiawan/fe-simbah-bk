@@ -37,6 +37,7 @@ import type { RefineThemedLayoutV2SiderProps } from "@refinedev/antd";
 import type { CSSProperties } from "react";
 import LogoImage from "@/public/logo/logo-smkn-jenangan.png";
 import Image from "next/image";
+import { MobileBottomNavbar } from "./mobileBottomNavbar";
 
 const drawerButtonStyles: CSSProperties = {
   borderStartStartRadius: 0,
@@ -92,8 +93,6 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
         />
         {!collapsed && (
           <div className="flex flex-col">
-            {" "}
-            {/* Tambahkan wrapper div dengan flex-col */}
             <h4 className="text-white text-lg font-semibold m-0">SI-PEKA</h4>
             <h3 className="text-white text-sm m-0 font-light">
               SMKN 1 JENANGAN PONOROGO
@@ -134,7 +133,6 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
               key={item.key}
               icon={icon ?? <UnorderedListOutlined />}
               title={label}
-              // Tambahkan style untuk menu sub-item
               style={{
                 whiteSpace: "nowrap",
                 color: "white",
@@ -247,7 +245,7 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
       </>
     );
   };
-  const SIDEBAR_WIDTH = 250; // Increased from 280px to 320px for more space
+  const SIDEBAR_WIDTH = 250;
   const COLLAPSED_WIDTH = 80;
 
   const renderMenu = () => {
@@ -262,7 +260,6 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
           paddingTop: "25px",
           border: "none",
           overflow: "auto",
-          // height: isMobile ? "calc(100vh - 64px)" : "calc(100% - 72px)",
           minHeight: "auto",
         }}
         theme="dark"
@@ -276,70 +273,9 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
     );
   };
 
-  const renderDrawerSider = () => {
-    return (
-      <>
-        <Drawer
-          open={mobileSiderOpen}
-          onClose={() => setMobileSiderOpen(false)}
-          placement={direction === "rtl" ? "right" : "left"}
-          closable={true}
-          width={SIDEBAR_WIDTH}
-          bodyStyle={{
-            padding: 0,
-            height: "100%",
-            backgroundColor: "rgba(44, 89, 90, 1)", // Sesuaikan dengan warna tema
-          }}
-          maskClosable={true}
-          styles={{
-            body: {
-              marginTop: "20px",
-              padding: 0,
-              height: "100%",
-            },
-            header: {
-              display: "none", // Sembunyikan header drawer
-            },
-            mask: {
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-            },
-            content: {
-              boxShadow: "none",
-            },
-          }}
-        >
-          <Layout>
-            <Layout.Sider
-              style={{
-                height: "100vh",
-                backgroundColor: "rgba(44, 89, 90, 1)",
-                borderRight: "none",
-              }}
-            >
-              <div
-                style={{
-                  width: "100%",
-                  padding: "16px",
-                  display: "flex",
-                  justifyContent: "flex-start",
-                  alignItems: "center",
-                  height: "64px",
-                  backgroundColor: "rgba(44, 89, 90, 1)",
-                  color: "white",
-                }}
-              >
-                <RenderToTitle collapsed={false} />
-              </div>
-              {renderMenu()}
-            </Layout.Sider>
-          </Layout>
-        </Drawer>
-      </>
-    );
-  };
-
+  // Return mobile bottom navigation for mobile devices
   if (isMobile) {
-    return renderDrawerSider();
+    return <MobileBottomNavbar />;
   }
 
   const siderStyles: React.CSSProperties = {
@@ -354,6 +290,7 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
     siderStyles.height = "100vh";
     siderStyles.zIndex = 999;
   }
+
   const renderClosingIcons = () => {
     const iconProps = { style: { color: "white" } };
     const OpenIcon = direction === "rtl" ? RightOutlined : LeftOutlined;
@@ -397,8 +334,6 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
             justifyContent: siderCollapsed ? "center" : "flex-start",
             alignItems: "center",
             height: "64px",
-            // backgroundColor: token.colorBgElevated,
-
             fontSize: "14px",
           }}
         >

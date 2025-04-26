@@ -22,6 +22,7 @@ import {
   ContactsFilled,
   ControlFilled,
   HomeFilled,
+  PhoneOutlined,
   ReadFilled,
   TrophyFilled,
   UserOutlined,
@@ -137,7 +138,6 @@ export default function RootLayout({
                           icon: <ControlFilled style={{ fontSize: "1.2em" }} />,
                         },
                       },
-
                       {
                         name: "student-violations",
                         show: "/student-violations/show/:id",
@@ -181,8 +181,7 @@ export default function RootLayout({
                           label: "Rekap per Kelas",
                           icon: <ReadFilled style={{ fontSize: "1.2em" }} />,
                         },
-                      },
-                      // {
+                      }, // {
                       //   name: "violation-summary/yearly",
                       //   list: "/violation-summary/yearlies",
                       //   meta: {
@@ -198,6 +197,19 @@ export default function RootLayout({
                           parent: "management-violations",
                           label: "Rekap per Semester",
                           icon: <ReadFilled style={{ fontSize: "1.2em" }} />,
+                        },
+                      },
+                      {
+                        name: "student-calls",
+                        list: "/student-calls",
+                        create: "/student-calls/create",
+                        edit: "/student-calls/edit/:id",
+                        show: "/student-calls/show/:id",
+
+                        meta: {
+                          canDelete: true,
+                          label: "Panggilan Siswa",
+                          icon: <PhoneOutlined style={{ fontSize: "1.2em" }} />,
                         },
                       },
                     ]}

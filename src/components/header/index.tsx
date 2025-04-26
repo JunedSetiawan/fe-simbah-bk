@@ -33,6 +33,8 @@ import {
 } from "@ant-design/icons";
 import { Dropdown, Menu as AntdMenu } from "antd";
 import { useThemedLayoutContext } from "@refinedev/antd";
+import Image from "next/image";
+import LogoImage from "@/public/logo/logo-smkn-jenangan.png";
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -129,7 +131,6 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
         "cute",
         "glasses",
         "love",
-
         "shades",
         "sleepClose",
         "stars",
@@ -143,7 +144,6 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
         "faceMask",
         "kissHeart",
         "lilSmile",
-
         "smileLol",
         "smileTeeth",
         "tongueOut",
@@ -158,30 +158,8 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
     headerStyles.zIndex = 1;
   }
 
-  const renderCollapseButton = () => {
-    if (isMobile) {
-      return (
-        <Button
-          size="large"
-          onClick={() => setMobileSiderOpen(true)}
-          icon={<BarsOutlined />}
-        />
-      );
-    }
-
-    const OpenIcon = direction === "rtl" ? RightOutlined : LeftOutlined;
-    const CollapsedIcon = direction === "rtl" ? LeftOutlined : RightOutlined;
-    const Icon = siderCollapsed ? CollapsedIcon : OpenIcon;
-
-    return (
-      <Button
-        size="large"
-        onClick={() => setSiderCollapsed(!siderCollapsed)}
-        icon={<Icon />}
-      />
-    );
-  };
   const { push } = useNavigation();
+
   const userMenu = (
     <AntdMenu
       style={{
@@ -223,47 +201,24 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
       </AntdMenu.Item>
     </AntdMenu>
   );
-  const renderHeaderRight = () => {
-    return (
-      <Space size="middle">
-        {isMobile && (
-          <Button
-            size="large"
-            onClick={() => setMobileSiderOpen(true)}
-            icon={<MenuOutlined />}
-          />
-        )}
-        {!isMobile && (
-          <Button
-            size="large"
-            onClick={() => setSiderCollapsed(!siderCollapsed)}
-            icon={siderCollapsed ? <RightOutlined /> : <LeftOutlined />}
-          />
-        )}
-        <Dropdown
-          overlay={userMenu}
-          trigger={["click"]}
-          placement="bottomRight"
-        >
-          <Avatar
-            src={avatar}
-            alt={user?.username}
-            style={{ cursor: "pointer" }}
-          />
-        </Dropdown>
-      </Space>
-    );
-  };
+
+  // App title and logo component for mobile view
+  const AppTitle = () => (
+    <div className="flex items-center gap-2">
+      <Image src={LogoImage} alt="Logo" width={36} height={36} />
+      <div className="flex flex-col">
+        <h4 className="text-lg font-semibold m-0">SI-PEKA</h4>
+        <h3 className="text-xs m-0 font-light">SMKN 1 JENANGAN</h3>
+      </div>
+    </div>
+  );
+
   return (
     <AntdLayout.Header style={headerStyles}>
-      {/* Bagian Kiri - Tombol Sider */}
+      {/* Left section - Sidebar toggle button (only on desktop) or App title (on mobile) */}
       <div>
         {isMobile ? (
-          <Button
-            size="large"
-            onClick={() => setMobileSiderOpen(true)}
-            icon={<MenuOutlined />}
-          />
+          <AppTitle />
         ) : (
           <Button
             size="large"
@@ -273,10 +228,10 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
         )}
       </div>
 
-      {/* Bagian Tengah - Bisa ditambahkan konten jika perlu */}
+      {/* Middle section - Can be used for additional content if needed */}
       <div style={{ flex: 1 }}></div>
 
-      {/* Bagian Kanan - Avatar & Dropdown */}
+      {/* Right section - User avatar and dropdown */}
       {(user?.username || user?.profileType) && (
         <Dropdown
           overlay={userMenu}
