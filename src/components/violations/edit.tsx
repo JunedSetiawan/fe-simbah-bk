@@ -67,7 +67,7 @@ export const ViolationsEdit = () => {
       formProps.form.setFieldsValue(formData);
       setSelectedClassId(initialClassId);
     }
-  }, [data, formProps.form]);
+  }, [data, formProps.form, initialClassId]);
 
   // Fetch daftar siswa ketika kelas dipilih
   const { isLoading: isLoadingStudents } = useCustom({

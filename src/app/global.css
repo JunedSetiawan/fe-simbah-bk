@@ -12,6 +12,10 @@
  :where(.css-dev-only-do-not-override-odgtvf).ant-menu-dark>.ant-menu.ant-menu-inline .ant-menu-sub.ant-menu-inline {
      background: rgba(44, 89, 90, 1) !important;
  }
+ :where(.css-odgtvf).ant-menu-dark.ant-menu-inline .ant-menu-sub.ant-menu-inline,
+ :where(.css-odgtvf).ant-menu-dark>.ant-menu.ant-menu-inline .ant-menu-sub.ant-menu-inline {
+     background: rgba(44, 89, 90, 1) !important;
+ }
 /* Override Ant Design menu item styles */
 .ant-menu-item a {
     color: white !important;

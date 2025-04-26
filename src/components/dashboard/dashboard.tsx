@@ -165,7 +165,7 @@ export const Dashboard = () => {
     } else if (activeTab === "class" && filters.class_id) {
       refetchClass();
     }
-  }, [filters]);
+  }, [filters, activeTab, refetchDashboard, refetchModule, refetchClass]);
 
   // Colors for charts
   const COLORS = [
@@ -858,7 +858,7 @@ export const Dashboard = () => {
                 </ResponsiveContainer>
               </Col>
             </Row>
-            // Implementasi pada modul counseling
+
             {data.by_student && (
               <>
                 <Title level={5} style={{ marginTop: 16 }}>
@@ -952,7 +952,7 @@ export const Dashboard = () => {
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
-            // Untuk implementasi pada modul home_visit
+
             {data.by_student && (
               <>
                 <Title level={5} style={{ marginTop: 16 }}>

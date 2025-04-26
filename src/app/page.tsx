@@ -8,7 +8,7 @@ import { ThemedLayoutV2 } from "@components/layout";
 import { Header } from "@components/header";
 import { Dashboard } from "@components/dashboard";
 
-export default function IndexPage({ children }: React.PropsWithChildren) {
+export default function IndexPage() {
   const apiUrl = useApiUrl();
 
   return (

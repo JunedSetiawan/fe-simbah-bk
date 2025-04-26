@@ -452,7 +452,6 @@ const VisitTable = ({
                       <EditButton
                         icon={<CheckCircleOutlined />}
                         size="small"
-                        children="Selesaikan"
                         type="primary"
                         recordItemId={record.id}
                         title="Selesaikan kunjungan"
@@ -469,7 +468,6 @@ const VisitTable = ({
                           danger
                           size="small"
                           type="primary"
-                          children="Batalkan"
                           icon={<CloseCircleOutlined />}
                           loading={cancelLoading}
                           title="Batalkan kunjungan"

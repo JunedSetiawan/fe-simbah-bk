@@ -8,7 +8,7 @@
 
 # testing
 /coverage
-
+/certificates
 # next.js
 /.next/
 /out/
@@ -29,6 +29,10 @@ yarn-error.log*
 .env*.local
 .env*.production
 .env
+
+# Auto Generated PWA files
+/public/sw.js
+/public/workbox-*.js
 
 # vercel
 .vercel

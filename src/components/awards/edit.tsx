@@ -92,7 +92,7 @@ export const AwardsEdit = () => {
         ]);
       }
     }
-  }, [data, formProps.form, apiUrl]);
+  }, [data, formProps.form, apiUrl, initialClassId]);
 
   const { isLoading: isLoadingStudents } = useCustom({
     url: selectedClassId ? `${apiUrl}/classes/${selectedClassId}/students` : "",
