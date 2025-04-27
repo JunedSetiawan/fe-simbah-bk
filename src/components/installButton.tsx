@@ -1,7 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Modal, Steps, Typography, Popover, message } from "antd";
+import {
+  Button,
+  Modal,
+  Steps,
+  Typography,
+  Popover,
+  message,
+  FloatButton,
+} from "antd";
 import {
   AppstoreAddOutlined,
   InfoCircleOutlined,
@@ -96,14 +104,19 @@ const InstallButton: React.FC = () => {
           title="Install Our App"
           trigger="hover"
         >
-          <Button
+          <FloatButton
             type="primary"
             icon={<AppstoreAddOutlined />}
             onClick={handleInstallClick}
-            style={{ marginRight: 8 }}
+            style={{
+              marginRight: 8,
+              top: 16,
+              left: "50%",
+              transform: "translateX(-50%)",
+            }}
           >
             Install App
-          </Button>
+          </FloatButton>
         </Popover>
       )}
 
