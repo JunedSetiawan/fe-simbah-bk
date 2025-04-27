@@ -37,6 +37,8 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon-32x32.png",
   },
+equiv: "Content-Security-Policy",
+content: "upgrade-insecure-requests",
   authors: [{ name: "Jun", url: "https://juned-setiawan.vercel.app" }],
 };
 
