@@ -28,19 +28,6 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import InstallButton from "@components/installButton";
-import Head from "next/head";
-
-// Create a CSP component
-const CSPMeta = () => {
-  return (
-    <Head>
-      <meta
-        httpEquiv="Content-Security-Policy"
-        content="upgrade-insecure-requests"
-      />
-    </Head>
-  );
-};
 
 export const metadata: Metadata = {
   title: "Simbah BK - SI-PEKA",
@@ -63,12 +50,12 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <head>
+      {/* <head>
         <meta
           httpEquiv="Content-Security-Policy"
           content="upgrade-insecure-requests"
         />
-      </head>
+      </head> */}
       <body>
         <ConfigProvider
           theme={{

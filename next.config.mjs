@@ -8,6 +8,29 @@ const nextConfig = {
     compiler: {
         removeConsole: process.env.NODE_ENV !== "development"     // Remove console.log in production
     },
+    // Add headers configuration
+   async headers() {
+    return [
+        {
+            source: '/:path*',
+            headers: [
+                {
+                    key: 'Content-Security-Policy',
+                    // Using a different directive that allows mixed content
+                    value: 'block-all-mixed-content',
+                },
+            ],
+        },
+    ];
+},
+ async rewrites() {
+        return [
+            {
+                source: '/api/:path*',
+                destination: 'http://45.13.132.248:8080/api/:path*',
+            },
+        ];
+    },
 };
 
 export default withPWA({
