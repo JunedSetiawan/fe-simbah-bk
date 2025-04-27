@@ -28,6 +28,19 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import InstallButton from "@components/installButton";
+import Head from "next/head";
+
+// Create a CSP component
+const CSPMeta = () => {
+  return (
+    <Head>
+      <meta
+        httpEquiv="Content-Security-Policy"
+        content="upgrade-insecure-requests"
+      />
+    </Head>
+  );
+};
 
 export const metadata: Metadata = {
   title: "Simbah BK - SI-PEKA",
@@ -37,8 +50,6 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon-32x32.png",
   },
-equiv: "Content-Security-Policy",
-content: "upgrade-insecure-requests",
   authors: [{ name: "Jun", url: "https://juned-setiawan.vercel.app" }],
 };
 
@@ -52,6 +63,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+<CSPMeta />
       <body>
         <ConfigProvider
           theme={{
