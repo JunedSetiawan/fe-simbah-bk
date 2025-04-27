@@ -9,20 +9,20 @@ const nextConfig = {
         removeConsole: process.env.NODE_ENV !== "development"     // Remove console.log in production
     },
     // Add headers configuration
-   async headers() {
-    return [
-        {
-            source: '/:path*',
-            headers: [
-                {
-                    key: 'Content-Security-Policy',
-                    // Using a different directive that allows mixed content
-                    value: 'block-all-mixed-content',
-                },
-            ],
-        },
-    ];
-},
+//    async headers() {
+//     return [
+//         {
+//             source: '/:path*',
+//             headers: [
+//                 {
+//                     key: 'Content-Security-Policy',
+//                     // Using a different directive that allows mixed content
+//                     value: 'block-all-mixed-content',
+//                 },
+//             ],
+//         },
+//     ];
+// },
  async rewrites() {
         return [
             {
