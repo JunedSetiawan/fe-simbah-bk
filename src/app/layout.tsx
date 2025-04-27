@@ -27,6 +27,7 @@ import {
   TrophyFilled,
   UserOutlined,
 } from "@ant-design/icons";
+import InstallButton from "@components/installButton";
 
 export const metadata: Metadata = {
   title: "Simbah BK - SI-PEKA",
@@ -222,6 +223,7 @@ export default function RootLayout({
                       projectId: "PPapVH-nZKuqU-6aYAL4",
                     }}
                   >
+                    <InstallButton />
                     {children}
                     <RefineKbar />
                   </Refine>
