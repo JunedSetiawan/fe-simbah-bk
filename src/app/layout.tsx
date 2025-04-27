@@ -63,7 +63,12 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-<CSPMeta />
+      <head>
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content="upgrade-insecure-requests"
+        />
+      </head>
       <body>
         <ConfigProvider
           theme={{
