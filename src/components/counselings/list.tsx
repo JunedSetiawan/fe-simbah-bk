@@ -10,7 +10,7 @@ import {
   DeleteButton,
   DateField,
 } from "@refinedev/antd";
-import { Table, Space, Tooltip, Tag } from "antd";
+import { Table, Space, Tooltip, Tag, Grid } from "antd";
 import {
   EyeOutlined,
   EditOutlined,
@@ -22,6 +22,10 @@ export const CounselingList = () => {
   const { tableProps } = useTable({
     syncWithLocation: true,
   });
+
+  const breakpoint = Grid.useBreakpoint();
+  const isMobile =
+    typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
 
   return (
     <List title="Daftar Konseling">
@@ -98,7 +102,7 @@ export const CounselingList = () => {
         <Table.Column
           title="Aksi"
           dataIndex="actions"
-          fixed="right"
+          fixed={isMobile ? undefined : "right"}
           render={(_, record: BaseRecord) => (
             <Space>
               <Tooltip title="Lihat Detail">

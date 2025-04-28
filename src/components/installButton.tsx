@@ -26,7 +26,7 @@ const InstallButton: React.FC = () => {
   const [safariModalVisible, setSafariModalVisible] = useState(false);
 
   useEffect(() => {
-    // Check if it's Safari
+    // Cek apakah ini Safari
     const isSafariBrowser = /^((?!chrome|android).)*safari/i.test(
       navigator.userAgent
     );
@@ -55,9 +55,9 @@ const InstallButton: React.FC = () => {
       setIsInstallable(false);
 
       if (outcome === "accepted") {
-        message.success("App installation started!");
+        message.success("Instalasi aplikasi dimulai!");
       } else {
-        message.info("App installation was declined");
+        message.info("Instalasi aplikasi ditolak");
       }
     }
   };
@@ -70,21 +70,21 @@ const InstallButton: React.FC = () => {
     <div>
       <Steps direction="vertical" current={-1}>
         <Step
-          title="Tap the Share button"
-          description="Look for the share icon in Safari's bottom menu (iOS) or top toolbar (macOS)"
+          title="Ketuk tombol Bagikan"
+          description="Cari ikon bagikan di menu bawah Safari (iOS) atau toolbar atas (macOS)"
         />
         <Step
-          title="Find 'Add to Home Screen'"
-          description="Scroll down in the share menu to find this option"
+          title="Cari 'Tambah ke Layar Utama'"
+          description="Gulir ke bawah di menu bagikan untuk menemukan opsi ini"
         />
         <Step
-          title="Confirm Installation"
-          description="Tap 'Add' in the confirmation dialog"
+          title="Konfirmasi Instalasi"
+          description="Ketuk 'Tambah' di dialog konfirmasi"
         />
       </Steps>
       <div style={{ marginTop: 16 }}>
         <Text type="secondary">
-          The app will appear on your home screen like a native app
+          Aplikasi akan muncul di layar utama Anda seperti aplikasi native
         </Text>
       </div>
     </div>
@@ -92,7 +92,9 @@ const InstallButton: React.FC = () => {
 
   const installButtonPopoverContent = (
     <div>
-      <Paragraph>Install this app on your device for easier access</Paragraph>
+      <Paragraph>
+        Instal aplikasi ini di perangkat Anda untuk akses yang lebih mudah
+      </Paragraph>
     </div>
   );
 
@@ -101,7 +103,7 @@ const InstallButton: React.FC = () => {
       {isInstallable && (
         <Popover
           content={installButtonPopoverContent}
-          title="Install Our App"
+          title="Instal Aplikasi SI-PEKA"
           trigger="hover"
         >
           <FloatButton
@@ -115,7 +117,7 @@ const InstallButton: React.FC = () => {
               transform: "translateX(-50%)",
             }}
           >
-            Install App
+            Instal Aplikasi
           </FloatButton>
         </Popover>
       )}
@@ -127,20 +129,20 @@ const InstallButton: React.FC = () => {
             icon={<AppleOutlined />}
             onClick={showSafariInstructions}
           >
-            Install on iOS/Safari
+            Instal di iOS/Safari
           </Button>
 
           <Modal
             title={
               <Title level={4}>
-                <AppleOutlined /> Install on iOS/Safari
+                <AppleOutlined /> Instal di iOS/Safari
               </Title>
             }
             open={safariModalVisible}
             onCancel={() => setSafariModalVisible(false)}
             footer={[
               <Button key="close" onClick={() => setSafariModalVisible(false)}>
-                Got it
+                Mengerti
               </Button>,
             ]}
           >

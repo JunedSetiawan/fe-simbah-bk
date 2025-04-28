@@ -39,6 +39,7 @@ import {
   Card,
   Modal,
   Input,
+  Grid,
 } from "antd";
 import dayjs from "dayjs";
 import { ClockCircleOutlined, FilePdfOutlined } from "@ant-design/icons";
@@ -253,6 +254,9 @@ export const ViolationsList = () => {
         return "";
     }
   };
+  const breakpoint = Grid.useBreakpoint();
+  const isMobile =
+    typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
   return (
     <CanAccess
       resource="violations"
@@ -461,7 +465,7 @@ export const ViolationsList = () => {
                   <Table.Column
                     title="Actions"
                     dataIndex="actions"
-                    fixed="right"
+                    fixed={isMobile ? undefined : "right"}
                     render={(_, record: BaseRecord) => (
                       <Space>
                         <EditButton
@@ -485,7 +489,7 @@ export const ViolationsList = () => {
                   <Table.Column
                     title="Cetak Surat"
                     dataIndex="actions"
-                    fixed="right"
+                    fixed={isMobile ? undefined : "right"}
                     render={(_, record: BaseRecord) => {
                       const regulation =
                         record.regulation ||
@@ -607,7 +611,7 @@ export const ViolationsList = () => {
                       sorter={(a: any, b: any) => a.totalPoints - b.totalPoints}
                     />
                     <Table.Column
-                      fixed="right"
+                      fixed={isMobile ? undefined : "right"}
                       title="Actions"
                       dataIndex="actions"
                       render={(_, record: BaseRecord) => (

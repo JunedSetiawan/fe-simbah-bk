@@ -10,7 +10,7 @@ import {
   DeleteButton,
   DateField,
 } from "@refinedev/antd";
-import { Table, Space, Typography, Tag } from "antd";
+import { Table, Space, Typography, Tag, Grid } from "antd";
 import { ClockCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 
@@ -32,6 +32,10 @@ export const StudentCallsList = () => {
       return dateValue;
     }
   };
+
+  const breakpoint = Grid.useBreakpoint();
+  const isMobile =
+    typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
   return (
     <List>
       <Table {...tableProps} rowKey="id" bordered>
@@ -99,6 +103,7 @@ export const StudentCallsList = () => {
         <Table.Column
           title="Actions"
           dataIndex="actions"
+          fixed={isMobile ? undefined : "right"}
           render={(_, record: BaseRecord) => (
             <Space>
               <EditButton hideText size="small" recordItemId={record.id} />

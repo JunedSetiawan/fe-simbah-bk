@@ -26,6 +26,7 @@ import {
   Tabs,
   Button,
   Popconfirm,
+  Grid,
 } from "antd";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -285,6 +286,10 @@ const VisitTable = ({
     );
   };
 
+  const breakpoint = Grid.useBreakpoint();
+  const isMobile =
+    typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
+
   const mergedTableProps = {
     ...tableProps,
     ...filteredTableProps,
@@ -423,7 +428,7 @@ const VisitTable = ({
           title="Aksi"
           dataIndex="actions"
           width={180}
-          fixed="right"
+          fixed={isMobile ? undefined : "right"}
           render={(_, record) => {
             const isPending = record.status?.toLowerCase() === "pending";
 
@@ -449,30 +454,36 @@ const VisitTable = ({
                       action="cancel"
                       fallback={null}
                     >
-                      <EditButton
-                        icon={<CheckCircleOutlined />}
-                        size="small"
-                        type="primary"
-                        recordItemId={record.id}
-                        title="Selesaikan kunjungan"
-                      />
-
-                      <Popconfirm
-                        title="Batalkan kunjungan?"
-                        description="Apakah Anda yakin ingin membatalkan kunjungan ini?"
-                        onConfirm={() => handleCancelVisit(record.id)}
-                        okText="Ya"
-                        cancelText="Tidak"
-                      >
-                        <Button
-                          danger
+                      <Space>
+                        <EditButton
+                          icon={<CheckCircleOutlined />}
                           size="small"
                           type="primary"
-                          icon={<CloseCircleOutlined />}
-                          loading={cancelLoading}
-                          title="Batalkan kunjungan"
-                        />
-                      </Popconfirm>
+                          recordItemId={record.id}
+                          title="Selesaikan kunjungan"
+                        >
+                          Selesaikan{" "}
+                        </EditButton>
+
+                        <Popconfirm
+                          title="Batalkan kunjungan?"
+                          description="Apakah Anda yakin ingin membatalkan kunjungan ini?"
+                          onConfirm={() => handleCancelVisit(record.id)}
+                          okText="Ya"
+                          cancelText="Tidak"
+                        >
+                          <Button
+                            danger
+                            size="small"
+                            type="primary"
+                            icon={<CloseCircleOutlined />}
+                            loading={cancelLoading}
+                            title="Batalkan kunjungan"
+                          >
+                            Batalkan
+                          </Button>
+                        </Popconfirm>
+                      </Space>
                     </CanAccess>
                   </>
                 )}

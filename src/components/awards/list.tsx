@@ -28,6 +28,7 @@ import {
   Popconfirm,
   Card,
   Tabs,
+  Grid,
 } from "antd";
 import {
   ClockCircleOutlined,
@@ -314,6 +315,9 @@ const AwardsTable = ({
 
     return pointColors[point] || "default";
   };
+  const breakpoint = Grid.useBreakpoint();
+  const isMobile =
+    typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
 
   const mergedTableProps = {
     ...tableProps,
@@ -461,7 +465,7 @@ const AwardsTable = ({
         title="Aksi"
         dataIndex="actions"
         width={180}
-        fixed="right"
+        fixed={isMobile ? undefined : "right"}
         render={(_, record: BaseRecord) => {
           const isProposed = record.status === "proposed";
 

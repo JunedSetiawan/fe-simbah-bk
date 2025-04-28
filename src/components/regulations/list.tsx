@@ -25,6 +25,7 @@ import {
   Row,
   Col,
   Spin,
+  Grid,
 } from "antd";
 import {
   EyeOutlined,
@@ -76,6 +77,10 @@ export const RegulationList = () => {
     if (point > 0) return "#52c41a"; // Hijau untuk poin positif
     return "#faad14"; // Kuning untuk poin nol
   };
+
+  const breakpoint = Grid.useBreakpoint();
+  const isMobile =
+    typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
 
   return (
     <Card
@@ -182,7 +187,7 @@ export const RegulationList = () => {
         <Table.Column
           title="Actions"
           dataIndex="actions"
-          fixed="right"
+          fixed={isMobile ? undefined : "right"}
           render={(_, record: BaseRecord) => (
             <Space>
               <Tooltip title="Lihat Detail">

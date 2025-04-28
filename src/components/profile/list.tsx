@@ -41,19 +41,24 @@ export const ProfilePage: React.FC = () => {
   // Generate consistent avatar using Dicebear
   const avatar = useMemo(() => {
     return createAvatar(funEmoji, {
+      seed:
+        user?.teacher?.name ||
+        user?.student?.name ||
+        user?.parent?.name ||
+        "User",
+      size: 128,
       backgroundColor: ["b6e3f4", "c0aede", "d1d4f9", "ffd5dc", "ffdfbf"],
       eyes: [
         "closed",
         "closed2",
-        "crying",
+
         "cute",
         "glasses",
         "love",
-
         "shades",
         "sleepClose",
         "stars",
-        "tearDrop",
+
         "wink",
         "wink2",
       ],
@@ -63,14 +68,13 @@ export const ProfilePage: React.FC = () => {
         "faceMask",
         "kissHeart",
         "lilSmile",
-
         "smileLol",
         "smileTeeth",
         "tongueOut",
         "wideSmile",
       ],
     }).toDataUri();
-  }, []);
+  }, [user?.teacher?.name, user?.student?.name, user?.parent?.name]);
 
   // Determine badge color based on profile type
   const getBadgeColor = (type: string) => {
