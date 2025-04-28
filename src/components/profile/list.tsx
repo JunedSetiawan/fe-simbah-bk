@@ -370,9 +370,6 @@ export const ProfilePage: React.FC = () => {
               <Divider style={{ margin: "12px 0" }} />
 
               <Descriptions column={1}>
-                <Descriptions.Item label="User ID">
-                  {user?.id || "N/A"}
-                </Descriptions.Item>
                 <Descriptions.Item label="Username">
                   <Text strong>{user?.username || "N/A"}</Text>
                 </Descriptions.Item>
@@ -384,16 +381,7 @@ export const ProfilePage: React.FC = () => {
                   </Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="Dibuat pada">
-                  <DateField
-                    value={user?.createdAt}
-                    format="DD MMM YYYY HH:mm"
-                  />
-                </Descriptions.Item>
-                <Descriptions.Item label="Terakhir diperbarui">
-                  <DateField
-                    value={user?.updatedAt}
-                    format="DD MMM YYYY HH:mm"
-                  />
+                  <DateField value={user?.createdAt} format="DD MMM YYYY" />
                 </Descriptions.Item>
               </Descriptions>
             </Card>
