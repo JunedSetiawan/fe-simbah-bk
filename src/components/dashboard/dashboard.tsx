@@ -1,7 +1,7 @@
 "use client";
 // pages/dashboard/index.tsx
 import React, { useState, useEffect } from "react";
-import { Drawer, FloatButton } from "antd";
+import { Drawer, FloatButton, Radio } from "antd";
 import { FilterOutlined } from "@ant-design/icons";
 import { useApiUrl, useCustom, useSelect } from "@refinedev/core";
 import {
@@ -56,12 +56,21 @@ export const Dashboard = () => {
   const apiUrl = useApiUrl();
   const [activeTab, setActiveTab] = useState<string>("overview");
   const [filterDrawerVisible, setFilterDrawerVisible] = useState(false);
+  // Define filter state
   const [filters, setFilters] = useState({
     class_id: undefined,
-    year: undefined,
-    semester: undefined,
+    year: undefined, // For single year filter
+    semester: undefined, // For single year filter
+    start_year: undefined, // For year range filter
+    start_semester: undefined, // New: for semester range filter
+    end_year: undefined, // For year range filter
+    end_semester: undefined, // New: for semester range filter
   });
 
+  // Add state to track filter type
+  const [filterType, setFilterType] = useState<"single" | "range" | undefined>(
+    undefined
+  );
   // Get school years for filter
   const { options: schoolYearOptions } = useSelect({
     resource: "school-years",
@@ -144,16 +153,57 @@ export const Dashboard = () => {
 
   // Handle filter changes
   const handleFilterChange = (key: string, value: any) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    if (key === "year" || key === "semester") {
+      // Single year mode
+      if (key === "year") {
+        setFilterType("single");
+        setFilters((prev) => ({
+          ...prev,
+          [key]: value,
+          start_year: undefined,
+          start_semester: undefined,
+          end_year: undefined,
+          end_semester: undefined,
+        }));
+      } else {
+        setFilters((prev) => ({ ...prev, [key]: value }));
+      }
+    } else if (
+      key === "start_year" ||
+      key === "start_semester" ||
+      key === "end_year" ||
+      key === "end_semester"
+    ) {
+      // Year range mode
+      if (key === "start_year" || key === "end_year") {
+        setFilterType("range");
+        setFilters((prev) => ({
+          ...prev,
+          [key]: value,
+          year: undefined,
+          semester: undefined,
+        }));
+      } else {
+        setFilters((prev) => ({ ...prev, [key]: value }));
+      }
+    } else {
+      // Other filters (class_id, etc.)
+      setFilters((prev) => ({ ...prev, [key]: value }));
+    }
   };
 
-  // Reset all filters
+  // Reset all filters including the new year range filters
   const resetFilters = () => {
     setFilters({
       class_id: undefined,
       year: undefined,
       semester: undefined,
+      start_year: undefined,
+      start_semester: undefined,
+      end_year: undefined,
+      end_semester: undefined,
     });
+    setFilterType(undefined);
   };
 
   // Refetch data when filters change
@@ -1560,6 +1610,7 @@ export const Dashboard = () => {
     );
   };
 
+  // Modify the renderFilters function to include year range selection
   const renderFilters = () => {
     return (
       <>
@@ -1598,21 +1649,135 @@ export const Dashboard = () => {
         >
           <Space direction="vertical" size="middle" style={{ width: "100%" }}>
             <div>
-              <Text strong>Tahun Ajaran:</Text>
-              <Select
-                placeholder="Pilih Tahun Ajaran"
+              <Text strong>Filter berdasarkan:</Text>
+              <Radio.Group
+                onChange={(e) => setFilterType(e.target.value)}
+                value={filterType}
                 style={{ width: "100%", marginTop: 8 }}
-                value={filters.year}
-                onChange={(value) => handleFilterChange("year", value)}
-                allowClear
               >
-                {schoolYearOptions?.map((option) => (
-                  <Select.Option key={option.value} value={option.value}>
-                    {option.label} - {Number(option.label) + 1}
-                  </Select.Option>
-                ))}
-              </Select>
+                <Radio value="single">Tahun Ajaran Tunggal</Radio>
+                <Radio value="range">Rentang Tahun Ajaran</Radio>
+              </Radio.Group>
             </div>
+
+            {/* Only show single year filter if "single" is selected */}
+            {filterType === "single" && (
+              <>
+                <div>
+                  <Text strong>Tahun Ajaran:</Text>
+                  <Select
+                    placeholder="Pilih Tahun Ajaran"
+                    style={{ width: "100%", marginTop: 8 }}
+                    value={filters.year}
+                    onChange={(value) => handleFilterChange("year", value)}
+                    allowClear
+                  >
+                    {schoolYearOptions?.map((option) => (
+                      <Select.Option key={option.value} value={option.value}>
+                        {option.label} - {Number(option.label) + 1}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </div>
+
+                <div>
+                  <Text strong>Semester:</Text>
+                  <Select
+                    placeholder="Pilih Semester"
+                    style={{ width: "100%", marginTop: 8 }}
+                    value={filters.semester}
+                    onChange={(value) => handleFilterChange("semester", value)}
+                    allowClear
+                    disabled={!filters.year}
+                  >
+                    <Select.Option value="1">Semester 1</Select.Option>
+                    <Select.Option value="2">Semester 2</Select.Option>
+                  </Select>
+                </div>
+              </>
+            )}
+
+            {/* Only show year range filters if "range" is selected */}
+            {filterType === "range" && (
+              <>
+                <div>
+                  <Text strong>Tahun Ajaran Awal:</Text>
+                  <Select
+                    placeholder="Pilih Tahun Ajaran Awal"
+                    style={{ width: "100%", marginTop: 8 }}
+                    value={filters.start_year}
+                    onChange={(value) =>
+                      handleFilterChange("start_year", value)
+                    }
+                    allowClear
+                  >
+                    {schoolYearOptions?.map((option) => (
+                      <Select.Option key={option.value} value={option.value}>
+                        {option.label} - {Number(option.label) + 1}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </div>
+
+                <div>
+                  <Text strong>Semester Awal:</Text>
+                  <Select
+                    placeholder="Pilih Semester Awal"
+                    style={{ width: "100%", marginTop: 8 }}
+                    value={filters.start_semester}
+                    onChange={(value) =>
+                      handleFilterChange("start_semester", value)
+                    }
+                    allowClear
+                    disabled={!filters.start_year}
+                  >
+                    <Select.Option value="1">Semester 1</Select.Option>
+                    <Select.Option value="2">Semester 2</Select.Option>
+                  </Select>
+                </div>
+
+                <div>
+                  <Text strong>Tahun Ajaran Akhir:</Text>
+                  <Select
+                    placeholder="Pilih Tahun Ajaran Akhir"
+                    style={{ width: "100%", marginTop: 8 }}
+                    value={filters.end_year}
+                    onChange={(value) => handleFilterChange("end_year", value)}
+                    allowClear
+                    disabled={!filters.start_year}
+                  >
+                    {schoolYearOptions
+                      ?.filter(
+                        (option) =>
+                          !filters.start_year ||
+                          Number(option.value) >= Number(filters.start_year)
+                      )
+                      .map((option) => (
+                        <Select.Option key={option.value} value={option.value}>
+                          {option.label} - {Number(option.label) + 1}
+                        </Select.Option>
+                      ))}
+                  </Select>
+                </div>
+
+                <div>
+                  <Text strong>Semester Akhir:</Text>
+                  <Select
+                    placeholder="Pilih Semester Akhir"
+                    style={{ width: "100%", marginTop: 8 }}
+                    value={filters.end_semester}
+                    onChange={(value) =>
+                      handleFilterChange("end_semester", value)
+                    }
+                    allowClear
+                    disabled={!filters.end_year}
+                  >
+                    <Select.Option value="1">Semester 1</Select.Option>
+                    <Select.Option value="2">Semester 2</Select.Option>
+                  </Select>
+                </div>
+              </>
+            )}
 
             <div>
               <Text strong>Kelas:</Text>
@@ -1621,7 +1786,7 @@ export const Dashboard = () => {
                 style={{ width: "100%", marginTop: 8 }}
                 value={filters.class_id}
                 onChange={(value) => handleFilterChange("class_id", value)}
-                disabled={!filters.year}
+                // disabled={!filters.year && !filters.start_year}
                 allowClear
               >
                 {classOptions?.map((option) => (
@@ -1629,20 +1794,6 @@ export const Dashboard = () => {
                     {option.label}
                   </Select.Option>
                 ))}
-              </Select>
-            </div>
-
-            <div>
-              <Text strong>Semester:</Text>
-              <Select
-                placeholder="Pilih Semester"
-                style={{ width: "100%", marginTop: 8 }}
-                value={filters.semester}
-                onChange={(value) => handleFilterChange("semester", value)}
-                allowClear
-              >
-                <Select.Option value="1">Semester 1</Select.Option>
-                <Select.Option value="2">Semester 2</Select.Option>
               </Select>
             </div>
           </Space>
