@@ -263,10 +263,18 @@ export const Dashboard = () => {
               {formatDate(meta?.filters?.date_range?.end_date)}
             </p>
             {meta?.filters?.class_id && chart?.class_info && (
-              <p>
-                <strong>Kelas:</strong> {chart.class_info.name}
-              </p>
+              <>
+                <p>
+                  <strong>Kelas:</strong> {chart.class_info.name}
+                </p>
+              </>
             )}
+            <p>
+              <strong>Semester:</strong>{" "}
+              {meta?.filters?.semester ||
+                meta?.filters?.academic_period?.semester_range ||
+                "-"}
+            </p>
           </div>
         }
         style={{ marginBottom: 24 }}
@@ -639,6 +647,11 @@ export const Dashboard = () => {
     }
 
     const { data, meta } = moduleData.data;
+    const className = meta.filters.class_name || "-";
+    const semester =
+      meta.filters.academic_period.semester ||
+      meta.filters.academic_period.semester_range ||
+      "-";
     const date_range = meta.filters.date_range || "-";
     const moduleName = meta.filters.module;
 
@@ -649,12 +662,14 @@ export const Dashboard = () => {
           <Card title="Statistik Pelanggaran" style={{ marginBottom: 16 }}>
             <p>
               <strong>Periode:</strong> {formatDate(date_range.start)} -{" "}
-              {formatDate(date_range.end)}
+              {formatDate(date_range.end)} {"\t\t\t\t\t"} <br />
+              <strong>Kelas:</strong> {className} <br />
+              <strong>Semester</strong>: {semester}
             </p>
 
             {data.by_student && (
               <>
-                <Title level={5} style={{ marginTop: 16 }}>
+                <Title level={5} style={{ marginTop: 10 }}>
                   Pelanggaran per Siswa
                 </Title>
 
@@ -748,12 +763,14 @@ export const Dashboard = () => {
           <Card title="Statistik Penghargaan" style={{ marginBottom: 16 }}>
             <p>
               <strong>Periode:</strong> {formatDate(date_range.start)} -{" "}
-              {formatDate(date_range.end)}
+              {formatDate(date_range.end)} {"\t\t\t\t\t"} <br />
+              <strong>Kelas:</strong> {className} <br />
+              <strong>Semester</strong>: {semester}
             </p>
 
             {data.by_student && (
               <>
-                <Title level={5} style={{ marginTop: 16 }}>
+                <Title level={5} style={{ marginTop: 10 }}>
                   Penghargaan per Siswa
                 </Title>
                 <ResponsiveContainer width="100%" height={320}>
@@ -846,9 +863,11 @@ export const Dashboard = () => {
           <Card title="Statistik Konseling" style={{ marginBottom: 16 }}>
             <p>
               <strong>Periode:</strong> {formatDate(date_range.start)} -{" "}
-              {formatDate(date_range.end)}
+              {formatDate(date_range.end)} {"\t\t\t\t\t"} <br />
+              <strong>Kelas:</strong> {className} <br />
+              <strong>Semester</strong>: {semester}
             </p>
-            <Row gutter={16} style={{ marginTop: 16 }}>
+            <Row gutter={16} style={{ marginTop: 10 }}>
               <Col xs={24} md={12}>
                 <Title level={5}>Berdasarkan Bidang Layanan</Title>
                 <ResponsiveContainer width="100%" height={250}>
@@ -911,7 +930,7 @@ export const Dashboard = () => {
 
             {data.by_student && (
               <>
-                <Title level={5} style={{ marginTop: 16 }}>
+                <Title level={5} style={{ marginTop: 10 }}>
                   Konseling per Siswa
                 </Title>
                 {(() => {
@@ -971,9 +990,11 @@ export const Dashboard = () => {
           <Card title="Statistik Kunjungan Rumah" style={{ marginBottom: 16 }}>
             <p>
               <strong>Periode:</strong> {formatDate(date_range.start)} -{" "}
-              {formatDate(date_range.end)}
+              {formatDate(date_range.end)} {"\t\t\t\t\t"} <br />
+              <strong>Kelas:</strong> {className} <br />
+              <strong>Semester</strong>: {semester}
             </p>
-            <Title level={5} style={{ marginTop: 16 }}>
+            <Title level={5} style={{ marginTop: 10 }}>
               Berdasarkan Status
             </Title>
             <ResponsiveContainer width="100%" height={250}>
@@ -1005,7 +1026,7 @@ export const Dashboard = () => {
 
             {data.by_student && (
               <>
-                <Title level={5} style={{ marginTop: 16 }}>
+                <Title level={5} style={{ marginTop: 10 }}>
                   Kunjungan Rumah per Siswa
                 </Title>
                 {/* Tambahkan fungsi untuk membuat Y-axis dinamis */}
@@ -1088,7 +1109,7 @@ export const Dashboard = () => {
               </Col>
             </Row>
 
-            <Title level={5} style={{ marginTop: 16 }}>
+            <Title level={5} style={{ marginTop: 10 }}>
               Berdasarkan Kategori
             </Title>
             <ResponsiveContainer width="100%" height={320}>
