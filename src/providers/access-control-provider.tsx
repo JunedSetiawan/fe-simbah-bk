@@ -29,7 +29,7 @@ export const accessControlProvider: AccessControlProvider = {
       return { can: true };
     }
 
-    if (resource === "management-violations") {
+    if (resource === "management-violations" || resource === "violation-summary/class" || resource === "violation-summary/semester") {
       return { can: isSuperAdmin(user) || isAdmin(user) };
     }
 
