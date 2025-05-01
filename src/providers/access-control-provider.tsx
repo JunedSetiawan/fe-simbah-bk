@@ -25,12 +25,12 @@ export const accessControlProvider: AccessControlProvider = {
 
     const user = JSON.parse(userStr) as User;
 
-    if (
-      resource === "dashboard" ||
-      resource === "profile" ||
-      resource === "management-violations"
-    ) {
+    if (resource === "dashboard" || resource === "profile") {
       return { can: true };
+    }
+
+    if (resource === "management-violations") {
+      return { can: isSuperAdmin(user) || isAdmin(user) };
     }
 
     // Handle User resource
