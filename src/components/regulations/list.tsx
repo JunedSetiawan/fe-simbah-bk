@@ -1,7 +1,7 @@
 "use client";
 
-import React, { Suspense } from "react";
-import { BaseRecord, CanAccess, useCan, useMany } from "@refinedev/core";
+import React from "react";
+import { BaseRecord } from "@refinedev/core";
 import {
   List,
   useTable,
@@ -19,12 +19,8 @@ import {
   Tag,
   Typography,
   Button,
-  Tooltip,
-  Avatar,
   Badge,
   Row,
-  Col,
-  Spin,
   Grid,
 } from "antd";
 import {
@@ -190,43 +186,37 @@ export const RegulationList = () => {
           fixed={isMobile ? undefined : "right"}
           render={(_, record: BaseRecord) => (
             <Space>
-              <Tooltip title="Lihat Detail">
-                <ShowButton
-                  hideText
-                  size="middle"
-                  recordItemId={record.id}
-                  icon={<EyeOutlined />}
-                  type="text"
-                />
-              </Tooltip>
+              <ShowButton
+                hideText
+                size="middle"
+                recordItemId={record.id}
+                icon={<EyeOutlined />}
+                type="text"
+              />
 
-              <Tooltip title="Edit">
-                <EditButton
-                  hideText
-                  size="middle"
-                  recordItemId={record.id}
-                  icon={<EditOutlined />}
-                  type="text"
-                  accessControl={{
-                    enabled: true,
-                    hideIfUnauthorized: true,
-                  }}
-                />
-              </Tooltip>
+              <EditButton
+                hideText
+                size="middle"
+                recordItemId={record.id}
+                icon={<EditOutlined />}
+                type="text"
+                accessControl={{
+                  enabled: true,
+                  hideIfUnauthorized: true,
+                }}
+              />
 
-              <Tooltip title="Hapus">
-                <DeleteButton
-                  hideText
-                  size="middle"
-                  recordItemId={record.id}
-                  icon={<DeleteOutlined />}
-                  type="text"
-                  accessControl={{
-                    enabled: true,
-                    hideIfUnauthorized: true,
-                  }}
-                />
-              </Tooltip>
+              <DeleteButton
+                hideText
+                size="middle"
+                recordItemId={record.id}
+                icon={<DeleteOutlined />}
+                type="text"
+                accessControl={{
+                  enabled: true,
+                  hideIfUnauthorized: true,
+                }}
+              />
             </Space>
           )}
         />

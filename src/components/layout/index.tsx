@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React from "react";
 import { ThemedLayoutContextProvider } from "@refinedev/antd";
 import { ThemedHeaderV2 as DefaultHeader } from "./header";
 import { ThemedSiderV2 as DefaultSider } from "./sider";
 import { Grid, Layout as AntdLayout } from "antd";
 import type { RefineThemedLayoutV2Props } from "@refinedev/antd";
-import { MobileBottomNavbar } from "./mobileBottomNavbar";
 
 export const ThemedLayoutV2: React.FC<RefineThemedLayoutV2Props> = ({
   children,
@@ -40,7 +39,6 @@ export const ThemedLayoutV2: React.FC<RefineThemedLayoutV2Props> = ({
               style={{
                 minHeight: 360,
                 padding: isSmall ? 24 : 12,
-                paddingBottom: isMobile ? "80px" : "16px",
               }}
             >
               {children}

@@ -104,23 +104,23 @@ export const CounselingList = () => {
           dataIndex="actions"
           fixed={isMobile ? undefined : "right"}
           render={(_, record: BaseRecord) => (
-            <Space>
-              <Tooltip title="Lihat Detail">
-                <ShowButton
-                  hideText
-                  size="small"
-                  recordItemId={record.id}
-                  icon={<EyeOutlined />}
-                />
-              </Tooltip>
-              <Tooltip title="Edit">
-                <EditButton
-                  hideText
-                  size="small"
-                  recordItemId={record.id}
-                  icon={<EditOutlined />}
-                />
-              </Tooltip>
+            <Space style={{ zIndex: 1, position: "relative" }}>
+              <ShowButton
+                hideText
+                size="small"
+                recordItemId={record.id}
+                icon={<EyeOutlined />}
+                style={{ touchAction: "manipulation" }}
+              />
+
+              <EditButton
+                hideText
+                size="small"
+                recordItemId={record.id}
+                icon={<EditOutlined />}
+                style={{ touchAction: "manipulation" }}
+              />
+
               <Tooltip title="Hapus">
                 <DeleteButton
                   hideText
