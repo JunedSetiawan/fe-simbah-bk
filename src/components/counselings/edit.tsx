@@ -2,7 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import { Edit, useForm, useSelect } from "@refinedev/antd";
-import { Form, Input, DatePicker, notification, Select, Divider } from "antd";
+import {
+  Form,
+  Input,
+  DatePicker,
+  notification,
+  Select,
+  Divider,
+  Radio,
+} from "antd";
 import dayjs from "dayjs";
 import { CanAccess, useApiUrl, useCustom } from "@refinedev/core";
 import UnauthorizedPage from "@app/unauthorized";
@@ -48,15 +56,41 @@ export const CounselingsEdit = () => {
     optionValue: "id",
   });
 
+  // Options for bidang layanan radio buttons
+  const bidangLayananOptions = [
+    { label: "Pribadi", value: "Pribadi" },
+    { label: "Sosial", value: "Sosial" },
+    { label: "Belajar", value: "Belajar" },
+    { label: "Karir", value: "Karir" },
+  ];
+
+  // Options for jenis layanan radio buttons
+  const jenisLayananOptions = [
+    { label: "Orientasi", value: "Orientasi" },
+    { label: "Informasi", value: "Informasi" },
+    { label: "Konseling Perorangan", value: "Konseling Perorangan" },
+    { label: "Konseling Kelompok", value: "Konseling Kelompok" },
+    { label: "Bimbingan Kelompok", value: "Bimbingan Kelompok" },
+    { label: "Konseling Individual", value: "Konseling Individual" },
+    { label: "Bimbingan Individual", value: "Bimbingan Individual" },
+    { label: "Konsultasi", value: "Konsultasi" },
+    { label: "Mediasi", value: "Mediasi" },
+    { label: "Advokasi", value: "Advokasi" },
+    { label: "Konferensi Kasus", value: "Konferensi Kasus" },
+    { label: "Alih Tangan Kasus", value: "Alih Tangan Kasus" },
+  ];
+
   // Atur data form saat query selesai
   useEffect(() => {
     if (data && formProps.form) {
-      // Konversi data ke snake_case
+      // Konversi data ke format form
       const formData = {
-        name: data.name,
+        serviceField: data.serviceField,
+        serviceType: data.serviceType,
+        case: data.case,
+        summary: data.summary,
+        followUp: data.followUp,
         description: data.description,
-        action_taken: data.actionTaken,
-        regulation_id: data.regulationId,
         class_id: initialClassId,
         // Student ID akan diatur setelah daftar siswa dimuat
       };
@@ -165,27 +199,39 @@ export const CounselingsEdit = () => {
           <Divider />
 
           <Form.Item
-            label="Bidang Layanan"
+            label="Bidang Layanan (pilih salah satu)"
             name={["serviceField"]}
             rules={[
               {
                 required: true,
+                message: "Bidang layanan wajib dipilih",
               },
             ]}
           >
-            <Input />
+            <Radio.Group
+              options={bidangLayananOptions}
+              optionType="button"
+              buttonStyle="solid"
+            />
           </Form.Item>
+
           <Form.Item
-            label="Jenis Layanan"
+            label="Jenis Layanan (pilih salah satu)"
             name={["serviceType"]}
             rules={[
               {
                 required: true,
+                message: "Jenis layanan wajib dipilih",
               },
             ]}
           >
-            <Input />
+            <Radio.Group
+              options={jenisLayananOptions}
+              optionType="button"
+              buttonStyle="solid"
+            />
           </Form.Item>
+
           <Form.Item
             label="Kasus"
             name={["case"]}

@@ -116,6 +116,8 @@ export const CounselingCreate = () => {
     { label: "Konseling Perorangan", value: "Konseling Perorangan" },
     { label: "Konseling Kelompok", value: "Konseling Kelompok" },
     { label: "Bimbingan Kelompok", value: "Bimbingan Kelompok" },
+    { label: "Konseling Individual", value: "Konseling Individual" },
+    { label: "Bimbingan Individual", value: "Bimbingan Individual" },
     { label: "Konsultasi", value: "Konsultasi" },
     { label: "Mediasi", value: "Mediasi" },
     { label: "Advokasi", value: "Advokasi" },

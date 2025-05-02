@@ -196,7 +196,7 @@ export const ProfilePage: React.FC = () => {
                 {user.student?.nis || "N/A"}
               </Descriptions.Item>
               <Descriptions.Item label="Nomor KK">
-                {user.student?.kk_number || "N/A"}
+                {user.student?.phone_mobile || "N/A"}
               </Descriptions.Item>
               <Descriptions.Item label="Kelas">
                 {user.student?.studentClass?.class

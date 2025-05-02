@@ -66,12 +66,19 @@ export const StudentCallsList = () => {
           title="Siswa & Kelas"
         />
 
-        <Table.Column dataIndex="text" title="Text" />
         <Table.Column
-          dataIndex="date"
-          title="Jadwal"
-          width={150}
-          render={(value) => <Tag color={"default"}>{formatDate(value)}</Tag>}
+          title="Text & Jadwal"
+          key="textAndDate"
+          render={(record) => (
+            <div>
+              <span>{record.text} pada - </span>
+              {record.date && (
+                <Tag color={"default"} style={{ marginTop: 4 }}>
+                  {formatDate(record.date)}
+                </Tag>
+              )}
+            </div>
+          )}
           sorter={(a, b) => {
             if (!a.date || !b.date) return 0;
             return new Date(a.date).getTime() - new Date(b.date).getTime();
