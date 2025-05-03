@@ -104,6 +104,29 @@ const WhatsAppService = {
     });
   },
 };
+interface Student {
+  user_id: string;
+  student_id: string;
+  name: string;
+  nis: string;
+  nisn: string;
+}
+
+interface Parent {
+  id: string;
+  userId: string;
+  type: string;
+  name: string;
+  address: string;
+}
+
+interface StudentParent {
+  id: string;
+  studentXUserId: string;
+  parentXUserId: string;
+  parent: Parent;
+  student: Student;
+}
 
 export const HomeVisitsCreate = () => {
   const { TextArea } = Input;
@@ -140,14 +163,6 @@ export const HomeVisitsCreate = () => {
     optionValue: "id",
   });
 
-  interface Student {
-    user_id: string;
-    student_id: string;
-    name: string;
-    nis: string;
-    nisn: string;
-  }
-
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
     null
@@ -155,6 +170,7 @@ export const HomeVisitsCreate = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudentData, setSelectedStudentData] =
     useState<Student | null>(null);
+  const [studentParents, setStudentParents] = useState<StudentParent[]>([]);
   const [sendRemindersNow, setSendRemindersNow] = useState<boolean>(false);
 
   // Ambil daftar siswa ketika kelas dipilih
@@ -191,6 +207,42 @@ export const HomeVisitsCreate = () => {
     },
   });
 
+  // Fetch parents when student is selected
+  const { isLoading: isLoadingParents } = useCustom<{ data: StudentParent[] }>({
+    url: selectedStudentId
+      ? `${apiUrl}/students/${selectedStudentId}/parents`
+      : "",
+    method: "get",
+    queryOptions: {
+      enabled: !!selectedStudentId,
+      // In the useCustom hook's onSuccess handler:
+      onSuccess: (response) => {
+        if (response.data && Array.isArray(response.data)) {
+          setStudentParents(response.data);
+        } else if (
+          response.data &&
+          response.data.data &&
+          Array.isArray(response.data.data)
+        ) {
+          setStudentParents(response.data.data);
+        } else {
+          setStudentParents([]);
+          notification.error({
+            message: "Error",
+            description: "Unexpected response format from the server",
+          });
+        }
+      },
+      onError: (error) => {
+        notification.error({
+          message: "Error: " + (error.message || "Unknown error"),
+          description: "Failed to fetch parents for this student",
+        });
+        setStudentParents([]);
+      },
+    },
+  });
+
   // Buat opsi siswa yang aman
   const studentOptions =
     students && students.length > 0
@@ -214,6 +266,17 @@ export const HomeVisitsCreate = () => {
     setSelectedStudentId(value);
     const student = students.find((s) => s.student_id === value) || null;
     setSelectedStudentData(student);
+  };
+
+  // Tambahkan fungsi ini setelah handleStudentChange
+  const handleParentChange = (value: string) => {
+    const selectedParent = studentParents.find((p) => p.parent.id === value);
+    if (selectedParent && selectedParent.parent.address) {
+      // Isi alamat dengan alamat orang tua yang dipilih
+      formProps.form?.setFieldsValue({
+        address: selectedParent.parent.address,
+      });
+    }
   };
 
   const classSelectMergedProps = {
@@ -488,7 +551,6 @@ export const HomeVisitsCreate = () => {
               onChange={handleStudentChange}
             />
           </Form.Item>
-
           <Divider />
           <Form.Item
             label="Jadwal Kunjungan Rumah"
@@ -527,23 +589,43 @@ export const HomeVisitsCreate = () => {
               }}
             />
           </Form.Item>
-
-          <Form.Item
-            label="Alamat Kunjungan"
-            name={["address"]}
-            rules={[
-              {
-                required: true,
-                message: "Alamat kunjungan wajib diisi",
-              },
-            ]}
-          >
-            <TextArea
-              rows={4}
-              placeholder="Tulis Alamat Kunjugan rumah yang akan dituju"
-            />
-          </Form.Item>
-
+          {selectedStudentId && studentParents.length > 0 && (
+            <>
+              <Form.Item
+                label="Pilih Alamat Dari"
+                name={["parent_id"]}
+                help="Pilih orang tua untuk menggunakan alamatnya sebagai basis. Alamat tetap dapat diubah setelah dipilih."
+              >
+                <Select
+                  loading={isLoadingParents}
+                  disabled={!selectedStudentId || isLoadingParents}
+                  placeholder="Pilih orang tua"
+                  options={studentParents.map((sp) => ({
+                    label: `${sp.parent.name} (${sp.parent.type})`,
+                    value: sp.parent.id,
+                  }))}
+                  onChange={handleParentChange}
+                  allowClear
+                />
+              </Form.Item>
+              <Form.Item
+                label="Alamat Kunjungan"
+                name={["address"]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Alamat kunjungan wajib diisi",
+                  },
+                ]}
+                help="Alamat dapat diubah sesuai kebutuhan kunjungan"
+              >
+                <TextArea
+                  rows={4}
+                  placeholder="Tulis Alamat Kunjungan rumah yang akan dituju"
+                />
+              </Form.Item>
+            </>
+          )}
           <Modal
             title="Memproses Notifikasi WhatsApp"
             open={messageModal}

@@ -18,10 +18,7 @@ import {
   DeleteButton,
   DateField,
   FilterDropdown,
-  getDefaultFilter,
   rangePickerFilterMapper,
-  MapValueEvent,
-  FilterDropdownProps,
 } from "@refinedev/antd";
 import {
   Table,
@@ -40,12 +37,18 @@ import {
   Modal,
   Input,
   Grid,
+  notification,
 } from "antd";
 import dayjs from "dayjs";
-import { ClockCircleOutlined, FilePdfOutlined } from "@ant-design/icons";
+import {
+  ClearOutlined,
+  ClockCircleOutlined,
+  FilePdfOutlined,
+  FilterOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-// import type { FilterDropdownProps } from "antd/lib/table/interface";
 
 import { generatePdf, downloadPdf } from "@utils/pdfGenerator";
 import UnauthorizedPage from "@app/unauthorized";
@@ -54,30 +57,43 @@ import UnauthorizedPage from "@app/unauthorized";
 pdfMake.vfs = pdfFonts.vfs;
 
 const { Text } = Typography;
-const { RangePicker } = DatePicker;
 
 export const ViolationsList = () => {
-  const [form] = Form.useForm();
+  // Separate forms for each filter
+  const [filterForm] = Form.useForm(); // For the monthly class report
+  const [searchForm] = Form.useForm(); // For the main violations table
+
+  // States for the monthly class report (filtered tab)
   const [classId, setClassId] = useState<string | null>(null);
   const [month, setMonth] = useState<string | null>(null);
   const [year, setYear] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("all");
+  const [isFiltering, setIsFiltering] = useState(false);
+
+  // States for the main violations table search
+  const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
+  const [students, setStudents] = useState<any[]>([]);
+  const [tableFilters, setTableFilters] = useState({
+    classId: undefined,
+    studentId: undefined,
+  });
+
+  // PDF states
   const apiUrl = useApiUrl();
   const [pdfPreviewVisible, setPdfPreviewVisible] = useState(false);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const [pdfType, setPdfType] = useState<"statement" | "summons" | null>(null);
   const [selectedViolation, setSelectedViolation] = useState<any>(null);
-  const [isFiltering, setIsFiltering] = useState(false);
 
-  // Fetch class data for filter dropdown
-  const { options: classesOptionSelect } = useSelect({
+  // Fetch class data for filter dropdowns
+  const { options: classesOptions } = useSelect({
     resource: "classes",
     optionLabel: "classname",
     optionValue: "id",
   });
 
   // Standard violations table (index method)
-  const { tableProps, tableQuery, filters, setFilters } = useTable({
+  const { tableProps, tableQuery } = useTable({
     resource: "violations",
     syncWithLocation: true,
     pagination: {
@@ -86,30 +102,77 @@ export const ViolationsList = () => {
     filters: {
       initial: [
         {
-          field: "createdAt",
-          operator: "between",
-          value: undefined,
+          field: "studentClasses.class.id",
+          operator: "eq",
+          value: tableFilters.classId,
         },
         {
-          field: "name",
-          operator: "contains",
-          value: undefined,
+          field: "studentClasses.user.student.id",
+          operator: "eq",
+          value: tableFilters.studentId,
+        },
+      ],
+      permanent: [
+        {
+          field: "studentClasses.class.id",
+          operator: "eq",
+          value: tableFilters.classId,
         },
         {
-          field: "regulation.name",
-          operator: "contains",
-          value: undefined,
-        },
-        {
-          field: "studentClass.user.student.name",
-          operator: "contains",
-          value: undefined,
+          field: "studentClasses.user.student.id",
+          operator: "eq",
+          value: tableFilters.studentId,
         },
       ],
     },
   });
 
-  // Student violations data (studentViolations method)
+  // Fetch students when class is selected for the search form
+  const { isLoading: isLoadingStudents } = useCustom<{ data: any[] }>({
+    url: selectedClassId ? `${apiUrl}/classes/${selectedClassId}/students` : "",
+    method: "get",
+    queryOptions: {
+      enabled: !!selectedClassId,
+      onSuccess: (response) => {
+        if (response.data && Array.isArray(response.data)) {
+          setStudents(response.data);
+        } else if (
+          response.data &&
+          response.data.data &&
+          Array.isArray(response.data.data)
+        ) {
+          setStudents(response.data.data);
+        } else {
+          setStudents([]);
+          notification.error({
+            message: "Error",
+            description: "Unexpected response format from the server",
+          });
+        }
+      },
+      onError: (error) => {
+        notification.error({
+          message: "Error: " + (error.message || "Unknown error"),
+          description: "Failed to fetch students for this class",
+        });
+        setStudents([]);
+      },
+    },
+  });
+
+  // Create student options for dropdown
+  const studentOptions =
+    students && students.length > 0
+      ? students.map((student) => ({
+          label: `${student.name} (${student.nis})`,
+          value: student.student_id,
+          user_id: student.user_id,
+          nisn: student.nisn,
+          nis: student.nis,
+        }))
+      : [];
+
+  // Student violations data (studentViolations method) for filtered tab
   const { data: studentViolationsData, isLoading: studentViolationsLoading } =
     useCustom({
       url: `${apiUrl}/violations/students`,
@@ -129,23 +192,33 @@ export const ViolationsList = () => {
       },
     });
 
-  // Fetch regulation data for display
-  const { data: regulationData, isLoading: regulationIsLoading } = useMany({
-    resource: "regulations",
-    ids: tableProps?.dataSource?.map((item) => item?.regulationId) ?? [],
-    queryOptions: {
-      enabled: !!tableProps?.dataSource,
-    },
-  });
+  // Handle class selection for the search form
+  const handleSearchClassChange = (value: any) => {
+    setSelectedClassId(value);
+    searchForm.setFieldsValue({ studentId: undefined }); // Reset student when class changes
+  };
 
-  // Fetch regulations for the regulations filter dropdown
-  const { options: regulationsOptions } = useSelect({
-    resource: "regulations",
-    optionLabel: "name",
-    optionValue: "id",
-  });
+  // Handle search button click
+  const handleSearch = (values: { classId: any; studentId: any }) => {
+    // Update filters for the main table
+    setTableFilters({
+      classId: values.classId,
+      studentId: values.studentId,
+    });
+  };
 
-  // Handle filter submission
+  // Handle reset button click for search form
+  const handleResetSearch = () => {
+    searchForm.resetFields();
+    setSelectedClassId(null);
+    setStudents([]);
+    setTableFilters({
+      classId: undefined,
+      studentId: undefined,
+    });
+  };
+
+  // Handle filter submission for monthly report
   const handleFilter = (values: any) => {
     const selectedDate = values.date ? dayjs(values.date) : null;
 
@@ -163,15 +236,24 @@ export const ViolationsList = () => {
     }
   };
 
-  // Handle filter reset
-  const handleReset = () => {
-    form.resetFields();
+  // Handle filter reset for monthly report
+  const handleResetFilter = () => {
+    filterForm.resetFields();
     setClassId(null);
     setMonth(null);
     setYear(null);
     setActiveTab("all");
     setIsFiltering(false);
   };
+
+  // Fetch regulation data for display
+  const { data: regulationData, isLoading: regulationIsLoading } = useMany({
+    resource: "regulations",
+    ids: tableProps?.dataSource?.map((item) => item?.regulationId) ?? [],
+    queryOptions: {
+      enabled: !!tableProps?.dataSource,
+    },
+  });
 
   const go = useGo();
 
@@ -233,6 +315,7 @@ export const ViolationsList = () => {
       setPdfPreviewVisible(true);
     });
   };
+
   // Helper function to determine statement level from actionTaken
   const getStatementLevel = (actionTaken: string) => {
     if (actionTaken?.includes("Surat Pernyataan 1")) return 1;
@@ -254,6 +337,7 @@ export const ViolationsList = () => {
         return "";
     }
   };
+
   const breakpoint = Grid.useBreakpoint();
   const isMobile =
     typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
@@ -264,9 +348,10 @@ export const ViolationsList = () => {
       fallback={<UnauthorizedPage />}
     >
       <List title="Daftar Pelanggaran Ketertiban">
+        {/* Monthly Class Report Filter */}
         <Card style={{ marginBottom: 16 }}>
           <Form
-            form={form}
+            form={filterForm}
             layout="vertical"
             onFinish={handleFilter}
             initialValues={{}}
@@ -275,13 +360,13 @@ export const ViolationsList = () => {
               <Col xs={24} sm={8}>
                 <Form.Item
                   name="class"
-                  label="Kelas"
+                  label="Kelas (Laporan Bulanan)"
                   rules={[{ required: true }]}
                 >
                   <Select
                     placeholder="Pilih Kelas"
                     allowClear
-                    options={classesOptionSelect}
+                    options={classesOptions}
                   ></Select>
                 </Form.Item>
               </Col>
@@ -305,9 +390,66 @@ export const ViolationsList = () => {
               >
                 <Space>
                   <Button type="primary" htmlType="submit">
-                    Filter
+                    Lihat Laporan
                   </Button>
-                  <Button onClick={handleReset}>Reset</Button>
+                  <Button onClick={handleResetFilter}>Reset</Button>
+                </Space>
+              </Col>
+            </Row>
+          </Form>
+        </Card>
+
+        {/* Violations Search Form */}
+        <Card
+          style={{ marginBottom: 16 }}
+          title={
+            <Space>
+              <FilterOutlined />
+              <span>Filter Pencarian Pelanggaran</span>
+            </Space>
+          }
+        >
+          <Form form={searchForm} layout="vertical" onFinish={handleSearch}>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} sm={12} md={6}>
+                <Form.Item name="classId" label="Kelas">
+                  <Select
+                    placeholder="Pilih Kelas"
+                    options={classesOptions}
+                    onChange={handleSearchClassChange}
+                    allowClear
+                  />
+                </Form.Item>
+              </Col>
+
+              <Col xs={24} sm={12} md={6}>
+                <Form.Item name="studentId" label="Siswa">
+                  <Select
+                    placeholder={
+                      selectedClassId
+                        ? "Pilih Siswa"
+                        : "Pilih Kelas Terlebih Dahulu"
+                    }
+                    options={studentOptions}
+                    disabled={!selectedClassId || isLoadingStudents}
+                    loading={isLoadingStudents}
+                    allowClear
+                  />
+                </Form.Item>
+              </Col>
+
+              <Col xs={24}>
+                <Space>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    icon={<SearchOutlined />}
+                  >
+                    Cari
+                  </Button>
+                  <Button onClick={handleResetSearch} icon={<ClearOutlined />}>
+                    Reset
+                  </Button>
                 </Space>
               </Col>
             </Row>
@@ -369,11 +511,7 @@ export const ViolationsList = () => {
                     //     />
                     //   </FilterDropdown>
                     // )}
-                    defaultFilteredValue={getDefaultFilter(
-                      "regulation.name",
-                      filters,
-                      "contains"
-                    )}
+
                     render={(value, record: any) => {
                       if (regulationIsLoading) return <Spin size="small" />;
 
@@ -408,11 +546,7 @@ export const ViolationsList = () => {
                     //     />
                     //   </FilterDropdown>
                     // )}
-                    defaultFilteredValue={getDefaultFilter(
-                      "studentClass.user.student.name",
-                      filters,
-                      "contains"
-                    )}
+
                     render={(text, record) => {
                       const studentName = text; // Nama siswa
                       const className = record.studentClass.class.romanLevel; // Kelas (XI)

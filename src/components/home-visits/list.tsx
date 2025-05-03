@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   BaseRecord,
   CanAccess,
   useApiUrl,
+  useCustom,
   useCustomMutation,
   useNavigation,
+  useSelect,
 } from "@refinedev/core";
 import {
   useTable,
@@ -27,6 +29,11 @@ import {
   Button,
   Popconfirm,
   Grid,
+  Form,
+  Row,
+  Col,
+  Select,
+  notification,
 } from "antd";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -35,10 +42,13 @@ import {
   CalendarOutlined,
   CheckCircleOutlined,
   CheckOutlined,
+  ClearOutlined,
   ClockCircleOutlined,
   ClockCircleTwoTone,
   CloseCircleOutlined,
   ExclamationOutlined,
+  FilterOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import UnauthorizedPage from "@app/unauthorized";
 
@@ -230,13 +240,40 @@ const VisitTable = ({
   registerRefetch,
   refetchTables,
 }: any) => {
+  const [filters, setFilters] = useState({
+    classId: undefined,
+    studentId: undefined,
+  });
+
   const {
     tableProps: filteredTableProps,
     tableQuery: { refetch, data },
   } = useTable({
     syncWithLocation: true,
     filters: {
+      initial: [
+        {
+          field: "studentClasses.class.id",
+          operator: "eq",
+          value: filters.classId,
+        },
+        {
+          field: "studentClasses.user.student.id",
+          operator: "eq",
+          value: filters.studentId,
+        },
+      ],
       permanent: [
+        {
+          field: "studentClasses.class.id",
+          operator: "eq",
+          value: filters.classId,
+        },
+        {
+          field: "studentClasses.user.student.id",
+          operator: "eq",
+          value: filters.studentId,
+        },
         {
           field: "status",
           operator: "eq",
@@ -246,7 +283,104 @@ const VisitTable = ({
     },
   });
 
-  console.log("data", data?.data);
+  const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
+  const [students, setStudents] = useState<any[]>([]);
+  const apiUrl = useApiUrl();
+
+  // Get class options
+  const { options: classOptions } = useSelect({
+    resource: "classes",
+    optionLabel: "classname", // You may need to adjust this based on your API
+    optionValue: "id",
+  });
+
+  // Fetch students when class is selected
+  const { isLoading: isLoadingStudents } = useCustom<{ data: any[] }>({
+    url: selectedClassId ? `${apiUrl}/classes/${selectedClassId}/students` : "",
+    method: "get",
+    queryOptions: {
+      enabled: !!selectedClassId,
+      onSuccess: (response) => {
+        // Handle different response structures
+        if (response.data && Array.isArray(response.data)) {
+          setStudents(response.data);
+        } else if (
+          response.data &&
+          response.data.data &&
+          Array.isArray(response.data.data)
+        ) {
+          setStudents(response.data.data);
+        } else {
+          // Fallback if the structure is unexpected
+          setStudents([]);
+          notification.error({
+            message: "Error",
+            description: "Unexpected response format from the server",
+          });
+        }
+      },
+      onError: (error) => {
+        notification.error({
+          message: "Error: " + (error.message || "Unknown error"),
+          description: "Failed to fetch students for this class",
+        });
+        setStudents([]);
+      },
+    },
+  });
+
+  // Create student options
+  const studentOptions =
+    students && students.length > 0
+      ? students.map((student) => ({
+          label: `${student.name} (${student.nis})`,
+          value: student.student_id,
+          user_id: student.user_id,
+          nisn: student.nisn,
+          nis: student.nis,
+        }))
+      : [];
+
+  // Form instance for the filter form
+  const [form] = Form.useForm();
+
+  // Handle class selection
+  const handleClassChange = (value: any) => {
+    setSelectedClassId(value);
+    form.setFieldsValue({ studentId: undefined }); // Reset student when class changes
+  };
+
+  // Handle search button click
+  const handleSearch = (values: {
+    classId: any;
+    studentId: any;
+    serviceField: any;
+    serviceType: any;
+  }) => {
+    // Update filters
+    setFilters({
+      classId: values.classId,
+      studentId: values.studentId,
+    });
+
+    // // Trigger table refresh
+    // searchFormProps.form?.submit();
+  };
+
+  // Handle reset button click
+  const handleReset = () => {
+    form.resetFields();
+    setSelectedClassId(null);
+    setStudents([]);
+    setFilters({
+      classId: undefined,
+      studentId: undefined,
+    });
+
+    // Trigger table refresh
+    // searchFormProps.form?.submit();
+  };
+
   // Register this table's refetch function
   React.useEffect(() => {
     if (refetch && registerRefetch) {
@@ -261,7 +395,6 @@ const VisitTable = ({
     };
   }, [refetch, status, registerRefetch]);
 
-  const apiUrl = useApiUrl();
   const { list, show, edit } = useNavigation();
   const { mutate: cancelVisit, isLoading: cancelLoading } = useCustomMutation();
 
@@ -305,6 +438,61 @@ const VisitTable = ({
       action="list"
       fallback={<UnauthorizedPage />}
     >
+      {/* Filter Form */}
+      <Card
+        style={{ marginBottom: 16 }}
+        title={
+          <Space>
+            <FilterOutlined />
+            <span>Filter Pencarian</span>
+          </Space>
+        }
+      >
+        <Form form={form} layout="vertical" onFinish={handleSearch}>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="classId" label="Kelas">
+                <Select
+                  placeholder="Pilih Kelas"
+                  options={classOptions}
+                  onChange={handleClassChange}
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="studentId" label="Siswa">
+                <Select
+                  placeholder={
+                    selectedClassId
+                      ? "Pilih Siswa"
+                      : "Pilih Kelas Terlebih Dahulu"
+                  }
+                  options={studentOptions}
+                  disabled={!selectedClassId || isLoadingStudents}
+                  loading={isLoadingStudents}
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Space>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  icon={<SearchOutlined />}
+                >
+                  Cari
+                </Button>
+                <Button onClick={handleReset} icon={<ClearOutlined />}>
+                  Reset
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        </Form>
+      </Card>
       <Table {...mergedTableProps}>
         {/* Nomor Urut */}
         <Table.Column
