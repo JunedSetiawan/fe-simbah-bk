@@ -44,6 +44,7 @@ import {
   ClearOutlined,
   ClockCircleOutlined,
   FilePdfOutlined,
+  ExclamationCircleOutlined,
   FilterOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
@@ -52,6 +53,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 
 import { generatePdf, downloadPdf } from "@utils/pdfGenerator";
 import UnauthorizedPage from "@app/unauthorized";
+import { ProblematicStudentsTab } from "@components/ProblematicStudentsTab";
 
 // Register fonts for pdfMake
 pdfMake.vfs = pdfFonts.vfs;
@@ -91,6 +93,14 @@ export const ViolationsList = () => {
     optionLabel: "classname",
     optionValue: "id",
   });
+
+  const { options: schoolYearOptions } = useSelect({
+    resource: "school-years",
+    optionLabel: "year",
+    optionValue: "year",
+  });
+
+  console.log("schoolYearOptions", schoolYearOptions);
 
   // Standard violations table (index method)
   const { tableProps, tableQuery } = useTable({
@@ -341,6 +351,10 @@ export const ViolationsList = () => {
   const breakpoint = Grid.useBreakpoint();
   const isMobile =
     typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
+
+  // Determine if search forms should be displayed
+  const shouldShowSearchForms = activeTab !== "problematic";
+
   return (
     <CanAccess
       resource="violations"
@@ -349,112 +363,117 @@ export const ViolationsList = () => {
     >
       <List title="Daftar Pelanggaran Ketertiban">
         {/* Monthly Class Report Filter */}
-        <Card style={{ marginBottom: 16 }}>
-          <Form
-            form={filterForm}
-            layout="vertical"
-            onFinish={handleFilter}
-            initialValues={{}}
-          >
-            <Row gutter={24}>
-              <Col xs={24} sm={8}>
-                <Form.Item
-                  name="class"
-                  label="Kelas (Laporan Bulanan)"
-                  rules={[{ required: true }]}
-                >
-                  <Select
-                    placeholder="Pilih Kelas"
-                    allowClear
-                    options={classesOptions}
-                  ></Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={8}>
-                <Form.Item
-                  name="date"
-                  label="Bulan/Tahun"
-                  rules={[{ required: true }]}
-                >
-                  <DatePicker
-                    picker="month"
-                    placeholder="Pilih Bulan/Tahun"
-                    style={{ width: "100%" }}
-                  />
-                </Form.Item>
-              </Col>
-              <Col
-                xs={24}
-                sm={8}
-                style={{ display: "flex", alignItems: "center" }}
+        {shouldShowSearchForms && (
+          <>
+            <Card style={{ marginBottom: 16 }}>
+              <Form
+                form={filterForm}
+                layout="vertical"
+                onFinish={handleFilter}
+                initialValues={{}}
               >
-                <Space>
-                  <Button type="primary" htmlType="submit">
-                    Lihat Laporan
-                  </Button>
-                  <Button onClick={handleResetFilter}>Reset</Button>
-                </Space>
-              </Col>
-            </Row>
-          </Form>
-        </Card>
-
-        {/* Violations Search Form */}
-        <Card
-          style={{ marginBottom: 16 }}
-          title={
-            <Space>
-              <FilterOutlined />
-              <span>Filter Pencarian Pelanggaran</span>
-            </Space>
-          }
-        >
-          <Form form={searchForm} layout="vertical" onFinish={handleSearch}>
-            <Row gutter={[16, 16]}>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="classId" label="Kelas">
-                  <Select
-                    placeholder="Pilih Kelas"
-                    options={classesOptions}
-                    onChange={handleSearchClassChange}
-                    allowClear
-                  />
-                </Form.Item>
-              </Col>
-
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="studentId" label="Siswa">
-                  <Select
-                    placeholder={
-                      selectedClassId
-                        ? "Pilih Siswa"
-                        : "Pilih Kelas Terlebih Dahulu"
-                    }
-                    options={studentOptions}
-                    disabled={!selectedClassId || isLoadingStudents}
-                    loading={isLoadingStudents}
-                    allowClear
-                  />
-                </Form.Item>
-              </Col>
-
-              <Col xs={24}>
-                <Space>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    icon={<SearchOutlined />}
+                <Row gutter={24}>
+                  <Col xs={24} sm={8}>
+                    <Form.Item
+                      name="class"
+                      label="Kelas (Laporan Bulanan)"
+                      rules={[{ required: true }]}
+                    >
+                      <Select
+                        placeholder="Pilih Kelas"
+                        allowClear
+                        options={classesOptions}
+                      ></Select>
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} sm={8}>
+                    <Form.Item
+                      name="date"
+                      label="Bulan/Tahun"
+                      rules={[{ required: true }]}
+                    >
+                      <DatePicker
+                        picker="month"
+                        placeholder="Pilih Bulan/Tahun"
+                        style={{ width: "100%" }}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col
+                    xs={24}
+                    sm={8}
+                    style={{ display: "flex", alignItems: "center" }}
                   >
-                    Cari
-                  </Button>
-                  <Button onClick={handleResetSearch} icon={<ClearOutlined />}>
-                    Reset
-                  </Button>
+                    <Space>
+                      <Button type="primary" htmlType="submit">
+                        Lihat Laporan
+                      </Button>
+                      <Button onClick={handleResetFilter}>Reset</Button>
+                    </Space>
+                  </Col>
+                </Row>
+              </Form>
+            </Card>
+            <Card
+              style={{ marginBottom: 16 }}
+              title={
+                <Space>
+                  <FilterOutlined />
+                  <span>Filter Pencarian Pelanggaran</span>
                 </Space>
-              </Col>
-            </Row>
-          </Form>
-        </Card>
+              }
+            >
+              <Form form={searchForm} layout="vertical" onFinish={handleSearch}>
+                <Row gutter={[16, 16]}>
+                  <Col xs={24} sm={12} md={6}>
+                    <Form.Item name="classId" label="Kelas">
+                      <Select
+                        placeholder="Pilih Kelas"
+                        options={classesOptions}
+                        onChange={handleSearchClassChange}
+                        allowClear
+                      />
+                    </Form.Item>
+                  </Col>
+
+                  <Col xs={24} sm={12} md={6}>
+                    <Form.Item name="studentId" label="Siswa">
+                      <Select
+                        placeholder={
+                          selectedClassId
+                            ? "Pilih Siswa"
+                            : "Pilih Kelas Terlebih Dahulu"
+                        }
+                        options={studentOptions}
+                        disabled={!selectedClassId || isLoadingStudents}
+                        loading={isLoadingStudents}
+                        allowClear
+                      />
+                    </Form.Item>
+                  </Col>
+
+                  <Col xs={24}>
+                    <Space>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        icon={<SearchOutlined />}
+                      >
+                        Cari
+                      </Button>
+                      <Button
+                        onClick={handleResetSearch}
+                        icon={<ClearOutlined />}
+                      >
+                        Reset
+                      </Button>
+                    </Space>
+                  </Col>
+                </Row>
+              </Form>
+            </Card>
+          </>
+        )}
 
         <Tabs
           activeKey={activeTab}
@@ -770,6 +789,17 @@ export const ViolationsList = () => {
                     </Text>
                   </div>
                 ),
+            },
+            {
+              key: "problematic",
+              label: (
+                <span>
+                  <ExclamationCircleOutlined /> Siswa Bermasalah
+                </span>
+              ),
+              children: (
+                <ProblematicStudentsTab classOptions={classesOptions} />
+              ),
             },
           ]}
         ></Tabs>
