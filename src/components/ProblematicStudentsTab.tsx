@@ -1,4 +1,3 @@
-// ProblematicStudentsTab.jsx
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -26,7 +25,10 @@ import {
   WarningOutlined,
   UserOutlined,
   ReloadOutlined,
+  FileExcelOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
+import { exportProblematicStudentsToExcel } from "@utils/exportProblematicStudents";
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -99,6 +101,8 @@ export const ProblematicStudentsTab: React.FC<ProblematicStudentsTabProps> = ({
   const [hasSearched, setHasSearched] = useState(false);
   // State to track if we're currently filtering
   const [isFiltering, setIsFiltering] = useState(false);
+  // State to track if we're currently exporting
+  const [isExporting, setIsExporting] = useState(false);
   // Add a unique key to force refetch even with same parameters
   const [filterKey, setFilterKey] = useState(0);
 
@@ -168,6 +172,7 @@ export const ProblematicStudentsTab: React.FC<ProblematicStudentsTabProps> = ({
   useEffect(() => {
     return () => {
       setIsFiltering(false);
+      setIsExporting(false);
     };
   }, []);
 
@@ -239,6 +244,40 @@ export const ProblematicStudentsTab: React.FC<ProblematicStudentsTabProps> = ({
       setIsFiltering(true);
       setFilterKey((prevKey) => prevKey + 1); // Force refetch by incrementing key
       refetch();
+    }
+  };
+
+  // Handler for exporting to Excel
+  const handleExportExcel = async () => {
+    if (!filteredData.length) {
+      notification.warning({
+        message: "Tidak ada data",
+        description: "Tidak ada data untuk diexport",
+      });
+      return;
+    }
+
+    try {
+      setIsExporting(true);
+      await exportProblematicStudentsToExcel(
+        filteredData,
+        filters,
+        data?.data?.meta,
+        classOptions
+      );
+
+      notification.success({
+        message: "Export berhasil",
+        description: "Data berhasil diexport ke format Excel",
+      });
+    } catch (error) {
+      console.error("Export error:", error);
+      notification.error({
+        message: "Export gagal",
+        description: "Terjadi kesalahan saat mengexport data",
+      });
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -457,52 +496,75 @@ export const ProblematicStudentsTab: React.FC<ProblematicStudentsTabProps> = ({
         </div>
       ) : hasSearched && data?.data?.data ? (
         <>
-          <div style={{ marginBottom: 16 }}>
-            <Title level={5}>
-              Hasil Pencarian: {filteredData.length} Siswa Bermasalah
-            </Title>
+          <div
+            style={{
+              marginBottom: 16,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <div>
+              <Title level={5}>
+                Hasil Pencarian: {filteredData.length} Siswa Bermasalah
+              </Title>
 
-            <Space size="small" wrap>
-              {filterType === "single" ? (
-                <>
-                  <Tag color="blue">
-                    Tahun Ajaran: {data.data.meta.school_year || filters.year}{" "}
-                  </Tag>
-                  <Tag color="purple">
-                    {formatSemesterText(
-                      data.data.meta.semester || filters.semester
-                    )}
-                  </Tag>
-                </>
-              ) : (
-                <>
-                  <Tag color="blue">
-                    Tahun Ajaran:{" "}
-                    {data.data.meta.year_range ||
-                      `${filters.startYear}-${filters.endYear}`}{" "}
-                    {data.data.meta.semester_range
-                      ? `(${data.data.meta.semester_range})`
-                      : `(${filters.startSemester || "1"}-${
-                          filters.endSemester || "2"
-                        })`}
-                  </Tag>
-                </>
-              )}
-              <Tag color="orange">
-                Point ≥ {data.data.meta.filters.point_threshold}
-              </Tag>
-              <Tag color="cyan">
-                Min. Pelanggaran: {data.data.meta.filters.min_violations}
-              </Tag>
-              {data.data.meta.filters.class_id && (
-                <Tag color="green">
-                  Kelas:{" "}
-                  {classOptions.find(
-                    (c) => c.value === data.data.meta.filters.class_id
-                  )?.label || data.data.meta.filters.class_id}
+              <Space size="small" wrap>
+                {filterType === "single" ? (
+                  <>
+                    <Tag color="blue">
+                      Tahun Ajaran: {data.data.meta.school_year || filters.year}{" "}
+                    </Tag>
+                    <Tag color="purple">
+                      {formatSemesterText(
+                        data.data.meta.semester || filters.semester
+                      )}
+                    </Tag>
+                  </>
+                ) : (
+                  <>
+                    <Tag color="blue">
+                      Tahun Ajaran:{" "}
+                      {data.data.meta.year_range ||
+                        `${filters.startYear}-${filters.endYear}`}{" "}
+                      {data.data.meta.semester_range
+                        ? `(${data.data.meta.semester_range})`
+                        : `(${filters.startSemester || "1"}-${
+                            filters.endSemester || "2"
+                          })`}
+                    </Tag>
+                  </>
+                )}
+                <Tag color="orange">
+                  Point ≥ {data.data.meta.filters.point_threshold}
                 </Tag>
-              )}
-            </Space>
+                <Tag color="cyan">
+                  Min. Pelanggaran: {data.data.meta.filters.min_violations}
+                </Tag>
+                {data.data.meta.filters.class_id && (
+                  <Tag color="green">
+                    Kelas:{" "}
+                    {classOptions.find(
+                      (c) => c.value === data.data.meta.filters.class_id
+                    )?.label || data.data.meta.filters.class_id}
+                  </Tag>
+                )}
+              </Space>
+            </div>
+
+            {/* Export Button */}
+            {filteredData.length > 0 && (
+              <Button
+                type="primary"
+                icon={<FileExcelOutlined />}
+                onClick={handleExportExcel}
+                loading={isExporting}
+                disabled={isExporting}
+                style={{ background: "#52c41a", borderColor: "#52c41a" }}
+              >
+                Export Excel
+              </Button>
+            )}
           </div>
 
           {filteredData.length > 0 ? (

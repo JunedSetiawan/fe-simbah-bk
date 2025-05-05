@@ -29,13 +29,23 @@ export const accessControlProvider: AccessControlProvider = {
       return { can: true };
     }
 
-    if (resource === "management-violations" || resource === "violation-summary/class" || resource === "violation-summary/semester") {
+    if (
+      resource === "management-violations" ||
+      resource === "violation-summary/class" ||
+      resource === "violation-summary/semester"
+    ) {
       return { can: isSuperAdmin(user) || isAdmin(user) };
     }
 
     // Handle User resource
     if (resource === "users") {
       return { can: isSuperAdmin(user) };
+    }
+
+    if (resource === "problematic-students") {
+      return {
+        can: isSuperAdmin(user) || isAdmin(user) || isTeacher(user),
+      };
     }
 
     // Handle Regulations resource
