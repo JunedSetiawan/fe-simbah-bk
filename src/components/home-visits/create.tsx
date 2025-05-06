@@ -47,7 +47,6 @@ const WhatsAppService = {
       }
 
       // Handle scheduling differently - Fonnte API requires specific format
-      // In the WhatsAppService.sendMessage function:
       if (data.schedule && data.schedule !== "0") {
         // Convert to Unix timestamp (seconds since epoch)
         const scheduleTimestamp = Math.floor(
@@ -118,6 +117,8 @@ interface Parent {
   type: string;
   name: string;
   address: string;
+  phone?: string; // Added phone field for parents
+  phoneMobile?: string; // Alternative phone field
 }
 
 interface StudentParent {
@@ -149,8 +150,8 @@ export const HomeVisitsCreate = () => {
     teacher?: any;
   }>();
 
-  const teacherPhone = user?.teacher?.phone || user?.teacher.phoneMobile || ""; // Nomor telepon guru untuk koordinasi
-  const teacherName = user?.teacher?.name || user?.teacher.name || ""; // Nama guru untuk pengingat
+  const teacherPhone = user?.teacher?.phone || user?.teacher?.phoneMobile || ""; // Nomor telepon guru untuk koordinasi
+  const teacherName = user?.teacher?.name || ""; // Nama guru untuk pengingat
 
   const apiUrl = useApiUrl();
 
@@ -215,7 +216,6 @@ export const HomeVisitsCreate = () => {
     method: "get",
     queryOptions: {
       enabled: !!selectedStudentId,
-      // In the useCustom hook's onSuccess handler:
       onSuccess: (response) => {
         if (response.data && Array.isArray(response.data)) {
           setStudentParents(response.data);
@@ -293,15 +293,28 @@ export const HomeVisitsCreate = () => {
     return reminderDate.format("YYYY-MM-DD HH:mm:ss");
   };
 
+  // Function to get parent phone numbers
+  const getParentPhones = () => {
+    return studentParents
+      .map((p) => p.parent.phone || p.parent.phoneMobile)
+      .filter((phone): phone is string =>
+        Boolean(phone && phone.trim() !== "")
+      );
+  };
+
   const sendWhatsAppReminders = async (
     studentName: string,
     address: string,
     visitTime: string | Date,
     homeVisitId: string | number
   ) => {
+    // Get parents with valid phone numbers
+    const parentPhones = getParentPhones();
+    const totalRecipients = 1 + parentPhones.length; // Teacher + parents
+
     setMessageModal(true);
     setMessageProgress({
-      total: 1, // +1 untuk notifikasi kepada guru
+      total: totalRecipients,
       sent: 0,
       failed: 0,
     });
@@ -377,6 +390,53 @@ export const HomeVisitsCreate = () => {
       allSuccess = false;
     }
 
+    // 2. Kirim pesan ke orang tua siswa
+    for (const parentPhone of parentPhones) {
+      try {
+        const parentMessage = `Kepada Yth. Orang Tua/Wali Siswa ${studentName}\n\nDengan hormat, kami informasikan bahwa guru kami akan melakukan kunjungan rumah pada:\n\nTanggal/Waktu: ${formattedVisitTime}\nAlamat: ${address}\n\nBapak/Ibu dimohon untuk *Menyetujui* jika berkenan atau *Menolak* jika ada kendala kunjungan rumah di link detail lengkap kunjugan berikut:\n${detailUrl}. \n\nMohon kehadiran Bapak/Ibu pada waktu tersebut. Terima kasih.`;
+
+        let parentResult;
+
+        if (useScheduledMessages && reminderTime) {
+          parentResult = await WhatsAppService.scheduleMessage(
+            parentPhone,
+            parentMessage,
+            reminderTime
+          );
+        } else {
+          parentResult = await WhatsAppService.sendImmediateMessage(
+            parentPhone,
+            parentMessage
+          );
+        }
+
+        results.push({
+          success: true,
+          recipient: "Orang Tua",
+          result: parentResult,
+        });
+        setMessageProgress((prev) => ({
+          ...prev,
+          sent: prev.sent + 1,
+        }));
+      } catch (error: any) {
+        results.push({
+          success: false,
+          recipient: "Orang Tua",
+          error: error.message,
+        });
+        notification.error({
+          message: "Gagal mengirim pengingat kepada orang tua",
+          description: `Error: ${error.message}`,
+        });
+        setMessageProgress((prev) => ({
+          ...prev,
+          failed: prev.failed + 1,
+        }));
+        allSuccess = false;
+      }
+    }
+
     return { success: allSuccess, results };
   };
 
@@ -430,12 +490,18 @@ export const HomeVisitsCreate = () => {
             }
 
             const reminderType = isVisitSoon ? "Segera" : "Terjadwal";
+            const parentPhones = getParentPhones();
+            const hasParentPhones = parentPhones.length > 0;
 
             notification.info({
               message: `Menyiapkan pengingat WhatsApp (${reminderType})`,
               description: isVisitSoon
-                ? `Kunjungan akan segera dilaksanakan, pengingat akan dikirimkan langsung ke nomor Whatsapp Guru ${teacherName}.`
-                : `Pengingat akan dikirim 30 menit sebelum jadwal kunjungan ke nomor Whatsapp Guru ${teacherName}.`,
+                ? `Kunjungan akan segera dilaksanakan, pengingat akan dikirimkan langsung ke Guru ${teacherName}${
+                    hasParentPhones ? " dan Orang Tua siswa" : ""
+                  }.`
+                : `Pengingat akan dikirim 30 menit sebelum jadwal kunjungan ke Guru ${teacherName}${
+                    hasParentPhones ? " dan Orang Tua siswa" : ""
+                  }.`,
               duration: 5,
             });
 
@@ -454,8 +520,12 @@ export const HomeVisitsCreate = () => {
                   notification.success({
                     message: "Berhasil",
                     description: isVisitSoon
-                      ? `Kunjungan rumah berhasil dijadwalkan dan pengingat WhatsApp berhasil dikirim ke Nomor Guru ${teacherName}.`
-                      : `Kunjungan rumah berhasil dijadwalkan dan pengingat WhatsApp ke Nomor Guru ${teacherName}. akan dikirim 30 menit sebelum kunjungan.`,
+                      ? `Kunjungan rumah berhasil dijadwalkan dan pengingat WhatsApp berhasil dikirim ke Guru ${teacherName}${
+                          hasParentPhones ? " dan Orang Tua siswa" : ""
+                        }.`
+                      : `Kunjungan rumah berhasil dijadwalkan dan pengingat WhatsApp ke Guru ${teacherName}${
+                          hasParentPhones ? " dan Orang Tua siswa" : ""
+                        } akan dikirim 30 menit sebelum kunjungan.`,
                   });
                 } else {
                   notification.warning({
@@ -579,9 +649,14 @@ export const HomeVisitsCreate = () => {
                   setSendRemindersNow(isVisitSoon);
 
                   if (isVisitSoon) {
+                    const parentPhones = getParentPhones();
+                    const hasParentPhones = parentPhones.length > 0;
+
                     notification.info({
                       message: "Kunjungan segera",
-                      description: `Karena kunjungan dijadwalkan dalam waktu 30 menit, pengingat kunjungan akan dikirim segera ke Whatsapp ke Nomor Guru ${teacherName}.`,
+                      description: `Karena kunjungan dijadwalkan dalam waktu 30 menit, pengingat kunjungan akan dikirim segera ke Whatsapp Guru ${teacherName}${
+                        hasParentPhones ? " dan Orang Tua siswa" : ""
+                      }.`,
                       duration: 5,
                     });
                   }
@@ -601,7 +676,11 @@ export const HomeVisitsCreate = () => {
                   disabled={!selectedStudentId || isLoadingParents}
                   placeholder="Pilih orang tua"
                   options={studentParents.map((sp) => ({
-                    label: `${sp.parent.name} (${sp.parent.type})`,
+                    label: `${sp.parent.name} (${sp.parent.type})${
+                      sp.parent.phone || sp.parent.phoneMobile
+                        ? " - Memiliki nomor WA"
+                        : ""
+                    }`,
                     value: sp.parent.id,
                   }))}
                   onChange={handleParentChange}
