@@ -137,6 +137,16 @@ export const HomeVisitsList = () => {
         text: "Dibatalkan",
         icon: <CloseCircleOutlined />,
       },
+      approved: {
+        color: "success",
+        text: "Disetujui",
+        icon: <CheckCircleOutlined />,
+      },
+      rejected: {
+        color: "error",
+        text: "Ditolak",
+        icon: <CloseCircleOutlined />,
+      },
     };
 
     return (
@@ -551,10 +561,10 @@ const VisitTable = ({
           }}
         />
 
-        {/* Status Kunjungan */}
+        {/*Status Orang Tua */}
         <Table.Column
-          dataIndex="status"
-          title="Status"
+          dataIndex="statusApprovalByParent"
+          title="Status Persetujuan Orang Tua"
           width={120}
           render={(value) => {
             const status = getStatusBadge(value);
@@ -563,7 +573,10 @@ const VisitTable = ({
                 status={status.color}
                 text={
                   <>
-                    {status.icon} {status.text}
+                    {status.icon}{" "}
+                    {(status.text === "Menunggu" &&
+                      "Menunggu Persetujuan Orang Tua Siswa") ||
+                      status.text}
                   </>
                 }
               />
@@ -595,6 +608,28 @@ const VisitTable = ({
               {value.teacher.name || value.username || "-"}
             </Text>
           )}
+        />
+        {/* Status Kunjungan */}
+        <Table.Column
+          dataIndex="status"
+          title="Status Kunjungan"
+          width={120}
+          render={(value) => {
+            const status = getStatusBadge(value);
+            return (
+              <Badge
+                status={status.color}
+                text={
+                  <>
+                    {status.icon}{" "}
+                    {(status.text === "Menunggu" &&
+                      "Menunggu Kunjungan diselesaikan") ||
+                      status.text}
+                  </>
+                }
+              />
+            );
+          }}
         />
         <Table.Column
           dataIndex={["createdAt"]}

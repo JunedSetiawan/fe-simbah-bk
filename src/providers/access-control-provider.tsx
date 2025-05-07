@@ -106,6 +106,12 @@ export const accessControlProvider: AccessControlProvider = {
         };
       }
 
+      if (action === "approvalParent") {
+        return {
+          can: isSuperAdmin(user) || isParent(user),
+        };
+      }
+
       return {
         can: isSuperAdmin(user) || isAdmin(user) || isTeacher(user),
       };
