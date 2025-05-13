@@ -181,7 +181,12 @@ export const LoginPage: React.FC<LoginProps> = ({
 
         <div className="mt-12 text-center">
           <p className="text-xs text-gray-500">
-            &copy;2025 SMKN 1 Jenangan Ponorogo.
+            &copy;2025 SMKN 1 Jenangan Ponorogo. || Jika terdapat masalah
+            silahkan hubungi <a href="https://wa.me/6282365265904">Admin</a>
+          </p>
+          <p>
+            Demo: Username = <strong>guru1</strong>, Password ={" "}
+            <strong>Guru@123</strong>
           </p>
         </div>
       </Card>
