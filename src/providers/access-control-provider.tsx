@@ -15,8 +15,6 @@ const isParent = (user?: User) => user?.profileType === "Orang Tua";
 
 export const accessControlProvider: AccessControlProvider = {
   can: async ({ resource, action, params }) => {
-    const record = params?.record; // Access the violation record
-    console.log("Record", record);
     // Get user from localStorage
     const userStr = localStorage.getItem("user");
     if (!userStr) {

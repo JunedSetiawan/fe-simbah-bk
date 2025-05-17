@@ -6,6 +6,7 @@ import {
   useRouterType,
   useWarnAboutChange,
   useTranslate,
+  CanAccess,
 } from "@refinedev/core";
 import { Popover, Badge } from "antd";
 import {
@@ -43,56 +44,68 @@ export const MobileBottomNavbar: React.FC = () => {
   const moreMenuContent = (
     <div className="flex flex-col gap-3 py-2">
       {/* Panggilan Siswa */}
-      <Link
-        to="/student-calls"
-        className="flex items-center px-4 py-2 hover:bg-gray-100 rounded-md"
-      >
-        <PhoneFilled
-          style={{ fontSize: "1.2em", color: "rgba(44, 89, 90, 1)" }}
-          className="mr-2"
-        />
-        <span style={{ color: "rgba(44, 89, 90, 1)" }}>Panggilan Siswa</span>
-      </Link>
+      <CanAccess resource="student-calls" action="list">
+        <Link
+          to="/student-calls"
+          className="flex items-center px-4 py-2 hover:bg-gray-100 rounded-md"
+        >
+          <PhoneFilled
+            style={{ fontSize: "1.2em", color: "rgba(44, 89, 90, 1)" }}
+            className="mr-2"
+          />
+          <span style={{ color: "rgba(44, 89, 90, 1)" }}>Panggilan Siswa</span>
+        </Link>
+      </CanAccess>
+
+      {/* Logout */}
 
       {/* Rekap Menu Items */}
-      <Link
-        to="/violation-summary/classes"
-        className="flex items-center px-4 py-2 hover:bg-gray-100 rounded-md"
-        onClick={handleMenuItemClick}
-      >
-        <ReadFilled
-          style={{ fontSize: "1.2em", color: "rgba(44, 89, 90, 1)" }}
-          className="mr-2"
-        />
-        <span style={{ color: "rgba(44, 89, 90, 1)" }}>Rekap per Kelas</span>
-      </Link>
+      <CanAccess resource="violation-summary/class" action="list">
+        <Link
+          to="/violation-summary/classes"
+          className="flex items-center px-4 py-2 hover:bg-gray-100 rounded-md"
+          onClick={handleMenuItemClick}
+        >
+          <ReadFilled
+            style={{ fontSize: "1.2em", color: "rgba(44, 89, 90, 1)" }}
+            className="mr-2"
+          />
+          <span style={{ color: "rgba(44, 89, 90, 1)" }}>Rekap per Kelas</span>
+        </Link>
+      </CanAccess>
 
-      <Link
-        to="/violation-summary/semesters"
-        className="flex items-center px-4 py-2 hover:bg-gray-100 rounded-md"
-        onClick={handleMenuItemClick}
-      >
-        <ReadFilled
-          style={{ fontSize: "1.2em", color: "rgba(44, 89, 90, 1)" }}
-          className="mr-2"
-        />
-        <span style={{ color: "rgba(44, 89, 90, 1)" }}>Rekap per Semester</span>
-      </Link>
+      <CanAccess resource="violation-summary/semester" action="list">
+        <Link
+          to="/violation-summary/semesters"
+          className="flex items-center px-4 py-2 hover:bg-gray-100 rounded-md"
+          onClick={handleMenuItemClick}
+        >
+          <ReadFilled
+            style={{ fontSize: "1.2em", color: "rgba(44, 89, 90, 1)" }}
+            className="mr-2"
+          />
+          <span style={{ color: "rgba(44, 89, 90, 1)" }}>
+            Rekap per Semester
+          </span>
+        </Link>
+      </CanAccess>
 
       {/* Prestasi Ketertiban */}
-      <Link
-        to="/awards"
-        className="flex items-center px-4 py-2 hover:bg-gray-100 rounded-md"
-        onClick={handleMenuItemClick}
-      >
-        <TrophyFilled
-          style={{ fontSize: "1.2em", color: "rgba(44, 89, 90, 1)" }}
-          className="mr-2"
-        />
-        <span style={{ color: "rgba(44, 89, 90, 1)" }}>
-          Prestasi Ketertiban
-        </span>
-      </Link>
+      <CanAccess resource="awards" action="list">
+        <Link
+          to="/awards"
+          className="flex items-center px-4 py-2 hover:bg-gray-100 rounded-md"
+          onClick={handleMenuItemClick}
+        >
+          <TrophyFilled
+            style={{ fontSize: "1.2em", color: "rgba(44, 89, 90, 1)" }}
+            className="mr-2"
+          />
+          <span style={{ color: "rgba(44, 89, 90, 1)" }}>
+            Prestasi Ketertiban
+          </span>
+        </Link>
+      </CanAccess>
     </div>
   );
 
@@ -100,36 +113,42 @@ export const MobileBottomNavbar: React.FC = () => {
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 h-16">
       <div className="flex justify-around items-center h-full px-1">
         {/* Peraturan */}
-        <Link
-          to="/regulations"
-          className="flex flex-col items-center justify-center w-1/5"
-        >
-          <ControlFilled
-            style={{ fontSize: "1.5em", color: "rgba(44, 89, 90, 1)" }}
-          />
-          <span
-            className="text-xs mt-1 text-center"
-            style={{ color: "rgba(44, 89, 90, 1)" }}
+        <CanAccess resource="regulations" action="list">
+          <Link
+            to="/regulations"
+            className="flex flex-col items-center justify-center w-1/5"
           >
-            Peraturan
-          </span>
-        </Link>
+            <ControlFilled
+              style={{ fontSize: "1.5em", color: "rgba(44, 89, 90, 1)" }}
+            />
+            <span
+              className="text-xs mt-1 text-center"
+              style={{ color: "rgba(44, 89, 90, 1)" }}
+            >
+              Peraturan
+            </span>
+          </Link>
+        </CanAccess>
 
         {/* Pelanggaran */}
-        <Link
-          to="/violations"
-          className="flex flex-col items-center justify-center w-1/5"
-        >
-          <ReadFilled
-            style={{ fontSize: "1.5em", color: "rgba(44, 89, 90, 1)" }}
-          />
-          <span
-            className="text-xs mt-1 text-center"
-            style={{ color: "rgba(44, 89, 90, 1)" }}
+        <CanAccess resource="violations" action="list">
+          <Link
+            to="/violations"
+            className="flex flex-col items-center justify-center w-1/5"
           >
-            Pelanggaran
-          </span>
-        </Link>
+            <ReadFilled
+              style={{ fontSize: "1.5em", color: "rgba(44, 89, 90, 1)" }}
+            />
+            <span
+              className="text-xs mt-1 text-center"
+              style={{ color: "rgba(44, 89, 90, 1)" }}
+            >
+              Pelanggaran
+            </span>
+          </Link>
+        </CanAccess>
+
+        {/* Bimbingan Konseling */}
 
         {/* Dashboard (Center) */}
         <Link
@@ -148,36 +167,40 @@ export const MobileBottomNavbar: React.FC = () => {
         </Link>
 
         {/* Bimbingan Konseling */}
-        <Link
-          to="/counselings"
-          className="flex flex-col items-center justify-center w-1/5"
-        >
-          <ContactsFilled
-            style={{ fontSize: "1.5em", color: "rgba(44, 89, 90, 1)" }}
-          />
-          <span
-            className="text-xs mt-1 text-center"
-            style={{ color: "rgba(44, 89, 90, 1)" }}
+        <CanAccess resource="counselings" action="list">
+          <Link
+            to="/counselings"
+            className="flex flex-col items-center justify-center w-1/5"
           >
-            Konseling
-          </span>
-        </Link>
+            <ContactsFilled
+              style={{ fontSize: "1.5em", color: "rgba(44, 89, 90, 1)" }}
+            />
+            <span
+              className="text-xs mt-1 text-center"
+              style={{ color: "rgba(44, 89, 90, 1)" }}
+            >
+              Konseling
+            </span>
+          </Link>
+        </CanAccess>
 
         {/* Kunjungan Rumah */}
-        <Link
-          to="/home-visits"
-          className="flex flex-col items-center justify-center w-1/5"
-        >
-          <CalendarFilled
-            style={{ fontSize: "1.5em", color: "rgba(44, 89, 90, 1)" }}
-          />
-          <span
-            className="text-xs mt-1 text-center"
-            style={{ color: "rgba(44, 89, 90, 1)" }}
+        <CanAccess resource="home-visits" action="list">
+          <Link
+            to="/home-visits"
+            className="flex flex-col items-center justify-center w-1/5"
           >
-            Kunjungan
-          </span>
-        </Link>
+            <CalendarFilled
+              style={{ fontSize: "1.5em", color: "rgba(44, 89, 90, 1)" }}
+            />
+            <span
+              className="text-xs mt-1 text-center"
+              style={{ color: "rgba(44, 89, 90, 1)" }}
+            >
+              Kunjungan
+            </span>
+          </Link>
+        </CanAccess>
       </div>
 
       {/* More button (floating) */}

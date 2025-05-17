@@ -112,9 +112,6 @@ export const HomeVisitApproval = () => {
   const teacherName = searchParams.get("teacher");
   const teacherPhone = searchParams.get("phone");
 
-  // Tidak menggunakan status dari URL lagi
-  // const statusApproval = searchParams.get("status");
-
   const apiUrl = useApiUrl();
 
   // Fetch the actual status from backend
@@ -386,7 +383,7 @@ export const HomeVisitApproval = () => {
   // If there was an error or success, show appropriate message
   if (error) {
     return (
-      <Card style={{ margin: 24 }}>
+      <Card style={{ margin: "16px", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" }}>
         <Alert
           message="Terjadi Kesalahan"
           description={error}
@@ -399,7 +396,7 @@ export const HomeVisitApproval = () => {
 
   if (success) {
     return (
-      <Card style={{ margin: 24 }}>
+      <Card style={{ margin: "16px", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" }}>
         <Alert
           message="Berhasil"
           description={success}
@@ -412,7 +409,13 @@ export const HomeVisitApproval = () => {
 
   if (loading || isLoadingVisit) {
     return (
-      <Card style={{ margin: 24, textAlign: "center" }}>
+      <Card
+        style={{
+          margin: "16px",
+          textAlign: "center",
+          boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
+        }}
+      >
         <div style={{ padding: 24 }}>
           <Spin tip="Memuat data kunjungan..." />
         </div>
@@ -430,13 +433,22 @@ export const HomeVisitApproval = () => {
 
   return (
     <>
-      <Card style={{ margin: 24 }}>
-        <Title level={4}>Detail Kunjungan Rumah</Title>
-        <Divider />
+      <Card style={{ margin: "16px", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" }}>
+        <Title
+          level={4}
+          style={{
+            fontSize: "1.25rem",
+            textAlign: "center",
+            marginBottom: "16px",
+          }}
+        >
+          Detail Kunjungan Rumah
+        </Title>
+        <Divider style={{ margin: "12px 0" }} />
 
-        <Row gutter={[24, 24]}>
+        <Row gutter={[16, 16]}>
           {/* Student Information Card */}
-          <Col xs={24} lg={12}>
+          <Col xs={24} sm={24} md={12}>
             <Card
               title={
                 <Space>
@@ -445,17 +457,30 @@ export const HomeVisitApproval = () => {
                 </Space>
               }
               bordered={false}
-              style={{ height: "100%" }}
+              style={{
+                height: "100%",
+                boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+              }}
+              bodyStyle={{ padding: "16px" }}
             >
               <Space direction="vertical" style={{ width: "100%" }}>
                 <div>
-                  <Text type="secondary">Nama Siswa:</Text>
-                  <Title level={5}>{studentName || "-"}</Title>
+                  <Text type="secondary" style={{ fontSize: "0.875rem" }}>
+                    Nama Siswa:
+                  </Text>
+                  <Title
+                    level={5}
+                    style={{ margin: "4px 0 12px", fontSize: "1rem" }}
+                  >
+                    {studentName || "-"}
+                  </Title>
                 </div>
 
                 <div>
-                  <Text type="secondary">Kelas:</Text>
-                  <div>
+                  <Text type="secondary" style={{ fontSize: "0.875rem" }}>
+                    Kelas:
+                  </Text>
+                  <div style={{ marginTop: "4px" }}>
                     <Tag color="blue">{className || "-"}</Tag>
                   </div>
                 </div>
@@ -464,7 +489,7 @@ export const HomeVisitApproval = () => {
           </Col>
 
           {/* Visit Status Card */}
-          <Col xs={24} lg={12}>
+          <Col xs={24} sm={24} md={12}>
             <Card
               title={
                 <Space>
@@ -473,17 +498,30 @@ export const HomeVisitApproval = () => {
                 </Space>
               }
               bordered={false}
-              style={{ height: "100%" }}
+              style={{
+                height: "100%",
+                boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+              }}
+              bodyStyle={{ padding: "16px" }}
             >
               <Space direction="vertical" style={{ width: "100%" }}>
                 <div>
-                  <Text type="secondary">Jadwal Tanggal Kunjungan:</Text>
-                  <Title level={5}>{formatDate(visitDate) || "-"}</Title>
+                  <Text type="secondary" style={{ fontSize: "0.875rem" }}>
+                    Jadwal Tanggal Kunjungan:
+                  </Text>
+                  <Title
+                    level={5}
+                    style={{ margin: "4px 0 12px", fontSize: "1rem" }}
+                  >
+                    {formatDate(visitDate) || "-"}
+                  </Title>
                 </div>
 
                 <div>
-                  <Text type="secondary">Status Persetujuan:</Text>
-                  <div>
+                  <Text type="secondary" style={{ fontSize: "0.875rem" }}>
+                    Status Persetujuan:
+                  </Text>
+                  <div style={{ marginTop: "4px" }}>
                     <Badge
                       status={
                         statusBadge.status as
@@ -512,57 +550,131 @@ export const HomeVisitApproval = () => {
                 </Space>
               }
               bordered={false}
+              style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}
+              bodyStyle={{ padding: "16px" }}
             >
-              <Descriptions
-                bordered
-                column={{ xs: 1, sm: 2, md: 2, lg: 2, xl: 3, xxl: 4 }}
-              >
-                <Descriptions.Item
-                  label={
-                    <>
-                      <HomeOutlined /> Alamat
-                    </>
-                  }
-                  span={2}
-                >
-                  {address || "-"}
-                </Descriptions.Item>
+              {/* Mobile-friendly descriptions */}
+              <div className="mobile-descriptions">
+                <div style={{ marginBottom: "16px" }}>
+                  <div
+                    style={{
+                      backgroundColor: "#fafafa",
+                      padding: "8px 12px",
+                      borderRadius: "4px",
+                      marginBottom: "8px",
+                      fontWeight: 500,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <HomeOutlined /> Alamat
+                  </div>
+                  <div style={{ padding: "0 4px" }}>{address || "-"}</div>
+                </div>
 
-                <Descriptions.Item
-                  label={
-                    <>
-                      <UserOutlined /> Guru yang menjadwalkan
-                    </>
-                  }
-                  span={3}
-                >
-                  <Paragraph>{teacherName || "-"}</Paragraph>
-                </Descriptions.Item>
+                <div style={{ marginBottom: "16px" }}>
+                  <div
+                    style={{
+                      backgroundColor: "#fafafa",
+                      padding: "8px 12px",
+                      borderRadius: "4px",
+                      marginBottom: "8px",
+                      fontWeight: 500,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <UserOutlined /> Guru yang menjadwalkan
+                  </div>
+                  <div style={{ padding: "0 4px" }}>{teacherName || "-"}</div>
+                </div>
 
-                <Descriptions.Item
-                  label={
-                    <>
-                      <FileTextOutlined /> Deskripsi
-                    </>
-                  }
-                  span={3}
+                <div style={{ marginBottom: "16px" }}>
+                  <div
+                    style={{
+                      backgroundColor: "#fafafa",
+                      padding: "8px 12px",
+                      borderRadius: "4px",
+                      marginBottom: "8px",
+                      fontWeight: 500,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <FileTextOutlined /> Deskripsi
+                  </div>
+                  <div style={{ padding: "0 4px" }}>{description || "-"}</div>
+                </div>
+              </div>
+
+              {/* Desktop descriptions (hidden on mobile) */}
+              <div className="desktop-descriptions" style={{ display: "none" }}>
+                <Descriptions
+                  bordered
+                  column={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 3, xxl: 4 }}
+                  size="small"
                 >
-                  <Paragraph>{description || "-"}</Paragraph>
-                </Descriptions.Item>
-              </Descriptions>
+                  <Descriptions.Item
+                    label={
+                      <>
+                        <HomeOutlined /> Alamat
+                      </>
+                    }
+                    span={2}
+                  >
+                    {address || "-"}
+                  </Descriptions.Item>
+
+                  <Descriptions.Item
+                    label={
+                      <>
+                        <UserOutlined /> Guru yang menjadwalkan
+                      </>
+                    }
+                    span={3}
+                  >
+                    <Paragraph>{teacherName || "-"}</Paragraph>
+                  </Descriptions.Item>
+
+                  <Descriptions.Item
+                    label={
+                      <>
+                        <FileTextOutlined /> Deskripsi
+                      </>
+                    }
+                    span={3}
+                  >
+                    <Paragraph>{description || "-"}</Paragraph>
+                  </Descriptions.Item>
+                </Descriptions>
+              </div>
             </Card>
           </Col>
         </Row>
 
         {/* Approval Actions */}
         {showActionButtons && (
-          <Row justify="center" style={{ marginTop: 24 }}>
-            <Space size="large">
+          <Row justify="center" style={{ marginTop: "24px" }}>
+            <Space
+              size="middle"
+              direction="horizontal"
+              style={{
+                width: "100%",
+                justifyContent: "center",
+                flexWrap: "wrap",
+                gap: "12px",
+              }}
+            >
               <Button
                 type="primary"
                 icon={<CheckOutlined />}
                 onClick={handleApprove}
                 loading={isApproving || sendingNotification}
+                size="large"
+                style={{ minWidth: "160px" }}
               >
                 Setujui Kunjungan
               </Button>
@@ -571,6 +683,8 @@ export const HomeVisitApproval = () => {
                 icon={<CloseOutlined />}
                 onClick={showRejectModal}
                 loading={isRejecting}
+                size="large"
+                style={{ minWidth: "160px" }}
               >
                 Tolak Kunjungan
               </Button>
@@ -579,7 +693,7 @@ export const HomeVisitApproval = () => {
         )}
 
         {!showActionButtons && (
-          <Row justify="center" style={{ marginTop: 24 }}>
+          <Row justify="center" style={{ marginTop: "24px" }}>
             <Alert
               message={
                 visitStatus?.toLowerCase() === "approved"
@@ -590,6 +704,7 @@ export const HomeVisitApproval = () => {
                 visitStatus?.toLowerCase() === "approved" ? "success" : "error"
               }
               showIcon
+              style={{ width: "100%" }}
             />
           </Row>
         )}
@@ -600,6 +715,8 @@ export const HomeVisitApproval = () => {
         title="Alasan Penolakan"
         open={rejectModalVisible}
         onCancel={() => setRejectModalVisible(false)}
+        width={window.innerWidth < 576 ? "95%" : 520}
+        centered
         footer={[
           <Button key="cancel" onClick={() => setRejectModalVisible(false)}>
             Batal
@@ -628,11 +745,51 @@ export const HomeVisitApproval = () => {
           >
             <TextArea
               rows={4}
-              placeholder="Masukkan alasan mengapa kunjungan ditolak..."
+              placeholder="Masukkan alasan mengapa kunjungan ditolak atau jika ada masukan jadwal pada hari apa akan kami pertimbangkan..."
             />
           </Form.Item>
         </Form>
       </Modal>
+
+      {/* Add responsive styles */}
+      <style jsx global>
+        {`
+          /* Small screen adjustments: viewport width 576px or less */
+          @media (max-width: 576px) {
+            .desktop-descriptions {
+              display: none !important; /* Hide desktop descriptions on small screens */
+            }
+            .mobile-descriptions {
+              display: block; /* Show mobile descriptions on small screens */
+            }
+            .ant-card-head-title {
+              font-size: 14px !important; /* Reduce card title font size */
+            }
+            .ant-modal {
+              max-width: 95% !important; /* Limit modal width on small screens */
+            }
+          }
+
+          /* Large screen adjustments: viewport width 577px or greater */
+          @media (min-width: 577px) {
+            .desktop-descriptions {
+              display: block !important; /* Show desktop descriptions on larger screens */
+            }
+            .mobile-descriptions {
+              display: none; /* Hide mobile descriptions on larger screens */
+            }
+          }
+
+          /* Adjustments for Ant Design responsiveness */
+          .ant-form-item-label {
+            white-space: normal !important; /* Allow form labels to wrap into multiple lines */
+          }
+
+          .ant-card {
+            overflow: hidden; /* Prevent card content from overflowing */
+          }
+        `}
+      </style>
     </>
   );
 };
