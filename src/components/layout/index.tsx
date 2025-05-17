@@ -39,6 +39,7 @@ export const ThemedLayoutV2: React.FC<RefineThemedLayoutV2Props> = ({
               style={{
                 minHeight: 360,
                 padding: isSmall ? 24 : 12,
+                marginBottom: isMobile ? 64 : 32,
               }}
             >
               {children}

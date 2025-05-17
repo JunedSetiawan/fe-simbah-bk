@@ -183,6 +183,10 @@ export default function RootLayout({
                         },
                       },
                       {
+                        name: "parent-approval",
+                        list: "/parent-approval",
+                      },
+                      {
                         name: "violation-summary/class",
                         list: "/violation-summary/classes",
                         meta: {

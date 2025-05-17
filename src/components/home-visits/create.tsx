@@ -287,7 +287,9 @@ export const HomeVisitsCreate = () => {
     placeholder: "Pilih Kelas",
   };
 
-  const calculateReminderTime = (visitTime: string | Date) => {
+  const calculateReminderTime = (
+    visitTime: string | number | Date | dayjs.Dayjs | null | undefined
+  ) => {
     const visitDate = dayjs(visitTime);
     const reminderDate = visitDate.subtract(30, "minute");
     return reminderDate.format("YYYY-MM-DD HH:mm:ss");
@@ -303,10 +305,11 @@ export const HomeVisitsCreate = () => {
   };
 
   const sendWhatsAppReminders = async (
-    studentName: string,
-    address: string,
-    visitTime: string | Date,
-    homeVisitId: string | number
+    studentName: any,
+    address: any,
+    description: any,
+    visitTime: string | number | Date | dayjs.Dayjs | null | undefined,
+    homeVisitId: any
   ) => {
     // Get parents with valid phone numbers
     const parentPhones = getParentPhones();
@@ -318,6 +321,29 @@ export const HomeVisitsCreate = () => {
       sent: 0,
       failed: 0,
     });
+
+    // Create the approval URL with all necessary data
+    const approvalUrl = createParentApprovalUrl(
+      homeVisitId,
+      {
+        className:
+          formProps.form?.getFieldValue("class_name") ||
+          classSelectProps?.options?.find((c) => c.value === selectedClassId)
+            ?.label ||
+          "",
+        date: visitTime,
+        address: address,
+        description: formProps.form?.getFieldValue("description") || "",
+        involvedPersons: formProps.form?.getFieldValue("involvedPersons") || "",
+      },
+      {
+        name: studentName,
+      },
+      {
+        name: teacherName,
+        phone: teacherPhone,
+      }
+    );
 
     const detailUrl = `${window.location.origin}/home-visits/show/${homeVisitId}`;
     const results = [];
@@ -335,7 +361,7 @@ export const HomeVisitsCreate = () => {
     // 1. Kirim pesan ke guru
     if (teacherPhone) {
       try {
-        const teacherMessage = `Halo Guru ${teacherName} \n\n Pengingat: Anda memiliki jadwal kunjungan rumah untuk siswa ${studentName} pada ${formattedVisitTime}.\n\nAlamat: ${address}\n\nUntuk detail lengkap: ${detailUrl}`;
+        const teacherMessage = `Halo Guru ${teacherName} \n\n Pengingat: Anda memiliki jadwal kunjungan rumah untuk siswa ${studentName} pada ${formattedVisitTime}.\n\nAlamat: ${address}\n\nUntuk melihat detail lengkap: ${detailUrl}`;
 
         let teacherResult;
 
@@ -390,10 +416,10 @@ export const HomeVisitsCreate = () => {
       allSuccess = false;
     }
 
-    // 2. Kirim pesan ke orang tua siswa
+    // 2. Kirim pesan ke orang tua siswa dengan link approval page custom
     for (const parentPhone of parentPhones) {
       try {
-        const parentMessage = `Kepada Yth. Orang Tua/Wali Siswa ${studentName}\n\nDengan hormat, kami informasikan bahwa guru kami akan melakukan kunjungan rumah pada:\n\nTanggal/Waktu: ${formattedVisitTime}\nAlamat: ${address}\n\nBapak/Ibu dimohon untuk *Menyetujui* jika berkenan atau *Menolak* jika ada kendala kunjungan rumah di link detail lengkap kunjugan berikut:\n${detailUrl}. \n\nMohon kehadiran Bapak/Ibu pada waktu tersebut. Terima kasih.`;
+        const parentMessage = `Kepada Yth. Orang Tua/Wali Siswa ${studentName}\n\nDengan hormat, kami informasikan bahwa guru kami akan melakukan kunjungan rumah pada:\n\nTanggal/Waktu: ${formattedVisitTime}\nAlamat: ${address}\n\nBapak/Ibu dimohon untuk *Menyetujui* jika berkenan atau *Menolak* jika ada kendala kunjungan rumah di URL detail berikut:\n${approvalUrl}\n\nAlasan atau Perihal Kunjungan adalah ${description}.\n Mohon kehadiran Bapak/Ibu pada waktu tersebut. Terima kasih. \n\nDari Tim IT SMKN 1 JENANGAN PONOROGO.`;
 
         let parentResult;
 
@@ -509,6 +535,7 @@ export const HomeVisitsCreate = () => {
               const messageResults = await sendWhatsAppReminders(
                 selectedStudentData.name,
                 formattedValues.address,
+                formattedValues.description, // BENAR: parameter ketiga adalah description
                 formattedValues.date,
                 homeVisitId
               );
@@ -566,6 +593,40 @@ export const HomeVisitsCreate = () => {
       setMessageModal(false);
     }
   };
+
+  // Function to create a URL to the custom parent approval page with query parameters
+  const createParentApprovalUrl = (
+    homeVisitId: any,
+    visitData: {
+      className: any;
+      date: any;
+      address: any;
+      description: any;
+      involvedPersons: any;
+    },
+    studentData: { name: any },
+    teacherData: { name: any; phone: any }
+  ) => {
+    const baseUrl = `${window.location.origin}/parent-approval`;
+
+    // Prepare query parameters with essential data
+    const params = new URLSearchParams({
+      id: homeVisitId,
+      student: studentData.name,
+      class: `${visitData.className || ""}`,
+      date: dayjs(visitData.date).format("YYYY-MM-DD HH:mm:ss"),
+      address: visitData.address,
+      description: visitData.description || "",
+      involved: visitData.involvedPersons || "",
+      teacher: teacherData.name || "",
+      phone: teacherData.phone || "",
+      status: "pending",
+    });
+
+    return `${baseUrl}?${params.toString()}`;
+  };
+
+  // Modify the sendWhatsAppReminders function
 
   return (
     <CanAccess
@@ -701,6 +762,21 @@ export const HomeVisitsCreate = () => {
                 <TextArea
                   rows={4}
                   placeholder="Tulis Alamat Kunjungan rumah yang akan dituju"
+                />
+              </Form.Item>
+              <Form.Item
+                name="description"
+                label="Deskripsi atau Alasan Kunjungan"
+                rules={[
+                  {
+                    required: true,
+                    message: "Deskripsi kunjungan wajib diisi",
+                  },
+                ]}
+              >
+                <TextArea
+                  rows={4}
+                  placeholder="Jelaskan alasan kunjungan secara detail"
                 />
               </Form.Item>
             </>
