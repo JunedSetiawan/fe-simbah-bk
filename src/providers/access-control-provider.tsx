@@ -64,12 +64,7 @@ export const accessControlProvider: AccessControlProvider = {
     ) {
       if (action === "list" || action === "show") {
         return {
-          can:
-            isSuperAdmin(user) ||
-            isAdmin(user) ||
-            isTeacher(user) ||
-            isParent(user) ||
-            isStudent(user),
+          can: isSuperAdmin(user) || isAdmin(user) || isTeacher(user),
         };
       }
       // Rest of your code
