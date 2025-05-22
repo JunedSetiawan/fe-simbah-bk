@@ -50,7 +50,7 @@ export const authProviderClient: AuthProvider = {
 
       return {
         success: true,
-        redirectTo: "/",
+        redirectTo: "/dashboard",
       };
     } catch (error) {
       return {

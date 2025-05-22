@@ -49,7 +49,7 @@ export default function RootLayout({
   const theme = cookieStore.get("theme");
 
   return (
-    <html lang="en">
+    <html lang="en" className="light">
       {/* <head>
         <meta
           httpEquiv="Content-Security-Policy"
@@ -76,6 +76,10 @@ export default function RootLayout({
                     accessControlProvider={accessControlProvider}
                     resources={[
                       {
+                        name: "homepage",
+                        list: "/",
+                      },
+                      {
                         name: "profile",
                         list: "/profile",
                         meta: {
@@ -86,7 +90,7 @@ export default function RootLayout({
                       },
                       {
                         name: "dashboard",
-                        list: "/",
+                        list: "/dashboard",
                         meta: {
                           label: "Dashboard",
                           icon: <HomeFilled style={{ fontSize: "1.2em" }} />,

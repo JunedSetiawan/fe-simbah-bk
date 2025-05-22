@@ -1,5 +1,7 @@
 @import "tailwindcss" important;
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @utility bg-primary {
     background-color: #2c595a;
 }
@@ -7,6 +9,7 @@
 @utility bg-secondary {
     background-color: #f5f5f5;
 }
+
 
  :where(.css-dev-only-do-not-override-odgtvf).ant-menu-dark.ant-menu-inline .ant-menu-sub.ant-menu-inline,
  :where(.css-dev-only-do-not-override-odgtvf).ant-menu-dark>.ant-menu.ant-menu-inline .ant-menu-sub.ant-menu-inline {
@@ -116,4 +119,70 @@
 .ant-btn-text:hover {
     background-color: #f0f5ff;
     color: #1890ff;
+}
+
+
+.swiper-pagination-bullet {
+    background: #e5e7eb !important;
+    opacity: 1 !important;
+    border-radius: 0.5rem !important;
+    width: 3.5rem !important;
+    height: 0.125rem !important;
+}
+
+.swiper-pagination-bullet-active {
+    background: #111827 !important;
+}
+
+@keyframes borderRun {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.animated-border {
+    position: relative;
+    background: white;
+    border-radius: 1.5rem;
+    border: 2px solid #e5e7eb;
+    overflow: hidden;
+}
+
+.animated-border::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 0deg,
+            transparent 0deg,
+            transparent 315deg,
+            #06b6d4 315deg,
+            #3b82f6 330deg,
+            #8b5cf6 345deg,
+            #ec4899 360deg,
+            transparent 15deg,
+            transparent 360deg);
+    animation: borderRun 3s linear infinite;
+    z-index: 1;
+}
+
+.animated-border::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    background: white;
+    border-radius: calc(1.5rem - 3px);
+    z-index: 2;
+}
+
+.animated-border-content {
+    position: relative;
+    z-index: 3;
+    padding: 1.5rem;
 }
