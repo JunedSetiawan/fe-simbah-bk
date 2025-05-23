@@ -220,8 +220,8 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
 
   const dashboard = hasDashboard ? (
     <Menu.Item key="dashboard" icon={<DashboardOutlined />}>
-      <Link to="/">{translate("dashboard.title", "Dashboard")}</Link>
-      {!siderCollapsed && selectedKey === "/" && (
+      <Link to="/dashboard">{translate("dashboard.title", "Dashboard")}</Link>
+      {!siderCollapsed && selectedKey === "/dashboard" && (
         <div className="ant-menu-tree-arrow" />
       )}
     </Menu.Item>

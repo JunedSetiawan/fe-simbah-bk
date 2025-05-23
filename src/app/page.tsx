@@ -6,7 +6,7 @@ import { Pagination } from "swiper/modules";
 import "swiper/css/bundle";
 import "swiper/css/pagination";
 import "swiper/css/effect-cards";
-import { Card, Button, notification, Badge } from "antd";
+import { Card, Button, notification, Badge, FloatButton } from "antd";
 import {
   MessageOutlined,
   NotificationOutlined,
@@ -18,6 +18,7 @@ import {
   HomeOutlined,
   WhatsAppOutlined,
   BarChartOutlined,
+  CustomerServiceOutlined,
 } from "@ant-design/icons";
 import LogoImage from "@/public/logo/logo-smkn-jenangan.png";
 import Image from "next/image";
@@ -25,8 +26,7 @@ import { Link } from "@refinedev/core";
 
 export default function IndexPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [theme, setTheme] = useState("light");
-  const [api, contextHolder] = notification.useNotification();
+  const [mounted, setMounted] = useState(false);
 
   // Sample data
   const awardsData = [
@@ -48,16 +48,13 @@ export default function IndexPage() {
     { title: "Konseling BK", description: "Sesi konseling masalah belajar" },
   ];
 
+  // Fix hydration by ensuring component is mounted
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const savedTheme = localStorage.getItem("theme") || "light";
-      setTheme(savedTheme);
-      localStorage.setItem("theme", savedTheme);
-    }
+    setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && mounted) {
       import("swiper/bundle").then((SwiperModule) => {
         const Swiper = SwiperModule.default;
 
@@ -88,26 +85,24 @@ export default function IndexPage() {
         });
       });
     }
-  }, []);
+  }, [mounted]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const handleWhatsAppNotification = () => {
-    api.info({
-      message: "Pertanyaan",
-      description:
-        "Silakan hubungi kami melalui WhatsApp untuk pertanyaan lebih lanjut. 0823-1234-5678",
-
-      placement: "bottomRight",
-    });
+  const handleWhatsAppClick = () => {
+    window.open("https://wa.me/+6282365265904", "_blank");
   };
+
+  // Don't render until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <Suspense>
       <main className="bg-white">
-        {contextHolder}
         <header>
           <nav className="fixed overflow-hidden z-20 w-full bg-white/80 rounded-b-lg border-b border-gray-200 backdrop-blur-2xl">
             <div className="px-6 m-auto max-w-6xl 2xl:px-0">
@@ -182,13 +177,6 @@ export default function IndexPage() {
                         Mulai Menggunakan
                       </Button>
                     </Link>
-                    <Button
-                      size="large"
-                      icon={<NotificationOutlined />}
-                      onClick={handleWhatsAppNotification}
-                    >
-                      Ada yang ingin ditanyakan?
-                    </Button>
                   </div>
                 </div>
                 <div className="-mx-6 relative mt-8 sm:mt-12 max-w-xl sm:mx-auto">
@@ -425,6 +413,42 @@ export default function IndexPage() {
             </div>
           </section>
         </main>
+
+        {/* Floating WhatsApp Button */}
+        <div
+          className="fixed bottom-6 right-6 z-50 cursor-pointer"
+          onClick={handleWhatsAppClick}
+        >
+          {/* Desktop version - with text */}
+          <div className="hidden md:flex items-center bg-[#25D366] hover:bg-[#20b954] text-white px-4 py-3 rounded-full shadow-lg transition-all duration-300 hover:shadow-xl">
+            <WhatsAppOutlined className="text-xl mr-2" />
+            <span className="text-sm font-medium whitespace-nowrap">
+              Pertanyaan atau Masalah? Bisa klik disini
+            </span>
+          </div>
+
+          {/* Mobile version - icon only */}
+          <div className="flex md:hidden items-center justify-center bg-[#25D366] hover:bg-[#20b954] text-white w-14 h-14 rounded-full shadow-lg transition-all duration-300 hover:shadow-xl">
+            <FloatButton
+              icon={<WhatsAppOutlined />}
+              type="primary"
+              style={{
+                right: 24,
+                bottom: 24,
+                backgroundColor: "#25D366",
+                borderColor: "#25D366",
+                width: 60,
+                height: 60,
+              }}
+              tooltip="Pertanyaan atau Masalah? Bisa klik disini"
+              onClick={handleWhatsAppClick}
+            >
+              <span>Pertanyaan atau Masalah? Bisa klik disini</span>
+            </FloatButton>
+          </div>
+        </div>
+
+        {/* Floating WhatsApp Button */}
 
         <footer className="rounded-xl border border-gray-200 ">
           <div className="max-w-6xl mx-auto space-y-16 px-6 py-16 text-gray-600 2xl:px-0">
