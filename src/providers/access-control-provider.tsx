@@ -56,15 +56,15 @@ export const accessControlProvider: AccessControlProvider = {
       };
     }
 
-    if (
-      resource === "violations" ||
-      resource === "violation-summary/class" ||
-      resource === "violation-summary/semester" ||
-      resource === "violation-summary/yearly"
-    ) {
+    if (resource === "violations") {
       if (action === "list" || action === "show") {
         return {
-          can: isSuperAdmin(user) || isAdmin(user) || isTeacher(user),
+          can:
+            isSuperAdmin(user) ||
+            isAdmin(user) ||
+            isTeacher(user) ||
+            isStudent(user) ||
+            isParent(user),
         };
       }
       // Rest of your code
