@@ -1,19 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Button,
-  Modal,
-  Steps,
-  Typography,
-  Popover,
-  message,
-  FloatButton,
-} from "antd";
+import { Button, Modal, Steps, Typography, Popover, message } from "antd";
 import {
   AppstoreAddOutlined,
   InfoCircleOutlined,
   AppleOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
 
 const { Title, Paragraph, Text } = Typography;
@@ -90,66 +83,49 @@ const InstallButton: React.FC = () => {
     </div>
   );
 
-  const installButtonPopoverContent = (
-    <div>
-      <Paragraph>
-        Instal aplikasi ini di perangkat Anda untuk akses yang lebih mudah
-      </Paragraph>
-    </div>
-  );
-
   return (
     <>
-      {isInstallable && (
-        <Popover
-          content={installButtonPopoverContent}
-          title="Instal Aplikasi SI-PEKA"
-          trigger="hover"
+      {/* Floating Install Button - Bottom Left */}
+      {(isInstallable || isSafari) && (
+        <div
+          className="fixed bottom-6 left-6 z-50 cursor-pointer"
+          onClick={isInstallable ? handleInstallClick : showSafariInstructions}
         >
-          <FloatButton
-            type="primary"
-            icon={<AppstoreAddOutlined />}
-            onClick={handleInstallClick}
-            style={{
-              marginRight: 8,
-              top: 16,
-              left: "50%",
-              transform: "translateX(-50%)",
-            }}
-          >
-            Instal Aplikasi
-          </FloatButton>
-        </Popover>
+          {/* Desktop version - with text */}
+          <div className="flex items-center bg-[#1890ff] hover:bg-[#096dd9] text-white px-4 py-3 rounded-full shadow-lg transition-all duration-300 hover:shadow-xl">
+            <DownloadOutlined className="text-xl mr-2" />
+            <span className="text-sm font-medium whitespace-nowrap">
+              Install Aplikasi
+            </span>
+          </div>
+
+          {/* Mobile version - icon only */}
+          {/* <div className="md:hidden flex items-center justify-center bg-[#1890ff] hover:bg-[#096dd9] text-white w-14 h-14 rounded-full shadow-lg transition-all duration-300 hover:shadow-xl">
+            <DownloadOutlined className="text-xl" />
+            <span className="text-sm font-medium whitespace-nowrap">
+              Install Aplikasi
+            </span>
+          </div> */}
+        </div>
       )}
 
-      {isSafari && (
-        <>
-          <Button
-            type="default"
-            icon={<AppleOutlined />}
-            onClick={showSafariInstructions}
-          >
-            Instal di iOS/Safari
-          </Button>
-
-          <Modal
-            title={
-              <Title level={4}>
-                <AppleOutlined /> Instal di iOS/Safari
-              </Title>
-            }
-            open={safariModalVisible}
-            onCancel={() => setSafariModalVisible(false)}
-            footer={[
-              <Button key="close" onClick={() => setSafariModalVisible(false)}>
-                Mengerti
-              </Button>,
-            ]}
-          >
-            <SafariInstructionsContent />
-          </Modal>
-        </>
-      )}
+      {/* Safari Instructions Modal */}
+      <Modal
+        title={
+          <Title level={4}>
+            <AppleOutlined /> Instal di iOS/Safari
+          </Title>
+        }
+        open={safariModalVisible}
+        onCancel={() => setSafariModalVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setSafariModalVisible(false)}>
+            Mengerti
+          </Button>,
+        ]}
+      >
+        <SafariInstructionsContent />
+      </Modal>
     </>
   );
 };

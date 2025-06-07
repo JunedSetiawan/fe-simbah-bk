@@ -23,6 +23,7 @@ import {
 import LogoImage from "@/public/logo/logo-smkn-jenangan.png";
 import Image from "next/image";
 import { Link } from "@refinedev/core";
+import InstallButton from "@components/installButton";
 
 export default function IndexPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -470,6 +471,7 @@ export default function IndexPage() {
             </div>
           </div>
         </footer>
+        <InstallButton />
       </main>
     </Suspense>
   );

@@ -34,6 +34,7 @@ import {
   Col,
   Select,
   notification,
+  Alert,
 } from "antd";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -49,6 +50,7 @@ import {
   ExclamationOutlined,
   FilterOutlined,
   SearchOutlined,
+  ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import UnauthorizedPage from "@app/unauthorized";
 
@@ -650,66 +652,86 @@ const VisitTable = ({
         <Table.Column
           title="Aksi"
           dataIndex="actions"
-          width={180}
+          width={220}
           fixed={isMobile ? undefined : "right"}
           render={(_, record) => {
             const isPending = record.status?.toLowerCase() === "pending";
+            const parentApprovalStatus =
+              record.statusApprovalByParent?.toLowerCase();
 
             return (
-              <Space>
-                <ShowButton
-                  hideText
-                  size="small"
-                  recordItemId={record.id}
-                  title="Lihat detail"
-                />
+              <Space direction="vertical" size={4}>
+                {/* Always show these buttons */}
+                <Space>
+                  <ShowButton
+                    hideText
+                    size="small"
+                    recordItemId={record.id}
+                    title="Lihat detail"
+                  />
+                  <DeleteButton
+                    hideText
+                    size="small"
+                    recordItemId={record.id}
+                    title="Hapus kunjungan"
+                  />
 
-                <DeleteButton
-                  hideText
-                  size="small"
-                  recordItemId={record.id}
-                  title="Hapus kunjungan"
-                />
-                {isPending && (
-                  <>
+                  {isPending && (
                     <CanAccess
                       resource="home-visits"
                       action="cancel"
                       fallback={null}
                     >
-                      <Space>
-                        <EditButton
-                          icon={<CheckCircleOutlined />}
-                          size="small"
-                          type="primary"
-                          recordItemId={record.id}
-                          title="Selesaikan kunjungan"
-                        >
-                          Selesaikan{" "}
-                        </EditButton>
+                      {/* Parent approval status handling */}
+                      {parentApprovalStatus === "pending" && (
+                        <Alert
+                          message="Menunggu Persetujuan..."
+                          type="warning"
+                          showIcon
+                          icon={<ExclamationCircleOutlined />}
+                          style={{ fontSize: "12px", padding: "4px 8px" }}
+                        />
+                      )}
 
-                        <Popconfirm
-                          title="Batalkan kunjungan?"
-                          description="Apakah Anda yakin ingin membatalkan kunjungan ini?"
-                          onConfirm={() => handleCancelVisit(record.id)}
-                          okText="Ya"
-                          cancelText="Tidak"
-                        >
-                          <Button
-                            danger
+                      {parentApprovalStatus === "approved" && (
+                        <Space>
+                          <EditButton
+                            icon={<CheckCircleOutlined />}
                             size="small"
                             type="primary"
-                            icon={<CloseCircleOutlined />}
-                            loading={cancelLoading}
-                            title="Batalkan kunjungan"
+                            recordItemId={record.id}
+                            title="Selesaikan kunjungan"
                           >
-                            Batalkan
-                          </Button>
-                        </Popconfirm>
-                      </Space>
+                            Selesaikan
+                          </EditButton>
+                        </Space>
+                      )}
+
+                      {parentApprovalStatus === "rejected" && (
+                        <Space>
+                          <Popconfirm
+                            title="Batalkan kunjungan?"
+                            description="Apakah Anda yakin ingin membatalkan kunjungan ini?"
+                            onConfirm={() => handleCancelVisit(record.id)}
+                            okText="Ya"
+                            cancelText="Tidak"
+                          >
+                            <Button
+                              danger
+                              size="small"
+                              type="primary"
+                              icon={<CloseCircleOutlined />}
+                              loading={cancelLoading}
+                              title="Batalkan kunjungan"
+                            >
+                              Batalkan
+                            </Button>
+                          </Popconfirm>
+                        </Space>
+                      )}
                     </CanAccess>
-                  </>
-                )}
+                  )}
+                </Space>
               </Space>
             );
           }}

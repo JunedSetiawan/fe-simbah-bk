@@ -11,14 +11,16 @@ import {
 } from "@refinedev/core";
 import LogoImage from "@/public/logo/logo-smkn-jenangan.png";
 // import { Title } from "@refinedev/antd";
-import { Card, Input, Button, Form, theme } from "antd";
+import { Card, Input, Button, Form, theme, Alert } from "antd";
 import Image from "next/image";
 import {
   ArrowRightOutlined,
   EyeOutlined,
   EyeInvisibleOutlined,
+  InfoCircleOutlined,
 } from "@ant-design/icons";
 import { LoginFormTypes } from "./types";
+import InstallButton from "@components/installButton";
 
 type DivPropsType = React.DetailedHTMLProps<
   React.HTMLAttributes<HTMLDivElement>,
@@ -112,7 +114,25 @@ export const LoginPage: React.FC<LoginProps> = ({
   };
 
   const content = (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      {/* Demo Alert - Top Center */}
+      <div className="w-full max-w-md mb-4">
+        <Alert
+          message="Demo Account"
+          description={
+            <div>
+              <strong>Username:</strong> guru1 <br />
+              <strong>Password:</strong> Guru@123
+            </div>
+          }
+          type="info"
+          icon={<InfoCircleOutlined />}
+          showIcon
+          className="text-center"
+          closable
+        />
+      </div>
+
       <Card className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
         <div className="flex items-center gap-3 mb-12">
           <div className="h-14 w-14 relative">
@@ -181,15 +201,12 @@ export const LoginPage: React.FC<LoginProps> = ({
 
         <div className="mt-12 text-center">
           <p className="text-xs text-gray-500">
-            &copy;2025 SMKN 1 Jenangan Ponorogo. || Jika terdapat masalah
-            silahkan hubungi <a href="https://wa.me/6282365265904">Admin</a>
-          </p>
-          <p>
-            Demo: Username = <strong>guru1</strong>, Password ={" "}
-            <strong>Guru@123</strong>
+            &copy;2025 SMKN 1 Jenangan Ponorogo. Jika terdapat masalah silahkan
+            hubungi <a href="https://wa.me/6282365265904">Admin</a>
           </p>
         </div>
       </Card>
+      <InstallButton />
     </div>
   );
 

@@ -237,7 +237,7 @@ export default function RootLayout({
                       projectId: "PPapVH-nZKuqU-6aYAL4",
                     }}
                   >
-                    <InstallButton />
+                    {/* <InstallButton /> */}
                     {children}
                     <RefineKbar />
                   </Refine>
