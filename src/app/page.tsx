@@ -178,6 +178,11 @@ export default function IndexPage() {
                         Mulai Menggunakan
                       </Button>
                     </Link>
+                    <Link to="/files/BUKU_PANDUAN_SEDERHANA_UNTUK_ORANG_TUA_SISWA.pdf">
+                      <Button type="default" size="large">
+                        Unduh Dokumentasi Untuk Pengguna Orang Tua Siswa
+                      </Button>
+                    </Link>
                   </div>
                 </div>
                 <div className="-mx-6 relative mt-8 sm:mt-12 max-w-xl sm:mx-auto">
